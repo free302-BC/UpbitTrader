@@ -1,0 +1,38 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Version>1.0</Version>
+    <TargetFramework>net5.0</TargetFramework>
+    <RootNamespace>Universe.Coin.Upbit</RootNamespace>
+    <AssemblyName>Universe.Coin.Upbit</AssemblyName>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <LangVersion>9.0</LangVersion>
+    <Nullable>enable</Nullable>
+    <WarningsAsErrors>CS8600;CS8602;CS8603;CS8625;CS8604</WarningsAsErrors>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <Company>UniverseSoft</Company>
+    <Product>Universe.Coin</Product>
+    <Authors>UniverseSoft</Authors>
+    <Description>Coin Trading Library for Upbit</Description>
+    <Copyright>Copyright (c) 2021 UniverseSoft</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+  </PropertyGroup>
+
+  <UsingTask TaskName="GetCurrentBuildVersion" AssemblyFile="..\Universe.BuildVersion.dll" />
+  <Target Name="UpdateVersion" BeforeTargets="BeforeBuild">
+    <GetCurrentBuildVersion BaseVersion="$(Version)">
+      <Output TaskParameter="Version" PropertyName="FileVersion" />
+      <Output TaskParameter="Version" PropertyName="AssemblyVersion" />
+    </GetCurrentBuildVersion>
+  </Target>
+  <ItemGroup>
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.11.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\UpbitSwagger\UpbitSwagger.csproj" />
+  </ItemGroup>
+
+</Project>
