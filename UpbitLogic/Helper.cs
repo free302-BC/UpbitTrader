@@ -10,7 +10,7 @@ namespace Universe.Coin.Upbit
 {
     public class Helper
     {
-        public static string buildAuthToken(string accessKey, string secretKey)
+        public static string BuildAuthToken(string accessKey, string secretKey)
         {
             // parameter가 Dictionary<string, string> 일 경우
             //StringBuilder builder = new StringBuilder();
@@ -26,7 +26,7 @@ namespace Universe.Coin.Upbit
 
 
             var credentials = secretKey.Sign();
-            string jwtToken = credentials.buildJwtToken(accessKey);
+            string jwtToken = credentials.BuildJwtToken(accessKey);
             return jwtToken;
             //var authorizationToken = "Bearer " + jwtToken;
             //return authorizationToken;

@@ -14,15 +14,6 @@ namespace Universe.Coin.Upbit.App
 {
     public abstract class WorkerBase<W, S> : IHostedService where W : WorkerBase<W, S> where S : class
     {
-        //public static (string ModelName, string ModelFile) GetModelInfo(IConfiguration config)
-        //{
-        //    var baseKey = $"{typeof(S).Name}:{typeof(W).Name}";
-        //    var name = config.Get<string>(baseKey, nameof(ModelSetting.Model), nameof(ModelSetting.Model.ModelName));//.GetValue<string>(nameKey);
-        //    var dir = config.Get<string>(baseKey, nameof(ModelSetting.DataDir));
-        //    var file = Path.Combine(Environment.CurrentDirectory, dir, $"{name}.zip");
-        //    return (name, file);
-        //}
-
         readonly ILogger _logger;
         S _set;
 

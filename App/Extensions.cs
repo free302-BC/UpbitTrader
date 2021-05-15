@@ -11,11 +11,13 @@ namespace Universe.Coin.Upbit.App
 {
     public static class Extensions
     {
-        public static IServiceCollection AddJsonFile(this IServiceCollection sc, out IConfiguration config, string jsonFile = "appsettings.json")
-            => sc.AddSingleton(config = new ConfigurationBuilder().SetBasePath(Environment.CurrentDirectory).AddJsonFile(jsonFile).Build());
+        public static IServiceCollection AddJsonFile(this IServiceCollection sc, out IConfiguration config,
+            string jsonFile = "appsettings.json")
+            => sc.AddSingleton(
+                config = new ConfigurationBuilder().SetBasePath(Environment.CurrentDirectory).AddJsonFile(jsonFile).Build());
 
-        public static IServiceCollection AddSetting<S>(this IServiceCollection sc, IConfiguration config, string name)
-            where S : class => sc.Configure<S>(set => config.GetSection(name).Bind(set));
+        public static IServiceCollection AddSetting<S>(this ConfigTuple ct, string key) where S : class
+            => ct.Services.Configure<S>(s => ct.Config.GetSection(key).Bind(s));
 
         public static IServiceCollection AddSimpleConsole(this IServiceCollection sc)
             => sc.AddLogging(b => b.AddSimpleConsole(opt =>

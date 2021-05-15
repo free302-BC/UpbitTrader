@@ -18,7 +18,7 @@ namespace Universe.Coin.Upbit
             var credentials = new SigningCredentials(securityKey, "HS256");
             return credentials;
         }
-        public static string buildJwtToken(this SigningCredentials credentials, string accessKey)
+        public static string BuildJwtToken(this SigningCredentials credentials, string accessKey)
         {
             var payload = new JwtPayload
             {
@@ -33,6 +33,11 @@ namespace Universe.Coin.Upbit
             var jwtToken = new JwtSecurityTokenHandler().WriteToken(secToken);
             return jwtToken;
         }
+
+
+        public static string BuildAuthToken(this WorkerSetting set) => Helper.BuildAuthToken(keys.Item1, keys.Item2);
+
+
 
     }//class
 }

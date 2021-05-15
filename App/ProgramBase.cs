@@ -14,13 +14,12 @@ namespace Universe.Coin.Upbit.App
     public class ProgramBase
     {
         protected static readonly Action<object?> log = Console.WriteLine;
-        protected delegate void ConfigAction(IConfiguration config, IServiceCollection sc);
-        static List<ConfigAction> _configs;
+        static List<Action<ConfigTuple>> _configs;
         static List<Type> _workers;
 
         static ProgramBase()
         {
-            _configs = new List<ConfigAction>();
+            _configs = new List<Action<ConfigTuple>>();
             _workers = new List<Type>();
         }
         protected static void RunHost()
@@ -33,7 +32,6 @@ namespace Universe.Coin.Upbit.App
                 host.RunAsync(cts.Token).ContinueWith(t => log(t.Exception), TaskContinuationOptions.OnlyOnFaulted);
 
                 //run worker
-                //foreach (var m in _workers) m.Invoke(host, host.Services.GetRequiredService<IConfiguration>(), cts.Token);
                 foreach (var m in _workers) ((IHostedService)host.Services.GetRequiredService(m)).StartAsync(cts.Token);
 
                 host.WaitForShutdown();
@@ -49,7 +47,7 @@ namespace Universe.Coin.Upbit.App
             builder.ConfigureServices((context, services) =>
             {
                 services.AddSimpleConsole();
-                foreach (var a in _configs) a.Invoke(context.Configuration, services);
+                foreach (var config in _configs) config.Invoke((context.Configuration, services));
             });
             return builder;
         }//build
@@ -57,10 +55,10 @@ namespace Universe.Coin.Upbit.App
         protected static void AddWorker<W,S>() where W : WorkerBase<W, S> where S: class
         {
             //config
-            _configs.Add((config, services) => 
+            _configs.Add(ct =>
             { 
-                services.AddTransient<W>();
-                services.AddSetting<S>(config, typeof(W).Name);
+                ct.Services.AddTransient<W>();
+                ct.AddSetting<S>(typeof(W).Name);
             });
 
             //run

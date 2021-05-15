@@ -20,16 +20,19 @@ namespace Universe.Coin.Upbit.App
         protected override void work(WorkerSetting set)
         {
             var config = Configuration.Default;
-            var token = Helper.buildAuthToken(set.AccessKey, set.SecretKey);
-            config.ApiKey.Add("Authorization", token);
             config.ApiKeyPrefix.Add("Authorization", "Bearer");
 
-            var apiInstance = new APIKeyApi();
+            var keyApi = new APIKeyApi();
+            var accountApi = new AccountApi();
             try
             {
                 // API 키 리스트 조회
-                List<APIKey> result = apiInstance.APIKeyInfo();
-                info($"------- {result.ToText()} ------------");
+                config.ApiKey["Authorization"] = (set.AccessKey, set.SecretKey).BuildAuthToken();
+                List<APIKey> result = keyApi.APIKeyInfo();
+                info($"\n---------------\n{result.ToText()}\n---------------");
+
+                var account = accountApi.AccountInfo();
+                info($"\n---------------\n{account.ToText()}\n---------------");
             }
             catch (Exception e)
             {
