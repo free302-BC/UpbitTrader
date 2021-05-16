@@ -6,6 +6,7 @@ using System.Web;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -17,13 +18,26 @@ namespace Universe.Coin.Upbit.App
     using ResJson = List<Dictionary<string, object>>;
     public class TestWorker : WorkerBase<TestWorker, WorkerSetting>
     {
-        public TestWorker(ILogger<TestWorker> logger, IOptionsMonitor<WorkerSetting> set) : base(logger, set) { }
+        public TestWorker(ILogger<TestWorker> logger, IOptionsMonitor<WorkerSetting> set, IServiceProvider sp) 
+            : base(logger, set, sp) { }
 
         protected override void work(WorkerSetting set)
         {
+            var logger = _sp.GetRequiredService<ILogger<UpbitClient>>();
+            var uc = new UpbitClient(set, logger);
             try
             {
-                candle(set);
+                var list = uc.ApiCandleDay();
+                //printResJson(list);
+                info("--------------");
+
+                for (int i = 0; i < 10; i++)
+                {
+                    list = uc.ApiCandleDay();
+                    if (list.Count < 8) break;
+                    printDic(list[0]);
+                    //Thread.Sleep(10);
+                }
             }
             catch (Exception e)
             {
@@ -31,40 +45,25 @@ namespace Universe.Coin.Upbit.App
             }
         }
 
-        void candle(WorkerSetting set)
+        void printResJson(ResJson list)
         {
-            var api = Api.CandleDays;
-            var nvc = HttpUtility.ParseQueryString(string.Empty);
-            nvc.Add("market", "KRW-BTC");// string | 마켓 코드 (ex. KRW-BTC) 
-            nvc.Add("to", "");// string | 마지막 캔들 시각 (exclusive). 포맷 : `yyyy-MM-dd'T'HH:mm:ssXXX` or `yyyy-MM-dd HH:mm:ss`. 비워서 요청 시 가장 최근 캔들  (optional) 
-            nvc.Add("count", "8");  // decimal? | 캔들 개수  (optional) 
-            nvc.Add("convertingPriceUnit", "KRW");
-
-            var wc = new WebClient();
-            wc.QueryString.Add(nvc);
-            wc.BuildAuthToken(set);//, nvc);
-            wc.Headers["Accept"] = "application/json";
-
-            try
-            {
-                var url = Helper.GetApiUrl(api);
-                info(url);
-                var response = wc.DownloadString(url);
-                var list = JsonSerializer.Deserialize<ResJson>(response) ?? new ResJson();
-
-                var sb = new StringBuilder();
-                foreach (var dic in list)
-                {
-                    sb.Clear();
-                    foreach (var k in dic.Keys) sb.AppendLine($"{k,-30}=\t{dic[k]}");
-                    info(sb);
-                }
-            }
-            catch (Exception ex)
-            {
-                log($"Execption from '{api}':\n{ex.Message}");
-            }
+            var sb = new StringBuilder();
+            foreach (var dic in list) printDIc(dic, sb);
         }
+
+        void printDIc(Dictionary<string, object> dic, StringBuilder sb)
+        {
+            sb.Clear();
+            foreach (var k in dic.Keys) sb.AppendLine($"{k,-30}=\t{dic[k]}");
+            info(sb);
+        }
+        void printDic(Dictionary<string, object> dic)
+        {
+            var sb = new StringBuilder();
+            foreach (var k in dic.Keys) sb.AppendLine($"{k,-30}=\t{dic[k]}");
+            info(sb);
+        }
+
 
     }//class
 }

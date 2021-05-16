@@ -14,14 +14,16 @@ namespace Universe.AppBase
 {
     public abstract class WorkerBase<W, S> : IHostedService where W : WorkerBase<W, S> where S : class
     {
-        readonly ILogger _logger;
+        protected readonly ILogger _logger;
         readonly string _name = typeof(W).Name;
+        protected readonly IServiceProvider _sp;
         S _set { get; set; }
-        public WorkerBase(ILogger<W> logger, IOptionsMonitor<S> set)
+        public WorkerBase(ILogger<W> logger, IOptionsMonitor<S> set, IServiceProvider sp)
         {
             _logger = logger;
             _set = set.CurrentValue;
             set.OnChange(s => _set = s);
+            _sp = sp;
         }
 
         protected void info(object message) => _logger.LogInformation($"{message}");

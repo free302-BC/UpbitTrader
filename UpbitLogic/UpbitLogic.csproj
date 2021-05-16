@@ -29,6 +29,7 @@
     </GetCurrentBuildVersion>
   </Target>
   <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="5.0.0" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.11.0" />
   </ItemGroup>
   <ItemGroup>

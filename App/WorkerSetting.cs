@@ -6,7 +6,6 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
-using WC = System.Net.WebClient;
 
 namespace Universe.Coin.Upbit.App
 {
@@ -23,10 +22,10 @@ namespace Universe.Coin.Upbit.App
 
     public static class WorkerSettingExtensions
     {
-        public static void BuildAuthToken(this WC wc, WorkerSetting set)
-            => wc.Headers.Add("Authorization", (set.AccessKey, set.SecretKey).BuildAuthToken());
+        public static void BuildAuthToken(this WebClient wc, WorkerSetting set)
+            => wc.Headers.Add("Authorization", Helper.BuildAuthToken(set.AccessKey, set.SecretKey));
 
-        public static void BuildAuthToken(this WC wc, WorkerSetting set, NameValueCollection nvc)
-            => wc.Headers.Add("Authorization", (set.AccessKey, set.SecretKey).BuildAuthToken(nvc));
+        public static void BuildAuthToken(this WebClient wc, WorkerSetting set, NameValueCollection nvc)
+            => wc.Headers.Add("Authorization", Helper.BuildAuthToken(set.AccessKey, set.SecretKey, nvc));
     }
 }
