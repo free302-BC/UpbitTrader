@@ -9,7 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace Universe.Coin.Upbit.App
+namespace Universe.AppBase
 {
     public class ProgramBase
     {

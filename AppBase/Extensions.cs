@@ -7,10 +7,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-namespace Universe.Coin.Upbit.App
+namespace Universe.AppBase
 {
     public static class Extensions
     {
+
         public static IServiceCollection AddJsonFile(this IServiceCollection sc, out IConfiguration config,
             string jsonFile = "appsettings.json")
             => sc.AddSingleton(

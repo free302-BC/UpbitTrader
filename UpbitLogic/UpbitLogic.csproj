@@ -34,5 +34,13 @@
   <ItemGroup>
     <ProjectReference Include="..\UpbitSwagger\UpbitSwagger.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <None Update="api_json_option.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="api_path.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 
 </Project>

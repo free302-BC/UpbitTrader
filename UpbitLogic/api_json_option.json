@@ -1,0 +1,19 @@
+﻿{
+  "Converters": [],
+  "AllowTrailingCommas": false,
+  "DefaultBufferSize": 16384,
+  "Encoder": null,
+  "DictionaryKeyPolicy": null,
+  "IgnoreNullValues": false,
+  "DefaultIgnoreCondition": 0,
+  "NumberHandling": 0,
+  "IgnoreReadOnlyProperties": false,
+  "IgnoreReadOnlyFields": false,
+  "IncludeFields": true,
+  "MaxDepth": 0,
+  "PropertyNamingPolicy": null,
+  "PropertyNameCaseInsensitive": true,
+  "ReadCommentHandling": 0,
+  "WriteIndented": true,
+  "ReferenceHandler": null
+}

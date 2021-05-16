@@ -1,0 +1,132 @@
+﻿{
+  "APIKeyInfo": {
+    "Item1": "api_keys",
+    "Item2": "GET",
+    "Item3": "API 키 리스트 조회"
+  },
+  "AccountInfo": {
+    "Item1": "accounts",
+    "Item2": "GET",
+    "Item3": "전체 계좌 조회"
+  },
+  "AccountWallet": {
+    "Item1": "status/wallet",
+    "Item2": "GET",
+    "Item3": "입출금 현황"
+  },
+  "CandleDays": {
+    "Item1": "candles/days",
+    "Item2": "GET",
+    "Item3": "시세 캔들 조회 (일 단위)"
+  },
+  "CandleMinutes": {
+    "Item1": "candles/minutes/{unit}",
+    "Item2": "GET",
+    "Item3": "시세 캔들 조회 (분 단위)"
+  },
+  "CandleMonth": {
+    "Item1": "candles/months",
+    "Item2": "GET",
+    "Item3": "시세 캔들 조회 (월 단위)"
+  },
+  "CandleWeeks": {
+    "Item1": "candles/weeks",
+    "Item2": "GET",
+    "Item3": "시세 캔들 조회 (주 단위)"
+  },
+  "DepositCoinAddress": {
+    "Item1": "deposits/coin_address",
+    "Item2": "GET",
+    "Item3": "개별 입금 주소 조회"
+  },
+  "DepositCoinAddresses": {
+    "Item1": "deposits/coin_addresses",
+    "Item2": "GET",
+    "Item3": "전체 입금 주소 조회"
+  },
+  "DepositGenerateCoinAddress": {
+    "Item1": "deposits/generate_coin_address",
+    "Item2": "POST",
+    "Item3": "입금 주소 생성 요청"
+  },
+  "DepositInfo": {
+    "Item1": "deposit",
+    "Item2": "GET",
+    "Item3": "개별 입금 조회"
+  },
+  "DepositInfoAll": {
+    "Item1": "deposits",
+    "Item2": "GET",
+    "Item3": "입금 리스트 조회"
+  },
+  "MarketInfoAll": {
+    "Item1": "market/all",
+    "Item2": "GET",
+    "Item3": "마켓 코드 조회"
+  },
+  "OrderCancel": {
+    "Item1": "order",
+    "Item2": "DELETE",
+    "Item3": "주문 취소 접수"
+  },
+  "OrderChance": {
+    "Item1": "orders/chance",
+    "Item2": "GET",
+    "Item3": "주문 가능 정보"
+  },
+  "OrderInfo": {
+    "Item1": "order",
+    "Item2": "GET",
+    "Item3": "개별 주문 조회"
+  },
+  "OrderInfoAll": {
+    "Item1": "orders",
+    "Item2": "GET",
+    "Item3": "주문 리스트 조회"
+  },
+  "OrderNew": {
+    "Item1": "orders",
+    "Item2": "POST",
+    "Item3": "주문하기"
+  },
+  "OrderOrderbook": {
+    "Item1": "orderbook",
+    "Item2": "GET",
+    "Item3": "시세 호가 정보(Orderbook) 조회"
+  },
+  "TradeTicker": {
+    "Item1": "ticker",
+    "Item2": "GET",
+    "Item3": "시세 Ticker 조회"
+  },
+  "TradeTicks": {
+    "Item1": "trades/ticks",
+    "Item2": "GET",
+    "Item3": "시세 체결 조회"
+  },
+  "WithdrawChance": {
+    "Item1": "withdraws/chance",
+    "Item2": "GET",
+    "Item3": "출금 가능 정보"
+  },
+  "WithdrawCoin": {
+    "Item1": "withdraws/coin",
+    "Item2": "POST",
+    "Item3": "코인 출금하기"
+  },
+  "WithdrawInfo": {
+    "Item1": "withdraw",
+    "Item2": "GET",
+    "Item3": "개별 출금 조회"
+  },
+  "WithdrawInfoAll": {
+    "Item1": "withdraws",
+    "Item2": "GET",
+    "Item3": "출금 리스트 조회"
+  },
+  "WithdrawKrw": {
+    "Item1": "withdraws/krw",
+    "Item2": "POST",
+    "Item3": "원화 출금하기"
+  }
+}

@@ -10,13 +10,13 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace Universe.Coin.Upbit.App
+namespace Universe.AppBase
 {
     public abstract class WorkerBase<W, S> : IHostedService where W : WorkerBase<W, S> where S : class
     {
         readonly ILogger _logger;
-        S _set;
-
+        readonly string _name = typeof(W).Name;
+        S _set { get; set; }
         public WorkerBase(ILogger<W> logger, IOptionsMonitor<S> set)
         {
             _logger = logger;
@@ -34,7 +34,11 @@ namespace Universe.Coin.Upbit.App
                 info($"Worker Entering StartAsync()...");
                 work(_set);
                 info($"Worker Exiting StartAsync()...");
-            }, cancellationToken);
+            }, cancellationToken)
+            .ContinueWith(t => 
+            {
+                info($"<{_name}> done.");
+            });
         }
         public Task StopAsync(CancellationToken cancellationToken)
         {

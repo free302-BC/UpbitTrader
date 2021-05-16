@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Universe.Coin.Upbit;
+using Universe.AppBase;
 
 namespace Universe.Coin.Upbit.App
 {
@@ -14,6 +15,10 @@ namespace Universe.Coin.Upbit.App
     {
         static void Main(string[] args)
         {
+            //TestWorker.test();
+            //Helper.build();
+            //return;
+
             AddWorker<TestWorker, WorkerSetting>();
             RunHost();
         }

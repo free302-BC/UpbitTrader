@@ -1,10 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
     <Version>1.0</Version>
-    <OutputType>Exe</OutputType>
     <TargetFramework>net5.0</TargetFramework>
-    <RootNamespace>Universe.Coin.Upbit.App</RootNamespace>
-    <AssemblyName>Universe.Coin.Upbit.App</AssemblyName>
+    <RootNamespace>Universe.AppBase</RootNamespace>
+    <AssemblyName>Universe.AppBase</AssemblyName>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -15,9 +15,9 @@
 
   <PropertyGroup>
     <Company>UniverseSoft</Company>
-    <Product>Universe.Coin</Product>
+    <Product>Universe.AppBase</Product>
     <Authors>UniverseSoft</Authors>
-    <Description>Coin Trading Library for Upbit</Description>
+    <Description>Base class for hosted app</Description>
     <Copyright>Copyright (c) 2021 UniverseSoft</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
@@ -29,25 +29,11 @@
       <Output TaskParameter="Version" PropertyName="AssemblyVersion" />
     </GetCurrentBuildVersion>
   </Target>
-
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="5.0.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.1" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="5.0.0" />
-    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.11.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\AppBase\AppBase.csproj" />
-    <ProjectReference Include="..\UpbitLogic\UpbitLogic.csproj" />
-    <ProjectReference Include="..\UpbitSwagger\UpbitSwagger.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Update="appsettings.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
 
 </Project>
