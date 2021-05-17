@@ -20,7 +20,7 @@ namespace Universe.Coin.Upbit.App
 
     public class TestWorker : WorkerBase<TestWorker, WorkerSetting>
     {
-        public TestWorker(ILogger<TestWorker> logger, IOptionsMonitor<WorkerSetting> set, IServiceProvider sp) 
+        public TestWorker(ILogger<TestWorker> logger, IOptionsMonitor<WorkerSetting> set, IServiceProvider sp)
             : base(logger, set, sp) { }
 
         protected override void work(WorkerSetting set)
@@ -29,7 +29,7 @@ namespace Universe.Coin.Upbit.App
             var uc = new UpbitClient(set, logger);
             try
             {
-                backTest(uc, 15, 0.4f);
+                backTest(uc, 15, 0.4);
             }
             catch (Exception e)
             {
@@ -44,9 +44,9 @@ namespace Universe.Coin.Upbit.App
             info(sb);
         }
 
-        void backTest(UpbitClient uc, int count, float k)
+        void backTest(UpbitClient uc, int count, double k)
         {
-            var data = uc.ApiCandleDay();
+            var data = uc.ApiCandleDay(count);
             var first = data.First();
             //printJsonRes(data);
             info(first);
@@ -54,22 +54,19 @@ namespace Universe.Coin.Upbit.App
             var target = (first as ICalcModel).NextTarget(k);
             info(target);
 
-
-            var sum = 0.0;
-            var fee = 0.0015;
-            var models = data.Select(x => x as ICalcModel).ToList();
+            var sb = new StringBuilder();
+            var models = data.Select(x => new CalcModel(x, k)).ToList();
+            var totalRate = 1.0;
             for (int i = 1; i < models.Count; i++)
             {
-                var m = models[i];
-                var m0 = models[i - 1];
-                if (m.HighPrice > m0.NextTarget(k)) sum += m.TradePrice / m0.NextTarget(k) - fee;
-                else sum += 1.0;
-
+                totalRate *= models[i].CalcRate(models[i - 1].NextTarget);
+                sb.AppendLine(models[i].ToString());
             }
-
-            models.Aggregate(0.0, (s, x) => s += x.NextTarget(k));
-
+            info(sb);
+            totalRate = Math.Round((totalRate - 1) * 100, 2);
+            info($"rate= {totalRate}%");
         }
+
         void testLimit(UpbitClient uc)
         {
             var list = uc.ApiCandleDay();
