@@ -23,13 +23,13 @@ namespace Universe.Coin.Upbit
         const string _apiPathFile = "api_path.json";
         const string _jsonOptionFile = "api_json_option.json";
 
-        static readonly ApiDic _apiPath;
+        static readonly ApiDic _apiDic;
         static Helper()
         {
             var opt = JsonSerializer.Deserialize<JsonSerializerOptions>(File.ReadAllText(_jsonOptionFile));
-            _apiPath = JsonSerializer.Deserialize<ApiDic>(File.ReadAllText(_apiPathFile), opt) ?? new ApiDic();
+            _apiDic = JsonSerializer.Deserialize<ApiDic>(File.ReadAllText(_apiPathFile), opt) ?? new ApiDic();
         }
-        public static string GetApiUrl(Api api) => $"{_apiBaseUrl}{_apiPath[api].Path}";
+        public static string GetApiUrl(Api api) => $"{_apiBaseUrl}{_apiDic[api].Path}";
 
 
         #region ---- Build API Path Json File ----

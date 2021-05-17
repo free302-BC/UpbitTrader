@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -6,13 +7,13 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
-using System.Text.Json;
 using System.Threading.Tasks;
 using System.Web;
+using Universe.Coin.Upbit.Model;
 
 namespace Universe.Coin.Upbit
 {
-    using ResJson = List<Dictionary<string, object>>;
+    using JsonRes = List<CandleDay>;
 
     public class UpbitClient : IDisposable
     {
@@ -34,23 +35,21 @@ namespace Universe.Coin.Upbit
 
         public void AddQuery(NameValueCollection nvc) => _wc.QueryString.Add(nvc);
 
-        public ResJson ApiCandleDay()
+        public JsonRes ApiCandleDay(int count = 15)
         {
             var api = Api.CandleDays;
             var nvc = HttpUtility.ParseQueryString(string.Empty);
             nvc.Add("market", "KRW-BTC");// string | 마켓 코드 (ex. KRW-BTC) 
             nvc.Add("to", "");// string | 마지막 캔들 시각 (exclusive). 포맷 : `yyyy-MM-dd'T'HH:mm:ssXXX` or `yyyy-MM-dd HH:mm:ss`. 비워서 요청 시 가장 최근 캔들  (optional) 
-            nvc.Add("count", "8");  // decimal? | 캔들 개수  (optional) 
+            nvc.Add("count", count.ToString());
             nvc.Add("convertingPriceUnit", "KRW");
-
             _wc.QueryString.Clear();
             _wc.QueryString.Add(nvc);
-            //_wc.BuildAuthToken(_key);
 
             try
             {
                 var response = _wc.DownloadString(Helper.GetApiUrl(api));
-                var list = JsonSerializer.Deserialize<ResJson>(response) ?? new ResJson();
+                var list = JsonConvert.DeserializeObject<JsonRes>(response) ?? new JsonRes();
                 return list;
             }
             catch (WebException ex)
@@ -58,14 +57,13 @@ namespace Universe.Coin.Upbit
                 var msg = $"API={api}: uri = { ex.Response?.ResponseUri}\nstatus={ex.Status}: {ex.Message}";
                 if (ex.Response != null)
                 {
-                    var stream = ex.Response.GetResponseStream();
-                    var sr = new StreamReader(stream);
+                    using var sr = new StreamReader(ex.Response.GetResponseStream());
                     var text = sr.ReadToEnd();
                     msg = $"{msg}\nContent= {text}";
                 }
                 _logger.LogError(msg);
             }
-            return new ResJson();
+            return new JsonRes();
         }
 
 

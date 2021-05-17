@@ -12,10 +12,12 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Universe.AppBase;
 using System.Text.Json;
+using Universe.Coin.Upbit.Model;
 
 namespace Universe.Coin.Upbit.App
 {
-    using ResJson = List<Dictionary<string, object>>;
+    using JsonRes = List<CandleDay>;
+
     public class TestWorker : WorkerBase<TestWorker, WorkerSetting>
     {
         public TestWorker(ILogger<TestWorker> logger, IOptionsMonitor<WorkerSetting> set, IServiceProvider sp) 
@@ -27,17 +29,7 @@ namespace Universe.Coin.Upbit.App
             var uc = new UpbitClient(set, logger);
             try
             {
-                var list = uc.ApiCandleDay();
-                //printResJson(list);
-                info("--------------");
-
-                for (int i = 0; i < 10; i++)
-                {
-                    list = uc.ApiCandleDay();
-                    if (list.Count < 8) break;
-                    printDic(list[0]);
-                    //Thread.Sleep(10);
-                }
+                backTest(uc, 15, 0.4f);
             }
             catch (Exception e)
             {
@@ -45,25 +37,53 @@ namespace Universe.Coin.Upbit.App
             }
         }
 
-        void printResJson(ResJson list)
+        void printJsonRes(JsonRes list)
         {
             var sb = new StringBuilder();
-            foreach (var dic in list) printDIc(dic, sb);
-        }
-
-        void printDIc(Dictionary<string, object> dic, StringBuilder sb)
-        {
-            sb.Clear();
-            foreach (var k in dic.Keys) sb.AppendLine($"{k,-30}=\t{dic[k]}");
-            info(sb);
-        }
-        void printDic(Dictionary<string, object> dic)
-        {
-            var sb = new StringBuilder();
-            foreach (var k in dic.Keys) sb.AppendLine($"{k,-30}=\t{dic[k]}");
+            foreach (var dic in list) sb.AppendLine(dic.ToString()); //printDic(dic, sb, inLine);
             info(sb);
         }
 
+        void backTest(UpbitClient uc, int count, float k)
+        {
+            var data = uc.ApiCandleDay();
+            var first = data.First();
+            //printJsonRes(data);
+            info(first);
+
+            var target = (first as ICalcModel).NextTarget(k);
+            info(target);
+
+
+            var sum = 0.0;
+            var fee = 0.0015;
+            var models = data.Select(x => x as ICalcModel).ToList();
+            for (int i = 1; i < models.Count; i++)
+            {
+                var m = models[i];
+                var m0 = models[i - 1];
+                if (m.HighPrice > m0.NextTarget(k)) sum += m.TradePrice / m0.NextTarget(k) - fee;
+                else sum += 1.0;
+
+            }
+
+            models.Aggregate(0.0, (s, x) => s += x.NextTarget(k));
+
+        }
+        void testLimit(UpbitClient uc)
+        {
+            var list = uc.ApiCandleDay();
+            //printResJson(list);
+            info("--------------");
+
+            for (int i = 0; i < 10; i++)
+            {
+                list = uc.ApiCandleDay();
+                if (list.Count < 8) break;
+                info(list[0]);
+                Thread.Sleep(10);
+            }
+        }
 
     }//class
 }
