@@ -16,8 +16,6 @@ using Universe.Coin.Upbit.Model;
 
 namespace Universe.Coin.Upbit.App
 {
-    using JsonRes = List<CandleDay>;
-
     public class TestWorker : WorkerBase<TestWorker, WorkerSetting>
     {
         public TestWorker(ILogger<TestWorker> logger, IOptionsMonitor<WorkerSetting> set, IServiceProvider sp)
@@ -36,35 +34,19 @@ namespace Universe.Coin.Upbit.App
                 log("work():\n" + e.Message);
             }
         }
-
-        void printJsonRes(JsonRes list)
-        {
-            var sb = new StringBuilder();
-            foreach (var dic in list) sb.AppendLine(dic.ToString()); //printDic(dic, sb, inLine);
-            info(sb);
-        }
-
+        
         void backTest(UpbitClient uc, int count, double k)
         {
             var data = uc.ApiCandleDay(count);
-            var first = data.First();
-            //printJsonRes(data);
-            info(first);
+            info(ICandle.Print(data));
+            info(data[0]);
 
-            var target = (first as ICalcModel).NextTarget(k);
-            info(target);
+            var models = data.Select(x => new CalcModel(x)).Reverse().ToList();
+            CalcModel.CalcRate(models, k);
+            var finalRate = CalcModel.CalcCumulativeRate(models);
 
-            var sb = new StringBuilder();
-            var models = data.Select(x => new CalcModel(x, k)).ToList();
-            var totalRate = 1.0;
-            for (int i = 1; i < models.Count; i++)
-            {
-                totalRate *= models[i].CalcRate(models[i - 1].NextTarget);
-                sb.AppendLine(models[i].ToString());
-            }
-            info(sb);
-            totalRate = Math.Round((totalRate - 1) * 100, 2);
-            info($"rate= {totalRate}%");
+            info(CalcModel.Print(models));
+            info($"Final Profit Rate= {(finalRate - 1) * 100:N2}%");
         }
 
         void testLimit(UpbitClient uc)

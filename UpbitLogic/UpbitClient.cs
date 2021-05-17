@@ -40,9 +40,9 @@ namespace Universe.Coin.Upbit
             var api = Api.CandleDays;
             var nvc = HttpUtility.ParseQueryString(string.Empty);
             nvc.Add("market", "KRW-BTC");// string | 마켓 코드 (ex. KRW-BTC) 
-            nvc.Add("to", "");// string | 마지막 캔들 시각 (exclusive). 포맷 : `yyyy-MM-dd'T'HH:mm:ssXXX` or `yyyy-MM-dd HH:mm:ss`. 비워서 요청 시 가장 최근 캔들  (optional) 
             nvc.Add("count", count.ToString());
-            nvc.Add("convertingPriceUnit", "KRW");
+            //nvc.Add("to", "");// string | 마지막 캔들 시각 (exclusive). 포맷 : `yyyy-MM-dd'T'HH:mm:ssXXX` or `yyyy-MM-dd HH:mm:ss`. 비워서 요청 시 가장 최근 캔들  (optional) 
+            //nvc.Add("convertingPriceUnit", "KRW");
             _wc.QueryString.Clear();
             _wc.QueryString.Add(nvc);
 

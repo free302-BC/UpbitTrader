@@ -13,7 +13,7 @@ namespace Universe.Coin.Upbit.Model
     /// CandleDays
     /// </summary>
     [DataContract]
-    public partial class CandleDay : IEquatable<CandleDay>, IValidatableObject, ICalcModel
+    public partial class CandleDay : IEquatable<CandleDay>, IValidatableObject, ICandle
     {
         static readonly string[] _names =
         {
@@ -75,21 +75,21 @@ namespace Universe.Coin.Upbit.Model
         /// </summary>
         /// <value>마켓명</value>
         [DataMember(Name = "market", EmitDefaultValue = false)]
-        public string Market { get; set; }
+        public string Market { get; set; } = "";
 
         /// <summary>
         /// 캔들 기준 시각 (UTC 기준)
         /// </summary>
         /// <value>캔들 기준 시각 (UTC 기준)</value>
         [DataMember(Name = "candle_date_time_utc", EmitDefaultValue = false)]
-        public string CandleDateTimeUtc { get; set; }
+        public string CandleDateTimeUtc { get; set; } = "";
 
         /// <summary>
         /// 캔들 기준 시각 (KST 기준)
         /// </summary>
         /// <value>캔들 기준 시각 (KST 기준)</value>
         [DataMember(Name = "candle_date_time_kst", EmitDefaultValue = false)]
-        public string CandleDateTimeKst { get; set; }
+        public string CandleDateTimeKst { get; set; } = "";
 
         /// <summary>
         /// 시가
