@@ -39,14 +39,14 @@ namespace Universe.Coin.Upbit.App
         {
             var data = uc.ApiCandleDay(count);
             info(ICandle.Print(data));
-            info(data[0]);
 
             var models = data.Select(x => new CalcModel(x)).Reverse().ToList();
             CalcModel.CalcRate(models, k);
-            var finalRate = CalcModel.CalcCumulativeRate(models);
+            var finalRate = CalcModel.CalcCumRate(models);
+            var mdd = CalcModel.CalcDrawDown(models);
 
             info(CalcModel.Print(models));
-            info($"Final Profit Rate= {(finalRate - 1) * 100:N2}%");
+            info($"Final Profit Rate= {(finalRate - 1) * 100:N2}%\r\nMDD= {mdd:N2}%");
         }
 
         void testLimit(UpbitClient uc)

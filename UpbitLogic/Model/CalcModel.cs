@@ -22,7 +22,7 @@ namespace Universe.Coin.Upbit.Model
         const double _feeRate = 0.0005 * 2;
 
         public static CalcModel Default = new CalcModel();
-        CalcModel() 
+        CalcModel()
         {
             DateKST = DateTime.MinValue;
             Opening = High = Low = Closing = Delta = double.NaN;
@@ -41,7 +41,7 @@ namespace Universe.Coin.Upbit.Model
             Target = Math.Round(Opening + prev.Delta * k, 2);
             Rate = (High > Target) ? Math.Round(Closing / Target - _feeRate, 4) : 1.0;
         }
-        public override string ToString() 
+        public override string ToString()
             => $"{DateKST:yyMMdd.HHmm} {Opening,8:F1} {Target,8:F1} {High,8:F1} {Closing,8:F1} : {Rate,8:F4} {CumRate,8:F4} {DrawDown,8:F2}";
 
         public static void CalcRate(IList<CalcModel> models, double k)
@@ -50,14 +50,20 @@ namespace Universe.Coin.Upbit.Model
             for (int i = 1; i < models.Count; i++) models[i].calcRate(models[i - 1], k);
             models.RemoveAt(0);
         }
-        public static double CalcCumulativeRate(IList<CalcModel> models)
+        public static double CalcCumRate(IList<CalcModel> models)
         {
-            var totalRate = models.Aggregate(1.0, (t, m) => m.CumRate = Math.Round(t *= m.Rate, 4));
-            return Math.Round(totalRate, 4);
+            var finalRate = models.Aggregate(1.0, (cr, m) => m.CumRate = Math.Round(cr *= m.Rate, 4));
+            return Math.Round(finalRate, 4);
         }
-        static void calcDrawdown(IList<CalcModel> models)
+        public static double CalcDrawDown(IList<CalcModel> models)
         {
-
+            var max = double.MinValue;
+            foreach (var m in models)
+            {
+                max = max > m.CumRate ? max : m.CumRate;
+                m.DrawDown = max > m.CumRate ? Math.Round(100 * (max - m.CumRate) / max, 2) : 0.0;
+            }
+            return models.Max(m => m.DrawDown);
         }
 
         public static string Print(IEnumerable<CalcModel> models)
