@@ -14,16 +14,21 @@ namespace Universe.Coin.Upbit
     public static class Extensions
     {
         /// <summary>
-        /// BuildAuthToken
+        /// Set AuthToken to WebClient
         /// </summary>
         /// <param name="wc"></param>
         /// <param name="key"></param>
-        public static void BuildAuthToken(this WebClient wc, (string AccessKey, string SecretKey) key)
-            => wc.Headers.Add("Authorization", Helper.BuildAuthToken(key.AccessKey, key.SecretKey));
+        public static void SetAuthToken(this WebClient wc, string token) 
+            => wc.Headers.Add("Authorization", "Bearer " + token);
 
-        public static void BuildAuthToken(this WebClient wc, (string AccessKey, string SecretKey) key, NameValueCollection nvc)
-            => wc.Headers.Add("Authorization", Helper.BuildAuthToken(key.AccessKey, key.SecretKey, nvc));
+        public static void SetAcceptance(this WebClient wc) 
+            => wc.Headers["Accept"] = "application/json";
 
+        public static void SetQueryString(this WebClient wc, NameValueCollection nvc)
+        {
+            wc.QueryString.Clear();
+            wc.QueryString.Add(nvc);
+        }
 
     }//class
 }

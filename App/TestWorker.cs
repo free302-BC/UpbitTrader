@@ -13,6 +13,7 @@ using Microsoft.Extensions.Options;
 using Universe.AppBase;
 using System.Text.Json;
 using Universe.Coin.Upbit.Model;
+using System.IO;
 
 namespace Universe.Coin.Upbit.App
 {
@@ -24,21 +25,33 @@ namespace Universe.Coin.Upbit.App
         protected override void work(WorkerSetting set)
         {
             var logger = _sp.GetRequiredService<ILogger<UpbitClient>>();
-            var uc = new UpbitClient(set, logger);
+            var uc = new UpbitClient(checkAuthKey(set), logger);
             try
             {
-                backTest(uc, 15, 0.4);
+                backTest(uc, 7, 0.46);
+                backTest(uc, 30, 0.46);
+                backTest(uc, 90, 0.46);
             }
             catch (Exception e)
             {
                 log("work():\n" + e.Message);
             }
         }
-        
+
+        string checkAuthKey(WorkerSetting set)
+        {
+            if (File.Exists(set.TokenFile))
+            {
+                //key를 사용자에게 입력 받는 방법 필요 - 다중 사용자 web
+                Helper.SaveAuthToken(set.AccessKey, set.SecretKey, set.TokenFile);
+            }
+            return Helper.LoadAuthToken(set.TokenFile);
+        }
+
         void backTest(UpbitClient uc, int count, double k)
         {
             var data = uc.ApiCandleDay(count);
-            info(ICandle.Print(data));
+            //info(ICandle.Print(data));
 
             var models = data.Select(x => new CalcModel(x)).Reverse().ToList();
             CalcModel.CalcRate(models, k);

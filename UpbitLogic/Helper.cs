@@ -12,10 +12,12 @@ using System.Text.Json;
 using System.IO;
 using System.Text.Unicode;
 using System.Text.Encodings.Web;
+using Universe.Utility;
+using Universe.CryptoLogic;
 
 namespace Universe.Coin.Upbit
 {
-    using ApiDic = Dictionary<Api, (string Path, string Method, string Comment)>;
+    using ApiDic = Dictionary<ApiId, (string Path, string Method, string Comment)>;
 
     public class Helper
     {
@@ -29,7 +31,7 @@ namespace Universe.Coin.Upbit
             var opt = JsonSerializer.Deserialize<JsonSerializerOptions>(File.ReadAllText(_jsonOptionFile));
             _apiDic = JsonSerializer.Deserialize<ApiDic>(File.ReadAllText(_apiPathFile), opt) ?? new ApiDic();
         }
-        public static string GetApiUrl(Api api) => $"{_apiBaseUrl}{_apiDic[api].Path}";
+        public static string GetApiUrl(ApiId api) => $"{_apiBaseUrl}{_apiDic[api].Path}";
 
 
         #region ---- Build API Path Json File ----
@@ -58,7 +60,7 @@ namespace Universe.Coin.Upbit
         {
             var dic = new ApiDic();
             var len = _path.Length;
-            for (int i = 0; i < len; i++) dic.Add((Api)i, (_path[i], _method[i], _comment[i]));
+            for (int i = 0; i < len; i++) dic.Add((ApiId)i, (_path[i], _method[i], _comment[i]));
 
             //save json options file
             var optDecoder = new JsonSerializerOptions();
@@ -78,22 +80,36 @@ namespace Universe.Coin.Upbit
 
 
         #region ---- Authorization Token (inc. Payload) ----
-        public static string BuildAuthToken(string accessKey, string secretKey)
+
+        public static void SaveAuthToken(string accessKey, string secretKey, string filePath)
         {
-            var sing = sign(secretKey);
-            var payload = buildPayload(accessKey);
-            var token = buidlJwtToken(sing, payload);
-            return $"Bearer {token}";
+            var token = BuildAuthToken(accessKey, secretKey);
+            var bytes = Crypto.Encode(new Guid(_key).ToString(), token, false);
+            File.WriteAllBytes(filePath, bytes);
         }
-        public static string BuildAuthToken(string accessKey, string secretKey, NameValueCollection nvc)
+        static byte[] _key = { 172, 158, 186, 29, 129, 117, 73, 69, 145, 240, 30, 72, 113, 62, 81, 205 };
+        public static string LoadAuthToken(string filePath)
+        {
+            var raw = File.ReadAllBytes(filePath);
+            return Crypto.DecodeToString(new Guid(_key).ToString(), raw);
+        }
+
+        internal static string BuildAuthToken(string accessKey, string secretKey)
+        {
+            var sign = Helper.sign(secretKey);
+            var payload = buildPayload(accessKey);
+            var token = buidlJwtToken(sign, payload);
+            return token;
+        }
+        internal static string BuildAuthToken(string accessKey, string secretKey, NameValueCollection nvc)
         {
             var sing = sign(secretKey);
             var payload = buildPayload(accessKey, buildQueryHash(nvc));
             var token = buidlJwtToken(sing, payload);
-            return $"Bearer {token}";
+            return token;
         }
 
-        internal static string buildQueryHash(NameValueCollection nvc)
+        static string buildQueryHash(NameValueCollection nvc)
         {
             using var sha512 = SHA512.Create();
             byte[] queryHashByteArray = sha512.ComputeHash(Encoding.UTF8.GetBytes($"{nvc}"));
@@ -101,21 +117,21 @@ namespace Universe.Coin.Upbit
             return queryHash;
         }
 
-        internal static SigningCredentials sign(string secretKey)
+        static SigningCredentials sign(string secretKey)
         {
             var bytes = Encoding.Default.GetBytes(secretKey);
             var securityKey = new SymmetricSecurityKey(bytes);
             return new SigningCredentials(securityKey, "HS256");
         }
 
-        internal static string buidlJwtToken(SigningCredentials credentials, JwtPayload payload)
+        static string buidlJwtToken(SigningCredentials credentials, JwtPayload payload)
         {
             var header = new JwtHeader(credentials);
             var secToken = new JwtSecurityToken(header, payload);
             return new JwtSecurityTokenHandler().WriteToken(secToken);
         }
 
-        internal static JwtPayload buildPayload(string accessKey)
+        static JwtPayload buildPayload(string accessKey)
         {
             return new JwtPayload
             {
@@ -123,7 +139,7 @@ namespace Universe.Coin.Upbit
                 { "nonce", Guid.NewGuid().ToString() }
             };
         }
-        internal static JwtPayload buildPayload(string accessKey, string queryHash)
+        static JwtPayload buildPayload(string accessKey, string queryHash)
         {
             return new JwtPayload
             {

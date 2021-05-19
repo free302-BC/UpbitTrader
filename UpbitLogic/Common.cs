@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Universe.Coin.Upbit
 {
-    public enum Api
+    public enum ApiId
     {
         APIKeyInfo, AccountInfo, 
         AccountWallet, 
