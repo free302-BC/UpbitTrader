@@ -24,11 +24,10 @@ namespace Universe.Coin.Upbit
         public static void SetAcceptance(this WebClient wc) 
             => wc.Headers["Accept"] = "application/json";
 
-        public static void SetQueryString(this WebClient wc, NameValueCollection nvc)
+        public static void SetQueryString(this WebClient wc, params (string key, string value)[] pairs)
         {
-            wc.QueryString.Clear();
-            wc.QueryString.Add(nvc);
+            foreach(var pair in pairs) wc.QueryString[pair.key] = pair.value;
         }
-
+        
     }//class
 }

@@ -14,6 +14,7 @@ using Universe.AppBase;
 using System.Text.Json;
 using Universe.Coin.Upbit.Model;
 using System.IO;
+using System.Collections.Specialized;
 
 namespace Universe.Coin.Upbit.App
 {
@@ -37,7 +38,7 @@ namespace Universe.Coin.Upbit.App
                 log("work():\n" + e.Message);
             }
         }
-
+        
         string checkAuthKey(WorkerSetting set)
         {
             if (File.Exists(set.TokenFile))
@@ -62,6 +63,8 @@ namespace Universe.Coin.Upbit.App
             info($"Final Profit Rate= {(finalRate - 1) * 100:N2}%\r\nMDD= {mdd:N2}%");
         }
 
+        #region ---- TEST ----
+
         void testLimit(UpbitClient uc)
         {
             var list = uc.ApiCandleDay();
@@ -76,6 +79,14 @@ namespace Universe.Coin.Upbit.App
                 Thread.Sleep(10);
             }
         }
+        void testHash()
+        {
+            var nvc = new NameValueCollection();
+            nvc.Add("count", "123");
+            Helper.buildQueryHash(nvc);
+        }
+
+        #endregion
 
     }//class
 }

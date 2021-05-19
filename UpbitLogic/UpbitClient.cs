@@ -19,7 +19,6 @@ namespace Universe.Coin.Upbit
     {
         ILogger _logger;
         WebClient _wc;
-        NameValueCollection _nvc;
 
         public UpbitClient(string token, ILogger logger)
         {
@@ -27,9 +26,7 @@ namespace Universe.Coin.Upbit
             _wc = new WebClient();
             _wc.SetAuthToken(token);
             _wc.SetAcceptance();
-            _nvc = new NameValueCollection();
-            _nvc.Add("market", "KRW-BTC");// string | 마켓 코드 (ex. KRW-BTC) 
-            _nvc.Add("count", "");
+            _wc.SetQueryString(("market", "KRW-BTC"), ("count", "1"));
             //nvc.Add("to", "");// string | 마지막 캔들 시각 (exclusive). 포맷 : `yyyy-MM-dd'T'HH:mm:ssXXX` or `yyyy-MM-dd HH:mm:ss`. 비워서 요청 시 가장 최근 캔들  (optional) 
             //nvc.Add("convertingPriceUnit", "KRW");
         }
@@ -38,14 +35,9 @@ namespace Universe.Coin.Upbit
             _wc?.Dispose();
         }
 
-        public void AddQuery(NameValueCollection nvc) => _wc.QueryString.Add(nvc);
-
         public JsonRes ApiCandleDay(int count = 15)
         {
-            var nvc = new NameValueCollection(_nvc);
-            nvc["count"] = count.ToString();
-            _wc.SetQueryString(nvc);
-
+            _wc.SetQueryString(("count", count.ToString()));
             var api = ApiId.CandleDays;
             try
             {

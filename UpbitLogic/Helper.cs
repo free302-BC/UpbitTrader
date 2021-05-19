@@ -21,10 +21,11 @@ namespace Universe.Coin.Upbit
 
     public class Helper
     {
+        #region ---- API Path Json File ----
+
         const string _apiBaseUrl = "https://api.upbit.com/v1/";
         const string _apiPathFile = "api_path.json";
         const string _jsonOptionFile = "api_json_option.json";
-
         static readonly ApiDic _apiDic;
         static Helper()
         {
@@ -33,8 +34,6 @@ namespace Universe.Coin.Upbit
         }
         public static string GetApiUrl(ApiId api) => $"{_apiBaseUrl}{_apiDic[api].Path}";
 
-
-        #region ---- Build API Path Json File ----
         static readonly string[] _path =
         {
             "api_keys", "accounts", "status/wallet", "candles/days", "candles/minutes/{unit}",
@@ -56,7 +55,7 @@ namespace Universe.Coin.Upbit
             "주문 취소 접수","주문 가능 정보","개별 주문 조회","주문 리스트 조회","주문하기","시세 호가 정보(Orderbook) 조회",
             "시세 Ticker 조회","시세 체결 조회","출금 가능 정보","코인 출금하기","개별 출금 조회","출금 리스트 조회","원화 출금하기"
         };
-        public static void build()
+        public static void BuildApiJson()
         {
             var dic = new ApiDic();
             var len = _path.Length;
@@ -79,44 +78,30 @@ namespace Universe.Coin.Upbit
         #endregion
 
 
-        #region ---- Authorization Token (inc. Payload) ----
+        #region ---- Authorization Token (Payload) ----
 
+        static byte[] _key = { 172, 158, 186, 29, 129, 117, 73, 69, 145, 240, 30, 72, 113, 62, 81, 205 };
         public static void SaveAuthToken(string accessKey, string secretKey, string filePath)
         {
-            var token = BuildAuthToken(accessKey, secretKey);
+            var token = buildAuthToken(accessKey, secretKey);
             var bytes = Crypto.Encode(new Guid(_key).ToString(), token, false);
             File.WriteAllBytes(filePath, bytes);
         }
-        static byte[] _key = { 172, 158, 186, 29, 129, 117, 73, 69, 145, 240, 30, 72, 113, 62, 81, 205 };
         public static string LoadAuthToken(string filePath)
         {
             var raw = File.ReadAllBytes(filePath);
             return Crypto.DecodeToString(new Guid(_key).ToString(), raw);
         }
 
-        internal static string BuildAuthToken(string accessKey, string secretKey)
+        #region ---- Build Auth Token ----
+
+        static string buildAuthToken(string accessKey, string secretKey)
         {
             var sign = Helper.sign(secretKey);
             var payload = buildPayload(accessKey);
             var token = buidlJwtToken(sign, payload);
             return token;
         }
-        internal static string BuildAuthToken(string accessKey, string secretKey, NameValueCollection nvc)
-        {
-            var sing = sign(secretKey);
-            var payload = buildPayload(accessKey, buildQueryHash(nvc));
-            var token = buidlJwtToken(sing, payload);
-            return token;
-        }
-
-        static string buildQueryHash(NameValueCollection nvc)
-        {
-            using var sha512 = SHA512.Create();
-            byte[] queryHashByteArray = sha512.ComputeHash(Encoding.UTF8.GetBytes($"{nvc}"));
-            string queryHash = BitConverter.ToString(queryHashByteArray).Replace("-", "");//.ToLower()
-            return queryHash;
-        }
-
         static SigningCredentials sign(string secretKey)
         {
             var bytes = Encoding.Default.GetBytes(secretKey);
@@ -129,7 +114,10 @@ namespace Universe.Coin.Upbit
             var header = new JwtHeader(credentials);
             var secToken = new JwtSecurityToken(header, payload);
             return new JwtSecurityTokenHandler().WriteToken(secToken);
-        }
+        } 
+        #endregion
+
+        #region ---- Payload ----
 
         static JwtPayload buildPayload(string accessKey)
         {
@@ -148,10 +136,21 @@ namespace Universe.Coin.Upbit
                 { "query_hash", queryHash },
                 { "query_hash_alg", "SHA512" }
             };
-        }
+        } 
         #endregion
 
+        #region ---- Payload with QueryString (필요?) ----
+        internal static string BuildAuthToken(string accessKey, string secretKey, NameValueCollection nvc)
+        {
+            var sing = sign(secretKey);
+            var payload = buildPayload(accessKey, buildQueryHash(nvc));
+            var token = buidlJwtToken(sing, payload);
+            return token;
+        }
+        public static string buildQueryHash(NameValueCollection nvc) => $"{nvc}".ToHashString();
+        #endregion
 
+        #endregion
 
     }//class
 }
