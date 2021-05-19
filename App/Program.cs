@@ -15,6 +15,8 @@ namespace Universe.Coin.Upbit.App
     {
         static void Main(string[] args)
         {
+            _MarketInfo.Load();
+
             //AddWorker<TestWorker, WorkerSetting>();
             AddWorker<TraderWorker, WorkerSetting>();
             RunHost();

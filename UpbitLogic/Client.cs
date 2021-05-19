@@ -26,7 +26,7 @@ namespace Universe.Coin.Upbit
             try
             {
                 string response = _wc.DownloadString(Helper.GetApiUrl(api));
-                var list = JsonConvert.DeserializeObject<List<M>>(response)! ?? new List<M>();
+                var list = JsonConvert.DeserializeObject<List<M>>(response) ?? new List<M>();
                 return list;
             }
             catch (WebException ex)
@@ -36,40 +36,77 @@ namespace Universe.Coin.Upbit
             }
         }
 
-        public List<Orderbook> ApiOrderbook()
+        public Orderbook ApiOrderbook()
         {
             var api = ApiId.OrderOrderbook;
             _wc.RemoveQueryString("count");
             try
             {
                 string response = _wc.DownloadString(Helper.GetApiUrl(api));
-                var list = JsonConvert.DeserializeObject<List<Orderbook>>(response) ?? new List<Orderbook>();
-                return list;
+                var book = JsonConvert.DeserializeObject<List<Orderbook>>(response)?.FirstOrDefault() ?? new Orderbook();
+                return book;
             }
             catch (WebException ex)
             {
                 _logger.LogWebException(ex, api);
-                return new List<Orderbook>();
+                return new Orderbook();
             }
         }
 
-        public List<Ticker> ApiTicker()
+        public Ticker ApiTicker(string market = _market)
         {
             var api = ApiId.TradeTicker;
             _wc.QueryString.Clear();
-            _wc.SetQueryString("markets", _market);
+            _wc.SetQueryString("markets", market);
             try
             {
                 string response = _wc.DownloadString(Helper.GetApiUrl(api));
-                var list = JsonConvert.DeserializeObject<List<Ticker>>(response)! ?? new List<Ticker>();
+                var list = JsonConvert.DeserializeObject<List<Ticker>>(response)?.FirstOrDefault() ?? new Ticker();
                 return list;
             }
             catch (WebException ex)
             {
                 _logger.LogWebException(ex, api);
-                return new List<Ticker>();
+                return new Ticker();
             }
         }
+
+        public List<Account> ApiAccount()
+        {
+            var api = ApiId.AccountInfo;
+            _wc.QueryString.Clear();
+            try
+            {
+                string response = _wc.DownloadString(Helper.GetApiUrl(api));
+                var list = JsonConvert.DeserializeObject<List<Account>>(response) ?? new List<Account>();
+                return list;
+            }
+            catch (WebException ex)
+            {
+                _logger.LogWebException(ex, api);
+                return new List<Account>();
+            }
+        }
+
+        public List<MarketInfo> ApiMarketInfo()
+        {
+            var api = ApiId.MarketInfoAll;
+            _wc.QueryString.Clear();
+            try
+            {
+                string response = _wc.DownloadString(Helper.GetApiUrl(api));
+                var list = JsonConvert.DeserializeObject<List<MarketInfo>>(response) ?? new List<MarketInfo>();
+                return list;
+            }
+            catch (WebException ex)
+            {
+                _logger.LogWebException(ex, api);
+                return new List<MarketInfo>();
+            }
+        }
+
+
+
 
     }//class
 }

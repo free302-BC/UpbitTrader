@@ -28,7 +28,8 @@ namespace Universe.Coin.Upbit.App
             var uc = new Client(set.CheckAuthKey(), _sp.GetRequiredService<ILogger<Client>>());
             try
             {
-                run(uc);
+                //run(uc);
+                accountInfo(uc);
             }
             catch (Exception e)
             {
@@ -46,10 +47,9 @@ namespace Universe.Coin.Upbit.App
                 var now = DateTime.Now;
                 if (now < sell)
                 {
-                    var ticker = new CalcModel(uc.ApiTicker()[0]);
-                    info(ticker.ToTickerString());
-
-                    var order = new CalcModel(uc.ApiOrderbook()[0].OrderbookUnits[0]);
+                    //var ticker = new CalcModel(uc.ApiTicker());
+                    //info(ticker.ToTickerString());
+                    var order = new CalcModel(uc.ApiOrderbook().OrderbookUnits[0]);
                     info(order.ToOrderString());
                     var current = order.Ask;
                     if (current > target && !buy)
@@ -93,6 +93,13 @@ namespace Universe.Coin.Upbit.App
             var target = models[1].Target;
 
             return (next, sell, target);
+        }
+
+        void accountInfo(Client uc)
+        {
+            var accounts = uc.ApiAccount();
+            var markets = uc.ApiMarketInfo();
+            var btc = markets.Where(m => m.Market.Contains("USDT-")).ToList();
         }
 
     }//class

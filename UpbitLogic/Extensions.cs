@@ -16,6 +16,8 @@ namespace Universe.Coin.Upbit
 {
     public static class Extensions
     {
+        //public static string ToString(this MarketId id) => $"KRW-{id}";
+
         public static List<CalcModel> ApiDayModels(this Client client, int count) 
             => client.ApiCandle<CandleDay>(count).Select(x => x.ToModel()).Reverse().ToList();
 
