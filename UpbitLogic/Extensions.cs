@@ -28,8 +28,8 @@ namespace Universe.Coin.Upbit
         /// </summary>
         /// <param name="wc"></param>
         /// <param name="key"></param>
-        public static void SetAuthToken(this WebClient wc, string token) 
-            => wc.Headers.Add("Authorization", "Bearer " + token);
+        public static void SetAuthToken(this WebClient wc, string tokenFileName) 
+            => wc.Headers.Add("Authorization", "Bearer " + Helper.LoadAuthToken(tokenFileName));
 
         public static void SetAcceptance(this WebClient wc) 
             => wc.Headers["Accept"] = "application/json";

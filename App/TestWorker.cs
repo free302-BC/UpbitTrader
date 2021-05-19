@@ -26,7 +26,7 @@ namespace Universe.Coin.Upbit.App
         protected override void work(WorkerSetting set)
         {
             var logger = _sp.GetRequiredService<ILogger<Client>>();
-            var uc = new Client(set.CheckAuthKey(), logger);
+            var uc = new Client(set.TokenFile, logger);
             try
             {
                 findK(uc, 30);

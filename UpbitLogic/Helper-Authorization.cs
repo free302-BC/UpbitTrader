@@ -18,7 +18,6 @@ namespace Universe.Coin.Upbit
 {
     public partial class Helper
     {
-        
         #region ---- Authorization Token (Payload) ----
 
         static byte[] _key = { 172, 158, 186, 29, 129, 117, 73, 69, 145, 240, 30, 72, 113, 62, 81, 205 };

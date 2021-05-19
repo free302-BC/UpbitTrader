@@ -24,14 +24,6 @@ namespace Universe.Coin.Upbit.App
 
     public static class WorkerSettingExtensions
     {
-        public static string CheckAuthKey(this WorkerSetting set)
-        {
-            if (File.Exists(set.TokenFile))
-            {
-                //key를 사용자에게 입력 받는 방법 필요 - 다중 사용자 web
-                Helper.SaveAuthToken(set.AccessKey, set.SecretKey, set.TokenFile);
-            }
-            return Helper.LoadAuthToken(set.TokenFile);
-        }
+        
     }
 }

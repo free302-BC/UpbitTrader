@@ -25,7 +25,7 @@ namespace Universe.Coin.Upbit.App
 
         protected override void work(WorkerSetting set)
         {
-            var uc = new Client(set.CheckAuthKey(), _sp.GetRequiredService<ILogger<Client>>());
+            var uc = new Client(set.TokenFile, _sp.GetRequiredService<ILogger<Client>>());
             try
             {
                 //run(uc);
