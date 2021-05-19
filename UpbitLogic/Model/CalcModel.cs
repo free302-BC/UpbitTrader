@@ -21,6 +21,9 @@ namespace Universe.Coin.Upbit.Model
         public double DrawDown;
         const double _feeRate = 0.0005 * 2;
 
+        public string TimeKST = "";
+        public string Change = "";
+
         public static CalcModel Default = new CalcModel();
         CalcModel()
         {
@@ -36,6 +39,38 @@ namespace Universe.Coin.Upbit.Model
             Closing = Math.Round(candle.TradePrice / 10000.0, 1);
             Delta = High - Low;
         }
+
+        #region ---- Ticker ----
+        public CalcModel(Ticker ticker)
+        {
+            var s = ticker.TradeTimeKst;
+            TimeKST = ticker.TradeTimeKst;
+            Opening = Math.Round(ticker.OpeningPrice / 10000.0, 1);
+            High = Math.Round(ticker.HighPrice / 10000.0, 1);
+            Low = Math.Round(ticker.LowPrice / 10000.0, 1);
+            Closing = Math.Round(ticker.TradePrice / 10000.0, 1);
+            Delta = Math.Round(ticker.SignedChangePrice / 10000.0, 1);
+            Change = ticker.Change;
+        }
+        public string ToTickerString()
+            => $"{TimeKST,8} {Opening,8:F1} {High,8:F1} {Low,8:F1} {Closing,8:F1} : {Delta,8:F1} {Change}";
+        #endregion
+
+        #region ---- Orderbook ----
+        public CalcModel(OrderbookUnit order)
+        {
+            High = Math.Round(order.AskPrice / 10000.0, 1);
+            Low = Math.Round(order.BidPrice / 10000.0, 1);
+            Opening = order.AskSize;
+            Closing = order.BidSize;
+        }
+        public double Ask => High;
+        public double Bid => Low;
+        public double AskAmount => Opening;
+        public double BidAmount => Closing;
+        public string ToOrderString() => $"{AskAmount,8} {Ask,8:F1} {Bid,8:F1} {BidAmount,8:F1}";
+        #endregion
+
         void calcRate(CalcModel prev, double k)
         {
             Target = Math.Round(Opening + prev.Delta * k, 2);
@@ -43,7 +78,7 @@ namespace Universe.Coin.Upbit.Model
         }
         public override string ToString()
             => $"{DateKST:yyMMdd.HHmm} {Opening,8:F1} {Target,8:F1} {High,8:F1} {Closing,8:F1} : {Rate,8:F4} {CumRate,8:F4} {DrawDown,8:F2}";
-
+        
         public static void CalcRate(IList<CalcModel> models, double k)
         {
             models.Insert(0, Default);

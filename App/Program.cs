@@ -15,11 +15,8 @@ namespace Universe.Coin.Upbit.App
     {
         static void Main(string[] args)
         {
-            //TestWorker.test();
-            //Helper.build();
-            //return;
-
-            AddWorker<TestWorker, WorkerSetting>();
+            //AddWorker<TestWorker, WorkerSetting>();
+            AddWorker<TraderWorker, WorkerSetting>();
             RunHost();
         }
 

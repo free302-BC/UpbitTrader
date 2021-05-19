@@ -9,11 +9,8 @@ using System.Threading.Tasks;
 
 namespace Universe.Coin.Upbit.Model
 {
-    /// <summary>
-    /// CandleDays
-    /// </summary>
     [DataContract]
-    public partial class CandleDay : IEquatable<CandleDay>, IValidatableObject, ICandle
+    public class CandleDay : IEquatable<CandleDay>, IValidatableObject, ICandle
     {
         static readonly string[] _names =
         {

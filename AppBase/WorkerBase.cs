@@ -27,15 +27,20 @@ namespace Universe.AppBase
         }
 
         protected void info(object message) => _logger.LogInformation($"{message}");
+        protected void info(object msg1, object msg2) => _logger.LogInformation($"{msg1}{Environment.NewLine}{msg2}");
+        protected void info(object msg1, object msg2, object msg3) 
+            => _logger.LogInformation($"{msg1}{Environment.NewLine}{msg2}{Environment.NewLine}{msg3}");
+
         protected void log(object message) => _logger.LogError($"{message}");
+        protected void log(object msg1, object msg2) => _logger.LogError($"{msg1}{Environment.NewLine}{msg2}");
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
             return Task.Run(() =>
             {
-                info($"Worker Entering StartAsync()...");
+                info($"<{_name}> StartAsync()...");
                 work(_set);
-                info($"Worker Exiting StartAsync()...");
+                //info($"Worker Exiting StartAsync()...");
             }, cancellationToken)
             .ContinueWith(t => 
             {

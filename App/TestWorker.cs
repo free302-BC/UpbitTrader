@@ -25,55 +25,73 @@ namespace Universe.Coin.Upbit.App
 
         protected override void work(WorkerSetting set)
         {
-            var logger = _sp.GetRequiredService<ILogger<UpbitClient>>();
-            var uc = new UpbitClient(checkAuthKey(set), logger);
+            var logger = _sp.GetRequiredService<ILogger<Client>>();
+            var uc = new Client(set.CheckAuthKey(), logger);
             try
             {
-                backTest(uc, 7, 0.46);
-                backTest(uc, 30, 0.46);
-                backTest(uc, 90, 0.46);
+                findK(uc, 30);
+                //backTest(uc, 7, 0.46);
+                //backTest(uc, 30, 0.46);
+                //backTest(uc, 90, 0.46);
             }
             catch (Exception e)
             {
-                log("work():\n" + e.Message);
+                log("work():", e.Message);
             }
+        }
+
+        void findK(Client uc, int count)
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine($"--- Finding K: count= {count} ----");
+            var list = new List<(double k, double rate, double mdd)>();
+            var models = uc.ApiDayModels(count);
+            for (double k = 0.1; k <= 1.0; k += 0.1)
+            {
+                CalcModel.CalcRate(models, k);
+                var (rate, mdd) = backTest(models, k);
+                list.Add((k, rate, mdd));
+                sb.AppendLine($"{k,6:N2}: {(rate - 1) * 100,10:N2}%, {mdd,10:N2}%");
+            }
+            var maxRate = list.Max(x => x.rate);
+            var max = list.First(x => x.rate == maxRate);
+            sb.AppendLine("---------------------------------------------------");
+            sb.AppendLine($"{max.k,6:N2}: {(max.rate - 1) * 100,10:N2}%, {max.mdd,10:N2}%");
+            info(sb);
         }
         
-        string checkAuthKey(WorkerSetting set)
+        
+        void backTest(Client uc, int count, double k)
         {
-            if (File.Exists(set.TokenFile))
-            {
-                //key를 사용자에게 입력 받는 방법 필요 - 다중 사용자 web
-                Helper.SaveAuthToken(set.AccessKey, set.SecretKey, set.TokenFile);
-            }
-            return Helper.LoadAuthToken(set.TokenFile);
-        }
-
-        void backTest(UpbitClient uc, int count, double k)
-        {
-            var data = uc.ApiCandleDay(count);
+            var data = uc.ApiCandle<CandleDay>(count);
             //info(ICandle.Print(data));
 
-            var models = data.Select(x => new CalcModel(x)).Reverse().ToList();
-            CalcModel.CalcRate(models, k);
-            var finalRate = CalcModel.CalcCumRate(models);
-            var mdd = CalcModel.CalcDrawDown(models);
+            var models = data.Select(x => x.ToModel()).Reverse().ToList();
+            var (finalRate, mdd) = backTest(models, k);
 
             info(CalcModel.Print(models));
-            info($"Final Profit Rate= {(finalRate - 1) * 100:N2}%\r\nMDD= {mdd:N2}%");
+            info($"Final Profit Rate= {(finalRate - 1) * 100:N2}%", $"MDD= {mdd:N2}%");
+        }
+
+        private static (double rate, double mdd) backTest(List<CalcModel> models, double k)
+        {
+            CalcModel.CalcRate(models, k);
+            var rate = CalcModel.CalcCumRate(models);
+            var mdd = CalcModel.CalcDrawDown(models);
+            return (rate, mdd);
         }
 
         #region ---- TEST ----
 
-        void testLimit(UpbitClient uc)
+        void testLimit(Client uc)
         {
-            var list = uc.ApiCandleDay();
+            var list = uc.ApiCandle<CandleDay>();
             //printResJson(list);
             info("--------------");
 
             for (int i = 0; i < 10; i++)
             {
-                list = uc.ApiCandleDay();
+                list = uc.ApiCandle<CandleDay>();
                 if (list.Count < 8) break;
                 info(list[0]);
                 Thread.Sleep(10);
