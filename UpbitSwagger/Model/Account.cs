@@ -39,7 +39,8 @@ namespace IO.Swagger.Model
         /// <param name="avgBuyPrice">매수평균가.</param>
         /// <param name="avgBuyPriceModified">매수평균가 수정 여부.</param>
         /// <param name="unitCurrency">평단가 기준 화폐.</param>
-        public Account(string currency = default(string), string balance = default(string), string locked = default(string), string avgBuyPrice = default(string), bool? avgBuyPriceModified = default(bool?), string unitCurrency = default(string))
+        public Account(string currency = default, string balance = default, string locked = default, 
+            string avgBuyPrice = default, bool? avgBuyPriceModified = default, string unitCurrency = default)
         {
             this.Currency = currency;
             this.Balance = balance;
@@ -135,8 +136,7 @@ namespace IO.Swagger.Model
         /// <returns>Boolean</returns>
         public bool Equals(Account input)
         {
-            if (input == null)
-                return false;
+            if (input == null) return false;
 
             return 
                 (
@@ -191,7 +191,7 @@ namespace IO.Swagger.Model
                 if (this.AvgBuyPriceModified != null)
                     hashCode = hashCode * 59 + this.AvgBuyPriceModified.GetHashCode();
                 if (this.UnitCurrency != null)
-                    hashCode = hashCode * 59 + this.UnitCurrency.GetHashCode();
+                    hashCode = hashCode * 59 + UnitCurrency.GetHashCode();
                 return hashCode;
             }
         }
@@ -201,7 +201,7 @@ namespace IO.Swagger.Model
         /// </summary>
         /// <param name="validationContext">Validation context</param>
         /// <returns>Validation Result</returns>
-        IEnumerable<System.ComponentModel.DataAnnotations.ValidationResult> IValidatableObject.Validate(ValidationContext validationContext)
+        IEnumerable<ValidationResult> IValidatableObject.Validate(ValidationContext validationContext)
         {
             yield break;
         }

@@ -24,7 +24,7 @@ namespace Universe.Coin.Upbit.Model
         public string TimeKST = "";
         public string Change = "";
 
-        public static CalcModel Default = new CalcModel();
+        static readonly CalcModel _default = new();
         CalcModel()
         {
             DateKST = DateTime.MinValue;
@@ -81,7 +81,7 @@ namespace Universe.Coin.Upbit.Model
         
         public static void CalcRate(IList<CalcModel> models, double k)
         {
-            models.Insert(0, Default);
+            models.Insert(0, _default);
             for (int i = 1; i < models.Count; i++) models[i].calcRate(models[i - 1], k);
             models.RemoveAt(0);
         }
@@ -109,7 +109,7 @@ namespace Universe.Coin.Upbit.Model
             foreach (var m in models) sb.AppendLine(m.ToString());
             return sb.ToString();
         }
-        static string[] _names =
+        static readonly string[] _names =
         {
             nameof(DateKST), nameof(Opening), nameof(Target), nameof(High), nameof(Closing), nameof(Rate),
             nameof(CumRate), nameof(DrawDown)

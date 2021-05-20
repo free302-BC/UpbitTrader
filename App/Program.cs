@@ -15,7 +15,7 @@ namespace Universe.Coin.Upbit.App
     {
         static void Main(string[] args)
         {
-            Helper.buildCoinNameJson();
+            //Helper.buildCoinNameJson();
 
             //AddWorker<TestWorker, WorkerSetting>();
             AddWorker<TraderWorker, WorkerSetting>();

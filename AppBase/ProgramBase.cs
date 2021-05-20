@@ -14,8 +14,8 @@ namespace Universe.AppBase
     public class ProgramBase
     {
         protected static readonly Action<object?> log = Console.WriteLine;
-        static List<Action<ConfigTuple>> _configs;
-        static List<Type> _workers;
+        static readonly List<Action<ConfigTuple>> _configs;
+        static readonly List<Type> _workers;
 
         static ProgramBase()
         {
@@ -27,7 +27,7 @@ namespace Universe.AppBase
             try
             {
                 //run host
-                using CancellationTokenSource cts = new CancellationTokenSource();
+                using CancellationTokenSource cts = new();
                 using IHost host = createHostBuilder().Build();
                 host.RunAsync(cts.Token).ContinueWith(t => log(t.Exception), TaskContinuationOptions.OnlyOnFaulted);
 

@@ -15,6 +15,7 @@ using System.Text.Json;
 using Universe.Coin.Upbit.Model;
 using System.IO;
 using System.Collections.Specialized;
+using Universe.Utility;
 
 namespace Universe.Coin.Upbit.App
 {
@@ -29,7 +30,16 @@ namespace Universe.Coin.Upbit.App
             try
             {
                 //run(uc);
-                accountInfo(uc);
+                var a1 = uc.ApiAccount(); info("a1"); 
+                var a2 = uc.ApiAccount(); info("a2"); 
+                var a3 = uc.ApiAccount(); info("a3"); 
+                var a4 = uc.ApiAccount(); info("a4"); 
+                var a5 = uc.ApiAccount(); info("a5"); 
+                var a6 = uc.ApiAccount(); info("a6"); 
+                var a7 = uc.ApiAccount(); info("a7"); 
+                var a8 = uc.ApiAccount(); info("a8"); 
+                var a9 = uc.ApiAccount(); info("a9"); 
+                var a10 = uc.ApiAccount(); info("a10");
             }
             catch (Exception e)
             {
@@ -95,12 +105,7 @@ namespace Universe.Coin.Upbit.App
             return (next, sell, target);
         }
 
-        void accountInfo(Client uc)
-        {
-            var accounts = uc.ApiAccount();
-            var markets = uc.ApiMarketInfo();
-            var btc = markets.Where(m => m.Market.Contains("USDT-")).ToList();
-        }
+       
 
     }//class
 }

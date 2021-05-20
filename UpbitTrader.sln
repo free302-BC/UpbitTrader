@@ -7,14 +7,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UpbitSwagger", "UpbitSwagge
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "App", "App\App.csproj", "{8142EE67-DD81-4EE8-B829-E6B08BAED999}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UpbitLogic", "UpbitLogic\UpbitLogic.csproj", "{1DE7BA01-33E4-4DE0-9B45-D4080411089E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UpbitLogic", "UpbitLogic\UpbitLogic.csproj", "{1DE7BA01-33E4-4DE0-9B45-D4080411089E}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A3471B36-B232-44AD-A79A-7CD75A5A2231}"
 	ProjectSection(SolutionItems) = preProject
 		nuget.config = nuget.config
+		regular-express.txt = regular-express.txt
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AppBase", "AppBase\AppBase.csproj", "{9BB84B53-8FBA-4E87-98C1-DFB09026E15E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AppBase", "AppBase\AppBase.csproj", "{9BB84B53-8FBA-4E87-98C1-DFB09026E15E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

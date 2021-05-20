@@ -11,12 +11,13 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 using Universe.Coin.Upbit.Model;
+using Universe.Utility;
 
 namespace Universe.Coin.Upbit
 {
     public class Client : ClientBase
     {
-        public Client(string token, ILogger logger) : base(token, logger) { }
+        public Client(string tokenFileName, ILogger logger) : base(tokenFileName, logger) { }
 
         [return: NotNull]
         public List<M> ApiCandle<M>(int count = 15) where M : ICandle
@@ -87,6 +88,20 @@ namespace Universe.Coin.Upbit
                 return new List<Account>();
             }
         }
+
+        public double GetBalance(CurrencyId currencyId = CurrencyId.KRW)
+        {
+            var accounts = ApiAccount();
+            var krw = accounts.FirstOrDefault(a => a.Currency == currencyId.ToString());
+            return krw?.Balance?.To<double>() ?? 0.0;
+        }
+        public double GetBalance(string coinId = _coin)
+        {
+            var accounts = ApiAccount();
+            var krw = accounts.FirstOrDefault(a => a.Currency == coinId);
+            return krw?.Balance?.To<double>() ?? 0.0;
+        }
+
 
         public List<MarketInfo> ApiMarketInfo()
         {

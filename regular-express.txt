@@ -1,0 +1,6 @@
+[ToString()]
+\(\"+[ ]+(.+?)\"\).*\((.*)\).*\"\)
+($"$1{$2}")
+sb.Append("  Market: ").Append(Market).Append("\n");
+sb.Append($"Market: {Market}");
+

@@ -20,17 +20,23 @@ namespace Universe.Coin.Upbit
     {
         #region ---- Authorization Token (Payload) ----
 
-        static byte[] _key = { 172, 158, 186, 29, 129, 117, 73, 69, 145, 240, 30, 72, 113, 62, 81, 205 };
+        static readonly int[] _key =
+        {
+            172 ^ 0xFF, 158 ^ 0xFF, 186 ^ 0xFF, 29 ^ 0xFF, 129 ^ 0xFF, 117 ^ 0xFF, 73 ^ 0xFF, 069 ^ 0xFF,
+            145 ^ 0xFF, 240 ^ 0xFF, 030 ^ 0xFF, 72 ^ 0xFF, 113 ^ 0xFF, 062 ^ 0xFF, 81 ^ 0xFF, 205 ^ 0xFF
+        };
         public static void SaveAuthToken(string accessKey, string secretKey, string filePath)
         {
             var token = buildAuthToken(accessKey, secretKey);
-            var bytes = Crypto.Encode(new Guid(_key).ToString(), token, false);
+            var key = new Guid(_key.Select(x => (byte)(x ^ 0xFF)).ToArray()).ToString();
+            var bytes = Crypto.Encode(key, token, false);
             File.WriteAllBytes(filePath, bytes);
         }
         public static string LoadAuthToken(string filePath)
         {
             var raw = File.ReadAllBytes(filePath);
-            return Crypto.DecodeToString(new Guid(_key).ToString(), raw);
+            var key = new Guid(_key.Select(x => (byte)(x ^ 0xFF)).ToArray()).ToString();
+            return Crypto.DecodeToString(key, raw);
         }
 
         #region ---- Build Auth Token ----
@@ -54,7 +60,7 @@ namespace Universe.Coin.Upbit
             var header = new JwtHeader(credentials);
             var secToken = new JwtSecurityToken(header, payload);
             return new JwtSecurityTokenHandler().WriteToken(secToken);
-        } 
+        }
         #endregion
 
         #region ---- Payload ----
@@ -76,7 +82,7 @@ namespace Universe.Coin.Upbit
                 { "query_hash", queryHash },
                 { "query_hash_alg", "SHA512" }
             };
-        } 
+        }
         #endregion
 
         #region ---- Payload with QueryString (필요?) ----

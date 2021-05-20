@@ -16,23 +16,23 @@ using System.Text.Json;
 
 namespace Universe.Coin.Upbit
 {
-    using ApiDic = Dictionary<ApiId, (string Path, string Method, string Comment)>;
-    using CoinDic = Dictionary<string, (string English, string Korean)>;
-    using CurrencyDic = Dictionary<CurrencyId, string[]>;
-
     public partial class Helper
     {
         static Helper()
         {
             var opt = JsonSerializer.Deserialize<JsonSerializerOptions>(File.ReadAllText(_jsonOptionFile));
-            _apiDic = JsonSerializer.Deserialize<ApiDic>(File.ReadAllText(_apiPathFile), opt) ?? new ApiDic();
 
-            var json = File.ReadAllText(_CoinNameFile);
-            var raw = JsonSerializer.Deserialize<Dictionary<string, _cnp>>(json, opt) ?? new Dictionary<string, _cnp>();
-            CoinNames = raw.ToDictionary(p => p.Key, p => (p.Value.English, p.Value.Korean));
+            //API url & path
+            var json = File.ReadAllText(_apiPathFile);
+            _apiDic = JsonSerializer.Deserialize<ApiDic>(json, opt) ?? new ApiDic();
 
+            //coin name dic
+            json = File.ReadAllText(_CoinNameFile);
+            _coinNames = JsonSerializer.Deserialize<CoinDic>(json, opt) ?? new CoinDic();
+
+            //currency-coin dic -> market
             json = File.ReadAllText(_MarketCoinsFile);
-            MarketCoins = JsonSerializer.Deserialize<CurrencyDic>(json) ?? new CurrencyDic();
+            _marketCoins = JsonSerializer.Deserialize<CurrencyDic>(json, opt) ?? new CurrencyDic();
         }
 
         #region ---- API Path Json File ----
@@ -50,15 +50,15 @@ namespace Universe.Coin.Upbit
             for (int i = 0; i < len; i++) dic.Add((ApiId)i, (_path[i], _method[i], _comment[i]));
 
             //save json options file
-            var optDecoder = new JsonSerializerOptions();
-            optDecoder.IncludeFields = true;
-            optDecoder.WriteIndented = true;
-            optDecoder.PropertyNameCaseInsensitive = true;
-            var optJson = JsonSerializer.Serialize(optDecoder, optDecoder);
+            var opt = new JsonSerializerOptions();
+            opt.IncludeFields = true;
+            opt.WriteIndented = true;
+            opt.PropertyNameCaseInsensitive = true;
+            var optJson = JsonSerializer.Serialize(opt, opt);
             File.WriteAllText(_jsonOptionFile, optJson, Encoding.UTF8);
 
             //save api path file
-            var optEncoder = new JsonSerializerOptions(optDecoder);
+            var optEncoder = new JsonSerializerOptions(opt);
             optEncoder.Encoder = JavaScriptEncoder.Create(UnicodeRanges.BasicLatin, UnicodeRanges.HangulSyllables);
             var json = JsonSerializer.Serialize(dic, optEncoder);
             File.WriteAllText(_apiPathFile, json, Encoding.UTF8);

@@ -29,10 +29,12 @@ namespace Universe.Coin.Upbit.App
             var uc = new Client(set.TokenFile, logger);
             try
             {
+                var k = findK(uc, 7);
                 findK(uc, 30);
-                //backTest(uc, 7, 0.46);
-                //backTest(uc, 30, 0.46);
-                //backTest(uc, 90, 0.46);
+                findK(uc, 90);
+                //backTest(uc, 7, k);
+                //backTest(uc, 30, k);
+                //backTest(uc, 90, k);
             }
             catch (Exception e)
             {
@@ -40,7 +42,7 @@ namespace Universe.Coin.Upbit.App
             }
         }
 
-        void findK(Client uc, int count)
+        double findK(Client uc, int count)
         {
             var sb = new StringBuilder();
             sb.AppendLine($"--- Finding K: count= {count} ----");
@@ -58,8 +60,8 @@ namespace Universe.Coin.Upbit.App
             sb.AppendLine("---------------------------------------------------");
             sb.AppendLine($"{max.k,6:N2}: {(max.rate - 1) * 100,10:N2}%, {max.mdd,10:N2}%");
             info(sb);
+            return max.k;
         }
-        
         
         void backTest(Client uc, int count, double k)
         {

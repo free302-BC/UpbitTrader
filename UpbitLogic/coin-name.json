@@ -1,710 +1,710 @@
 {
   "BTC": {
-    "English": "Bitcoin",
-    "Korean": "비트코인"
+    "Item1": "Bitcoin",
+    "Item2": "비트코인"
   },
   "ETH": {
-    "English": "Ethereum",
-    "Korean": "이더리움"
+    "Item1": "Ethereum",
+    "Item2": "이더리움"
   },
   "NEO": {
-    "English": "NEO",
-    "Korean": "네오"
+    "Item1": "NEO",
+    "Item2": "네오"
   },
   "MTL": {
-    "English": "Metal",
-    "Korean": "메탈"
+    "Item1": "Metal",
+    "Item2": "메탈"
   },
   "LTC": {
-    "English": "Litecoin",
-    "Korean": "라이트코인"
+    "Item1": "Litecoin",
+    "Item2": "라이트코인"
   },
   "XRP": {
-    "English": "Ripple",
-    "Korean": "리플"
+    "Item1": "Ripple",
+    "Item2": "리플"
   },
   "ETC": {
-    "English": "Ethereum Classic",
-    "Korean": "이더리움클래식"
+    "Item1": "Ethereum Classic",
+    "Item2": "이더리움클래식"
   },
   "OMG": {
-    "English": "OmiseGo",
-    "Korean": "오미세고"
+    "Item1": "OmiseGo",
+    "Item2": "오미세고"
   },
   "SNT": {
-    "English": "Status Network Token",
-    "Korean": "스테이터스네트워크토큰"
+    "Item1": "Status Network Token",
+    "Item2": "스테이터스네트워크토큰"
   },
   "WAVES": {
-    "English": "Waves",
-    "Korean": "웨이브"
+    "Item1": "Waves",
+    "Item2": "웨이브"
   },
   "XEM": {
-    "English": "NEM",
-    "Korean": "넴"
+    "Item1": "NEM",
+    "Item2": "넴"
   },
   "QTUM": {
-    "English": "Qtum",
-    "Korean": "퀀텀"
+    "Item1": "Qtum",
+    "Item2": "퀀텀"
   },
   "LSK": {
-    "English": "Lisk",
-    "Korean": "리스크"
+    "Item1": "Lisk",
+    "Item2": "리스크"
   },
   "STEEM": {
-    "English": "Steem",
-    "Korean": "스팀"
+    "Item1": "Steem",
+    "Item2": "스팀"
   },
   "XLM": {
-    "English": "Lumen",
-    "Korean": "스텔라루멘"
+    "Item1": "Lumen",
+    "Item2": "스텔라루멘"
   },
   "ARDR": {
-    "English": "Ardor",
-    "Korean": "아더"
+    "Item1": "Ardor",
+    "Item2": "아더"
   },
   "KMD": {
-    "English": "Komodo",
-    "Korean": "코모도"
+    "Item1": "Komodo",
+    "Item2": "코모도"
   },
   "ARK": {
-    "English": "Ark",
-    "Korean": "아크"
+    "Item1": "Ark",
+    "Item2": "아크"
   },
   "STORJ": {
-    "English": "Storj",
-    "Korean": "스토리지"
+    "Item1": "Storj",
+    "Item2": "스토리지"
   },
   "GRS": {
-    "English": "Groestlcoin",
-    "Korean": "그로스톨코인"
+    "Item1": "Groestlcoin",
+    "Item2": "그로스톨코인"
   },
   "REP": {
-    "English": "Augur",
-    "Korean": "어거"
+    "Item1": "Augur",
+    "Item2": "어거"
   },
   "EMC2": {
-    "English": "Einsteinium",
-    "Korean": "아인스타이늄"
+    "Item1": "Einsteinium",
+    "Item2": "아인스타이늄"
   },
   "ADA": {
-    "English": "Ada",
-    "Korean": "에이다"
+    "Item1": "Ada",
+    "Item2": "에이다"
   },
   "SBD": {
-    "English": "SteemDollars",
-    "Korean": "스팀달러"
+    "Item1": "SteemDollars",
+    "Item2": "스팀달러"
   },
   "POWR": {
-    "English": "Power ledger",
-    "Korean": "파워렛저"
+    "Item1": "Power ledger",
+    "Item2": "파워렛저"
   },
   "BTG": {
-    "English": "Bitcoin Gold",
-    "Korean": "비트코인골드"
+    "Item1": "Bitcoin Gold",
+    "Item2": "비트코인골드"
   },
   "ICX": {
-    "English": "Icon",
-    "Korean": "아이콘"
+    "Item1": "Icon",
+    "Item2": "아이콘"
   },
   "EOS": {
-    "English": "EOS",
-    "Korean": "이오스"
+    "Item1": "EOS",
+    "Item2": "이오스"
   },
   "TRX": {
-    "English": "TRON",
-    "Korean": "트론"
+    "Item1": "TRON",
+    "Item2": "트론"
   },
   "SC": {
-    "English": "Siacoin",
-    "Korean": "시아코인"
+    "Item1": "Siacoin",
+    "Item2": "시아코인"
   },
   "IGNIS": {
-    "English": "Ignis",
-    "Korean": "이그니스"
+    "Item1": "Ignis",
+    "Item2": "이그니스"
   },
   "ONT": {
-    "English": "Ontology",
-    "Korean": "온톨로지"
+    "Item1": "Ontology",
+    "Item2": "온톨로지"
   },
   "ZIL": {
-    "English": "Zilliqa",
-    "Korean": "질리카"
+    "Item1": "Zilliqa",
+    "Item2": "질리카"
   },
   "POLY": {
-    "English": "Polymath",
-    "Korean": "폴리매쓰"
+    "Item1": "Polymath",
+    "Item2": "폴리매쓰"
   },
   "ZRX": {
-    "English": "0x Protocol",
-    "Korean": "제로엑스"
+    "Item1": "0x Protocol",
+    "Item2": "제로엑스"
   },
   "LOOM": {
-    "English": "Loom Network",
-    "Korean": "룸네트워크"
+    "Item1": "Loom Network",
+    "Item2": "룸네트워크"
   },
   "BCH": {
-    "English": "Bitcoin Cash",
-    "Korean": "비트코인캐시"
+    "Item1": "Bitcoin Cash",
+    "Item2": "비트코인캐시"
   },
   "ADX": {
-    "English": "AdEx",
-    "Korean": "애드엑스"
+    "Item1": "AdEx",
+    "Item2": "애드엑스"
   },
   "BAT": {
-    "English": "Basic Attention Token",
-    "Korean": "베이직어텐션토큰"
+    "Item1": "Basic Attention Token",
+    "Item2": "베이직어텐션토큰"
   },
   "IOST": {
-    "English": "IOST",
-    "Korean": "아이오에스티"
+    "Item1": "IOST",
+    "Item2": "아이오에스티"
   },
   "DMT": {
-    "English": "DMarket",
-    "Korean": "디마켓"
+    "Item1": "DMarket",
+    "Item2": "디마켓"
   },
   "RFR": {
-    "English": "Refereum",
-    "Korean": "리퍼리움"
+    "Item1": "Refereum",
+    "Item2": "리퍼리움"
   },
   "CVC": {
-    "English": "Civic",
-    "Korean": "시빅"
+    "Item1": "Civic",
+    "Item2": "시빅"
   },
   "IQ": {
-    "English": "Everipedia",
-    "Korean": "에브리피디아"
+    "Item1": "Everipedia",
+    "Item2": "에브리피디아"
   },
   "IOTA": {
-    "English": "IOTA",
-    "Korean": "아이오타"
+    "Item1": "IOTA",
+    "Item2": "아이오타"
   },
   "MFT": {
-    "English": "Mainframe",
-    "Korean": "메인프레임"
+    "Item1": "Mainframe",
+    "Item2": "메인프레임"
   },
   "ONG": {
-    "English": "ONG",
-    "Korean": "온톨로지가스"
+    "Item1": "ONG",
+    "Item2": "온톨로지가스"
   },
   "GAS": {
-    "English": "GAS",
-    "Korean": "가스"
+    "Item1": "GAS",
+    "Item2": "가스"
   },
   "UPP": {
-    "English": "Sentinel Protocol",
-    "Korean": "센티넬프로토콜"
+    "Item1": "Sentinel Protocol",
+    "Item2": "센티넬프로토콜"
   },
   "ELF": {
-    "English": "aelf",
-    "Korean": "엘프"
+    "Item1": "aelf",
+    "Item2": "엘프"
   },
   "KNC": {
-    "English": "Kyber Network",
-    "Korean": "카이버네트워크"
+    "Item1": "Kyber Network",
+    "Item2": "카이버네트워크"
   },
   "BSV": {
-    "English": "Bitcoin SV",
-    "Korean": "비트코인에스브이"
+    "Item1": "Bitcoin SV",
+    "Item2": "비트코인에스브이"
   },
   "THETA": {
-    "English": "Theta Token",
-    "Korean": "쎄타토큰"
+    "Item1": "Theta Token",
+    "Item2": "쎄타토큰"
   },
   "EDR": {
-    "English": "Endor",
-    "Korean": "엔도르"
+    "Item1": "Endor",
+    "Item2": "엔도르"
   },
   "QKC": {
-    "English": "QuarkChain",
-    "Korean": "쿼크체인"
+    "Item1": "QuarkChain",
+    "Item2": "쿼크체인"
   },
   "BTT": {
-    "English": "BitTorrent",
-    "Korean": "비트토렌트"
+    "Item1": "BitTorrent",
+    "Item2": "비트토렌트"
   },
   "MOC": {
-    "English": "Moss Coin",
-    "Korean": "모스코인"
+    "Item1": "Moss Coin",
+    "Item2": "모스코인"
   },
   "ENJ": {
-    "English": "Enjin",
-    "Korean": "엔진코인"
+    "Item1": "Enjin",
+    "Item2": "엔진코인"
   },
   "TFUEL": {
-    "English": "Theta Fuel",
-    "Korean": "쎄타퓨엘"
+    "Item1": "Theta Fuel",
+    "Item2": "쎄타퓨엘"
   },
   "MANA": {
-    "English": "Decentraland",
-    "Korean": "디센트럴랜드"
+    "Item1": "Decentraland",
+    "Item2": "디센트럴랜드"
   },
   "ANKR": {
-    "English": "Ankr",
-    "Korean": "앵커"
+    "Item1": "Ankr",
+    "Item2": "앵커"
   },
   "AERGO": {
-    "English": "Aergo",
-    "Korean": "아르고"
+    "Item1": "Aergo",
+    "Item2": "아르고"
   },
   "ATOM": {
-    "English": "Cosmos",
-    "Korean": "코스모스"
+    "Item1": "Cosmos",
+    "Item2": "코스모스"
   },
   "TT": {
-    "English": "Thunder Token",
-    "Korean": "썬더토큰"
+    "Item1": "Thunder Token",
+    "Item2": "썬더토큰"
   },
   "CRE": {
-    "English": "Carry Protocol",
-    "Korean": "캐리프로토콜"
+    "Item1": "Carry Protocol",
+    "Item2": "캐리프로토콜"
   },
   "SOLVE": {
-    "English": "Solve.Care",
-    "Korean": "솔브케어"
+    "Item1": "Solve.Care",
+    "Item2": "솔브케어"
   },
   "MBL": {
-    "English": "MovieBloc",
-    "Korean": "무비블록"
+    "Item1": "MovieBloc",
+    "Item2": "무비블록"
   },
   "TSHP": {
-    "English": "12SHIPS",
-    "Korean": "트웰브쉽스"
+    "Item1": "12SHIPS",
+    "Item2": "트웰브쉽스"
   },
   "WAXP": {
-    "English": "WAX",
-    "Korean": "왁스"
+    "Item1": "WAX",
+    "Item2": "왁스"
   },
   "HBAR": {
-    "English": "Hedera Hashgraph",
-    "Korean": "헤데라해시그래프"
+    "Item1": "Hedera Hashgraph",
+    "Item2": "헤데라해시그래프"
   },
   "MED": {
-    "English": "MediBloc",
-    "Korean": "메디블록"
+    "Item1": "MediBloc",
+    "Item2": "메디블록"
   },
   "MLK": {
-    "English": "MiL.k",
-    "Korean": "밀크"
+    "Item1": "MiL.k",
+    "Item2": "밀크"
   },
   "STPT": {
-    "English": "Standard Tokenization Protocol",
-    "Korean": "에스티피"
+    "Item1": "Standard Tokenization Protocol",
+    "Item2": "에스티피"
   },
   "ORBS": {
-    "English": "Orbs",
-    "Korean": "오브스"
+    "Item1": "Orbs",
+    "Item2": "오브스"
   },
   "VET": {
-    "English": "VeChain",
-    "Korean": "비체인"
+    "Item1": "VeChain",
+    "Item2": "비체인"
   },
   "CHZ": {
-    "English": "Chiliz",
-    "Korean": "칠리즈"
+    "Item1": "Chiliz",
+    "Item2": "칠리즈"
   },
   "PXL": {
-    "English": "PIXEL",
-    "Korean": "픽셀"
+    "Item1": "PIXEL",
+    "Item2": "픽셀"
   },
   "STMX": {
-    "English": "StormX",
-    "Korean": "스톰엑스"
+    "Item1": "StormX",
+    "Item2": "스톰엑스"
   },
   "DKA": {
-    "English": "dKargo",
-    "Korean": "디카르고"
+    "Item1": "dKargo",
+    "Item2": "디카르고"
   },
   "HIVE": {
-    "English": "Hive",
-    "Korean": "하이브"
+    "Item1": "Hive",
+    "Item2": "하이브"
   },
   "KAVA": {
-    "English": "Kava",
-    "Korean": "카바"
+    "Item1": "Kava",
+    "Item2": "카바"
   },
   "AHT": {
-    "English": "AhaToken",
-    "Korean": "아하토큰"
+    "Item1": "AhaToken",
+    "Item2": "아하토큰"
   },
   "LINK": {
-    "English": "Chainlink",
-    "Korean": "체인링크"
+    "Item1": "Chainlink",
+    "Item2": "체인링크"
   },
   "XTZ": {
-    "English": "Tezos",
-    "Korean": "테조스"
+    "Item1": "Tezos",
+    "Item2": "테조스"
   },
   "BORA": {
-    "English": "BORA",
-    "Korean": "보라"
+    "Item1": "BORA",
+    "Item2": "보라"
   },
   "JST": {
-    "English": "JUST",
-    "Korean": "저스트"
+    "Item1": "JUST",
+    "Item2": "저스트"
   },
   "CRO": {
-    "English": "Crypto.com Chain",
-    "Korean": "크립토닷컴체인"
+    "Item1": "Crypto.com Chain",
+    "Item2": "크립토닷컴체인"
   },
   "TON": {
-    "English": "TON",
-    "Korean": "톤"
+    "Item1": "TON",
+    "Item2": "톤"
   },
   "SXP": {
-    "English": "Swipe",
-    "Korean": "스와이프"
+    "Item1": "Swipe",
+    "Item2": "스와이프"
   },
   "LAMB": {
-    "English": "Lambda",
-    "Korean": "람다"
+    "Item1": "Lambda",
+    "Item2": "람다"
   },
   "HUNT": {
-    "English": "HUNT",
-    "Korean": "헌트"
+    "Item1": "HUNT",
+    "Item2": "헌트"
   },
   "MARO": {
-    "English": "Maro",
-    "Korean": "마로"
+    "Item1": "Maro",
+    "Item2": "마로"
   },
   "PLA": {
-    "English": "PlayDapp",
-    "Korean": "플레이댑"
+    "Item1": "PlayDapp",
+    "Item2": "플레이댑"
   },
   "DOT": {
-    "English": "Polkadot",
-    "Korean": "폴카닷"
+    "Item1": "Polkadot",
+    "Item2": "폴카닷"
   },
   "SRM": {
-    "English": "Serum",
-    "Korean": "세럼"
+    "Item1": "Serum",
+    "Item2": "세럼"
   },
   "MVL": {
-    "English": "MVL",
-    "Korean": "엠블"
+    "Item1": "MVL",
+    "Item2": "엠블"
   },
   "PCI": {
-    "English": "PayCoin",
-    "Korean": "페이코인"
+    "Item1": "PayCoin",
+    "Item2": "페이코인"
   },
   "STRAX": {
-    "English": "Stratis",
-    "Korean": "스트라티스"
+    "Item1": "Stratis",
+    "Item2": "스트라티스"
   },
   "AQT": {
-    "English": "Alpha Quark Token",
-    "Korean": "알파쿼크"
+    "Item1": "Alpha Quark Token",
+    "Item2": "알파쿼크"
   },
   "BCHA": {
-    "English": "Bitcoin Cash ABC",
-    "Korean": "비트코인캐시에이비씨"
+    "Item1": "Bitcoin Cash ABC",
+    "Item2": "비트코인캐시에이비씨"
   },
   "GLM": {
-    "English": "Golem",
-    "Korean": "골렘"
+    "Item1": "Golem",
+    "Item2": "골렘"
   },
   "QTCON": {
-    "English": "Quiztok",
-    "Korean": "퀴즈톡"
+    "Item1": "Quiztok",
+    "Item2": "퀴즈톡"
   },
   "SSX": {
-    "English": "SOMESING",
-    "Korean": "썸씽"
+    "Item1": "SOMESING",
+    "Item2": "썸씽"
   },
   "META": {
-    "English": "Metadium",
-    "Korean": "메타디움"
+    "Item1": "Metadium",
+    "Item2": "메타디움"
   },
   "OBSR": {
-    "English": "Observer",
-    "Korean": "옵저버"
+    "Item1": "Observer",
+    "Item2": "옵저버"
   },
   "FCT2": {
-    "English": "FirmaChain",
-    "Korean": "피르마체인"
+    "Item1": "FirmaChain",
+    "Item2": "피르마체인"
   },
   "LBC": {
-    "English": "LBRY Credits",
-    "Korean": "엘비알와이크레딧"
+    "Item1": "LBRY Credits",
+    "Item2": "엘비알와이크레딧"
   },
   "CBK": {
-    "English": "Cobak Token",
-    "Korean": "코박토큰"
+    "Item1": "Cobak Token",
+    "Item2": "코박토큰"
   },
   "SAND": {
-    "English": "The Sandbox",
-    "Korean": "샌드박스"
+    "Item1": "The Sandbox",
+    "Item2": "샌드박스"
   },
   "HUM": {
-    "English": "Humanscape",
-    "Korean": "휴먼스케이프"
+    "Item1": "Humanscape",
+    "Item2": "휴먼스케이프"
   },
   "DOGE": {
-    "English": "Dogecoin",
-    "Korean": "도지코인"
+    "Item1": "Dogecoin",
+    "Item2": "도지코인"
   },
   "STRK": {
-    "English": "Strike",
-    "Korean": "스트라이크"
+    "Item1": "Strike",
+    "Item2": "스트라이크"
   },
   "PUNDIX": {
-    "English": "Pundi X",
-    "Korean": "펀디엑스"
+    "Item1": "Pundi X",
+    "Item2": "펀디엑스"
   },
   "FLOW": {
-    "English": "Flow",
-    "Korean": "플로우"
+    "Item1": "Flow",
+    "Item2": "플로우"
   },
   "DAWN": {
-    "English": "Dawn Protocol",
-    "Korean": "던프로토콜"
+    "Item1": "Dawn Protocol",
+    "Item2": "던프로토콜"
   },
   "AXS": {
-    "English": "Axie Infinity",
-    "Korean": "엑시인피니티"
+    "Item1": "Axie Infinity",
+    "Item2": "엑시인피니티"
   },
   "STX": {
-    "English": "Stacks",
-    "Korean": "스택스"
+    "Item1": "Stacks",
+    "Item2": "스택스"
   },
   "DGB": {
-    "English": "DigiByte",
-    "Korean": "디지바이트"
+    "Item1": "DigiByte",
+    "Item2": "디지바이트"
   },
   "NMR": {
-    "English": "Numeraire",
-    "Korean": "뉴메레르"
+    "Item1": "Numeraire",
+    "Item2": "뉴메레르"
   },
   "NXT": {
-    "English": "Nxt",
-    "Korean": "엔엑스티"
+    "Item1": "Nxt",
+    "Item2": "엔엑스티"
   },
   "RDD": {
-    "English": "ReddCoin",
-    "Korean": "레드코인"
+    "Item1": "ReddCoin",
+    "Item2": "레드코인"
   },
   "BNT": {
-    "English": "Bancor",
-    "Korean": "뱅코르"
+    "Item1": "Bancor",
+    "Item2": "뱅코르"
   },
   "SYS": {
-    "English": "SysCoin",
-    "Korean": "시스코인"
+    "Item1": "SysCoin",
+    "Item2": "시스코인"
   },
   "ANT": {
-    "English": "Aragon",
-    "Korean": "아라곤"
+    "Item1": "Aragon",
+    "Item2": "아라곤"
   },
   "RLC": {
-    "English": "iEx.ec",
-    "Korean": "아이젝"
+    "Item1": "iEx.ec",
+    "Item2": "아이젝"
   },
   "RCN": {
-    "English": "Ripio Credit Network",
-    "Korean": "리피오크레딧네트워크"
+    "Item1": "Ripio Credit Network",
+    "Item2": "리피오크레딧네트워크"
   },
   "DNT": {
-    "English": "district0x",
-    "Korean": "디스트릭트0x"
+    "Item1": "district0x",
+    "Item2": "디스트릭트0x"
   },
   "TUSD": {
-    "English": "TrueUSD",
-    "Korean": "트루USD"
+    "Item1": "TrueUSD",
+    "Item2": "트루USD"
   },
   "LRC": {
-    "English": "Loopring",
-    "Korean": "루프링"
+    "Item1": "Loopring",
+    "Item2": "루프링"
   },
   "PRO": {
-    "English": "Propy",
-    "Korean": "프로피"
+    "Item1": "Propy",
+    "Item2": "프로피"
   },
   "RVN": {
-    "English": "Ravencoin",
-    "Korean": "레이븐코인"
+    "Item1": "Ravencoin",
+    "Item2": "레이븐코인"
   },
   "BFT": {
-    "English": "BnkToTheFuture",
-    "Korean": "비에프토큰"
+    "Item1": "BnkToTheFuture",
+    "Item2": "비에프토큰"
   },
   "GO": {
-    "English": "GoChain",
-    "Korean": "고체인"
+    "Item1": "GoChain",
+    "Item2": "고체인"
   },
   "PAX": {
-    "English": "Paxos Standard",
-    "Korean": "팩소스스탠다드"
+    "Item1": "Paxos Standard",
+    "Item2": "팩소스스탠다드"
   },
   "NCASH": {
-    "English": "Nucleus Vision",
-    "Korean": "뉴클리어스비전"
+    "Item1": "Nucleus Vision",
+    "Item2": "뉴클리어스비전"
   },
   "DENT": {
-    "English": "Dent",
-    "Korean": "덴트"
+    "Item1": "Dent",
+    "Item2": "덴트"
   },
   "VITE": {
-    "English": "Vite",
-    "Korean": "바이트토큰"
+    "Item1": "Vite",
+    "Item2": "바이트토큰"
   },
   "IOTX": {
-    "English": "IoTeX",
-    "Korean": "아이오텍스"
+    "Item1": "IoTeX",
+    "Item2": "아이오텍스"
   },
   "NKN": {
-    "English": "NKN",
-    "Korean": "엔케이엔"
+    "Item1": "NKN",
+    "Item2": "엔케이엔"
   },
   "FSN": {
-    "English": "Fusion",
-    "Korean": "퓨전"
+    "Item1": "Fusion",
+    "Item2": "퓨전"
   },
   "PI": {
-    "English": "Plian",
-    "Korean": "플리안"
+    "Item1": "Plian",
+    "Item2": "플리안"
   },
   "LUNA": {
-    "English": "Luna",
-    "Korean": "루나"
+    "Item1": "Luna",
+    "Item2": "루나"
   },
   "DAI": {
-    "English": "Dai",
-    "Korean": "다이"
+    "Item1": "Dai",
+    "Item2": "다이"
   },
   "MKR": {
-    "English": "Maker",
-    "Korean": "메이커"
+    "Item1": "Maker",
+    "Item2": "메이커"
   },
   "FX": {
-    "English": "Function X",
-    "Korean": "펑션엑스"
+    "Item1": "Function X",
+    "Item2": "펑션엑스"
   },
   "OGN": {
-    "English": "Origin Protocol",
-    "Korean": "오리진프로토콜"
+    "Item1": "Origin Protocol",
+    "Item2": "오리진프로토콜"
   },
   "ITAM": {
-    "English": "ITAM",
-    "Korean": "아이텀"
+    "Item1": "ITAM",
+    "Item2": "아이텀"
   },
   "HBD": {
-    "English": "Hive Dollar",
-    "Korean": "하이브달러"
+    "Item1": "Hive Dollar",
+    "Item2": "하이브달러"
   },
   "RINGX": {
-    "English": "RINGX",
-    "Korean": "링엑스"
+    "Item1": "RINGX",
+    "Item2": "링엑스"
   },
   "CHR": {
-    "English": "Chromia",
-    "Korean": "크로미아"
+    "Item1": "Chromia",
+    "Item2": "크로미아"
   },
   "DAD": {
-    "English": "DAD",
-    "Korean": "다드"
+    "Item1": "DAD",
+    "Item2": "다드"
   },
   "CTSI": {
-    "English": "Cartesi",
-    "Korean": "카르테시"
+    "Item1": "Cartesi",
+    "Item2": "카르테시"
   },
   "COMP": {
-    "English": "Compound",
-    "Korean": "컴파운드"
+    "Item1": "Compound",
+    "Item2": "컴파운드"
   },
   "ONIT": {
-    "English": "ONBUFF",
-    "Korean": "온버프"
+    "Item1": "ONBUFF",
+    "Item2": "온버프"
   },
   "CRV": {
-    "English": "Curve",
-    "Korean": "커브"
+    "Item1": "Curve",
+    "Item2": "커브"
   },
   "ALGO": {
-    "English": "Algorand",
-    "Korean": "알고랜드"
+    "Item1": "Algorand",
+    "Item2": "알고랜드"
   },
   "RSR": {
-    "English": "Reserve Rights",
-    "Korean": "리저브라이트"
+    "Item1": "Reserve Rights",
+    "Item2": "리저브라이트"
   },
   "OXT": {
-    "English": "Orchid",
-    "Korean": "오키드"
+    "Item1": "Orchid",
+    "Item2": "오키드"
   },
   "SUN": {
-    "English": "SUN",
-    "Korean": "썬"
+    "Item1": "SUN",
+    "Item2": "썬"
   },
   "GXC": {
-    "English": "GXChain",
-    "Korean": "지엑스체인"
+    "Item1": "GXChain",
+    "Item2": "지엑스체인"
   },
   "FIL": {
-    "English": "Filecoin",
-    "Korean": "파일코인"
+    "Item1": "Filecoin",
+    "Item2": "파일코인"
   },
   "UNI": {
-    "English": "Uniswap",
-    "Korean": "유니스왑"
+    "Item1": "Uniswap",
+    "Item2": "유니스왑"
   },
   "BASIC": {
-    "English": "Basic",
-    "Korean": "베이직"
+    "Item1": "Basic",
+    "Item2": "베이직"
   },
   "INJ": {
-    "English": "Injective Protocol",
-    "Korean": "인젝티브프로토콜"
+    "Item1": "Injective Protocol",
+    "Item2": "인젝티브프로토콜"
   },
   "PROM": {
-    "English": "Prometeus",
-    "Korean": "프로메테우스"
+    "Item1": "Prometeus",
+    "Item2": "프로메테우스"
   },
   "VAL": {
-    "English": "Validity",
-    "Korean": "밸리디티"
+    "Item1": "Validity",
+    "Item2": "밸리디티"
   },
   "PSG": {
-    "English": "Paris Saint-Germain Fan Token",
-    "Korean": "파리생제르맹"
+    "Item1": "Paris Saint-Germain Fan Token",
+    "Item2": "파리생제르맹"
   },
   "JUV": {
-    "English": "Juventus Fan Token",
-    "Korean": "유벤투스"
+    "Item1": "Juventus Fan Token",
+    "Item2": "유벤투스"
   },
   "FOR": {
-    "English": "ForTube",
-    "Korean": "포튜브"
+    "Item1": "ForTube",
+    "Item2": "포튜브"
   },
   "BFC": {
-    "English": "Bifrost",
-    "Korean": "바이프로스트"
+    "Item1": "Bifrost",
+    "Item2": "바이프로스트"
   },
   "LINA": {
-    "English": "Linear",
-    "Korean": "리니어파이낸스"
+    "Item1": "Linear",
+    "Item2": "리니어파이낸스"
   },
   "PICA": {
-    "English": "Pica",
-    "Korean": "피카"
+    "Item1": "Pica",
+    "Item2": "피카"
   },
   "CELO": {
-    "English": "Celo",
-    "Korean": "셀로"
+    "Item1": "Celo",
+    "Item2": "셀로"
   },
   "NEAR": {
-    "English": "NEAR Protocol",
-    "Korean": "니어프로토콜"
+    "Item1": "NEAR Protocol",
+    "Item2": "니어프로토콜"
   },
   "AUCTION": {
-    "English": "Bounce",
-    "Korean": "바운스토큰"
+    "Item1": "Bounce",
+    "Item2": "바운스토큰"
   },
   "GRT": {
-    "English": "The Graph",
-    "Korean": "그래프"
+    "Item1": "The Graph",
+    "Item2": "그래프"
   },
   "SNX": {
-    "English": "Synthetix",
-    "Korean": "신세틱스"
+    "Item1": "Synthetix",
+    "Item2": "신세틱스"
   }
 }
