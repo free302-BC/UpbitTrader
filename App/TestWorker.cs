@@ -26,15 +26,15 @@ namespace Universe.Coin.Upbit.App
         protected override void work(WorkerSetting set)
         {
             var logger = _sp.GetRequiredService<ILogger<Client>>();
-            var uc = new Client(set.TokenFile, logger);
+            var uc = new Client(set.AccessKey, set.SecretKey, logger);
             try
             {
                 var k = findK(uc, 7);
                 findK(uc, 30);
                 findK(uc, 90);
-                //backTest(uc, 7, k);
-                //backTest(uc, 30, k);
-                //backTest(uc, 90, k);
+                backTest(uc, 7, k);
+                backTest(uc, 30, k);
+                backTest(uc, 90, k);
             }
             catch (Exception e)
             {
@@ -82,6 +82,12 @@ namespace Universe.Coin.Upbit.App
             var mdd = CalcModel.CalcDrawDown(models);
             return (rate, mdd);
         }
+        void ticker(Client uc)
+        {
+            var ticker = new CalcModel(uc.ApiTicker());
+            info(ticker.ToTickerString());
+        }
+
 
         #region ---- TEST ----
 
@@ -104,6 +110,10 @@ namespace Universe.Coin.Upbit.App
             var nvc = new NameValueCollection();
             nvc.Add("count", "123");
             Helper.buildQueryHash(nvc);
+        }
+        void saveKey(WorkerSetting set)
+        {
+            Helper.SaveEncrptedKey(set.AccessKey, set.SecretKey, "key.txt");
         }
 
         #endregion

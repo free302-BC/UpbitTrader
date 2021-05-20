@@ -30,4 +30,18 @@ namespace Universe.Coin.Upbit
     public class CoinDic : Dictionary<string, (string English, string Korean)> { }
     public class CurrencyDic : Dictionary<CurrencyId, HashSet<string>> { }
 
+    public class KeyPair
+    {
+        public KeyPair(string a, string s)
+        {
+            Access = a;
+            Secret = s;
+        }
+        public string Access;
+        public string Secret;
+        public static implicit operator (string access, string secret)(KeyPair pair) => (pair.Access, pair.Secret);
+        public static implicit operator KeyPair((string access, string secret) key) => new KeyPair(key.access, key.secret);
+    }
+
+
 }

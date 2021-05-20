@@ -18,33 +18,12 @@ namespace Universe.Coin.Upbit
 {
     public partial class Helper
     {
-        #region ---- Authorization Token (Payload) ----
-
-        static readonly int[] _key =
-        {
-            172 ^ 0xFF, 158 ^ 0xFF, 186 ^ 0xFF, 29 ^ 0xFF, 129 ^ 0xFF, 117 ^ 0xFF, 73 ^ 0xFF, 069 ^ 0xFF,
-            145 ^ 0xFF, 240 ^ 0xFF, 030 ^ 0xFF, 72 ^ 0xFF, 113 ^ 0xFF, 062 ^ 0xFF, 81 ^ 0xFF, 205 ^ 0xFF
-        };
-        public static void SaveAuthToken(string accessKey, string secretKey, string filePath)
-        {
-            var token = buildAuthToken(accessKey, secretKey);
-            var key = new Guid(_key.Select(x => (byte)(x ^ 0xFF)).ToArray()).ToString();
-            var bytes = Crypto.Encode(key, token, false);
-            File.WriteAllBytes(filePath, bytes);
-        }
-        public static string LoadAuthToken(string filePath)
-        {
-            var raw = File.ReadAllBytes(filePath);
-            var key = new Guid(_key.Select(x => (byte)(x ^ 0xFF)).ToArray()).ToString();
-            return Crypto.DecodeToString(key, raw);
-        }
-
         #region ---- Build Auth Token ----
 
-        static string buildAuthToken(string accessKey, string secretKey)
+        public static string BuildAuthToken(KeyPair key)
         {
-            var sign = Helper.sign(secretKey);
-            var payload = buildPayload(accessKey);
+            var sign = Helper.sign(key.Secret);
+            var payload = buildPayload(key.Access);
             var token = buidlJwtToken(sign, payload);
             return token;
         }
@@ -96,8 +75,15 @@ namespace Universe.Coin.Upbit
         public static string buildQueryHash(NameValueCollection nvc) => $"{nvc}".ToHashString();
         #endregion
 
-        #endregion
+        #region ---- TEST ----
 
+        public static void SaveEncrptedKey(string accessKey, string secretKey, string filePath)
+        {
+            var ak = accessKey.Encode();
+            var sk = secretKey.Encode();
+            File.WriteAllText(filePath, $"{ak}\n{sk}");
+        } 
+        #endregion
 
     }//class
 }

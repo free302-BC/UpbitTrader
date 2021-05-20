@@ -17,27 +17,36 @@ namespace Universe.Coin.Upbit
 {
     public partial class Client : ClientBase
     {
-        public Client(string accessKeyEnc, string secretKeyEnc, ILogger logger) : 
-            base(accessKeyEnc, secretKeyEnc, logger) { }
-
-        public List<MarketInfo> ApiMarketInfo()
+        public List<Account> ApiAccount()
         {
-            var api = ApiId.MarketInfoAll;
+            var api = ApiId.AccountInfo;
             _wc.QueryString.Clear();
+            _wc.SetAuthToken(_key);
             try
             {
                 string response = _wc.DownloadString(Helper.GetApiUrl(api));
-                var list = JsonConvert.DeserializeObject<List<MarketInfo>>(response) ?? new List<MarketInfo>();
+                var list = JsonConvert.DeserializeObject<List<Account>>(response) ?? new List<Account>();
                 return list;
             }
             catch (WebException ex)
             {
                 _logger.LogWebException(ex, api);
-                return new List<MarketInfo>();
+                return new List<Account>();
             }
         }
 
-
+        public double GetBalance(CurrencyId currencyId)
+        {
+            var accounts = ApiAccount();
+            var krw = accounts.FirstOrDefault(a => a.Currency == currencyId.ToString());
+            return krw?.Balance?.To<double>() ?? 0.0;
+        }
+        public double GetBalance(string coinId)
+        {
+            var accounts = ApiAccount();
+            var krw = accounts.FirstOrDefault(a => a.Currency == coinId);
+            return krw?.Balance?.To<double>() ?? 0.0;
+        }
 
 
     }//class
