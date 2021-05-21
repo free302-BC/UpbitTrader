@@ -18,8 +18,6 @@ namespace Universe.Coin.Upbit
         protected ILogger _logger;
         protected WebClient _wc;
         protected const string _market = "KRW-BTC";
-        protected const CurrencyId _currency = CurrencyId.KRW;
-        protected const string _coin = "BTC";
         protected readonly KeyPair _key;
 
         public ClientBase(string accessKeyEnc, string secretKeyEnc, ILogger logger)

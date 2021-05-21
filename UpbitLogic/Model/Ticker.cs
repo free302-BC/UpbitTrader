@@ -56,35 +56,35 @@ namespace Universe.Coin.Upbit.Model
         /// </summary>
         /// <value>시가</value>
         [DataMember(Name = "opening_price", EmitDefaultValue = false)]
-        public double OpeningPrice { get; set; }
+        public decimal OpeningPrice { get; set; }
 
         /// <summary>
         /// 고가
         /// </summary>
         /// <value>고가</value>
         [DataMember(Name = "high_price", EmitDefaultValue = false)]
-        public double HighPrice { get; set; }
+        public decimal HighPrice { get; set; }
 
         /// <summary>
         /// 저가
         /// </summary>
         /// <value>저가</value>
         [DataMember(Name = "low_price", EmitDefaultValue = false)]
-        public double LowPrice { get; set; }
+        public decimal LowPrice { get; set; }
 
         /// <summary>
         /// 종가
         /// </summary>
         /// <value>종가</value>
         [DataMember(Name = "trade_price", EmitDefaultValue = false)]
-        public double TradePrice { get; set; }
+        public decimal TradePrice { get; set; }
 
         /// <summary>
         /// 전일 종가
         /// </summary>
         /// <value>전일 종가</value>
         [DataMember(Name = "prev_closing_price", EmitDefaultValue = false)]
-        public double PrevClosingPrice { get; set; }
+        public decimal PrevClosingPrice { get; set; }
 
         /// <summary>
         /// EVEN : 보합 RISE : 상승 FALL : 하락 
@@ -98,70 +98,70 @@ namespace Universe.Coin.Upbit.Model
         /// </summary>
         /// <value>변화액의 절대값</value>
         [DataMember(Name = "change_price", EmitDefaultValue = false)]
-        public double ChangePrice { get; set; }
+        public decimal ChangePrice { get; set; }
 
         /// <summary>
         /// 변화율의 절대값
         /// </summary>
         /// <value>변화율의 절대값</value>
         [DataMember(Name = "change_rate", EmitDefaultValue = false)]
-        public double ChangeRate { get; set; }
+        public decimal ChangeRate { get; set; }
 
         /// <summary>
         /// 부호가 있는 변화액
         /// </summary>
         /// <value>부호가 있는 변화액</value>
         [DataMember(Name = "signed_change_price", EmitDefaultValue = false)]
-        public double SignedChangePrice { get; set; }
+        public decimal SignedChangePrice { get; set; }
 
         /// <summary>
         /// 부호가 있는 변화율
         /// </summary>
         /// <value>부호가 있는 변화율</value>
         [DataMember(Name = "signed_change_rate", EmitDefaultValue = false)]
-        public double SignedChangeRate { get; set; }
+        public decimal SignedChangeRate { get; set; }
 
         /// <summary>
         /// 가장 최근 거래량
         /// </summary>
         /// <value>가장 최근 거래량</value>
         [DataMember(Name = "trade_volume", EmitDefaultValue = false)]
-        public double TradeVolume { get; set; }
+        public decimal TradeVolume { get; set; }
 
         /// <summary>
         /// 누적 거래대금 (UTC 0시 기준)
         /// </summary>
         /// <value>누적 거래대금 (UTC 0시 기준)</value>
         [DataMember(Name = "acc_trade_price", EmitDefaultValue = false)]
-        public double AccTradePrice { get; set; }
+        public decimal AccTradePrice { get; set; }
 
         /// <summary>
         /// 24시간 누적 거래대금
         /// </summary>
         /// <value>24시간 누적 거래대금</value>
         [DataMember(Name = "acc_trade_price_24h", EmitDefaultValue = false)]
-        public double AccTradePrice24h { get; set; }
+        public decimal AccTradePrice24h { get; set; }
 
         /// <summary>
         /// 누적 거래량 (UTC 0시 기준)
         /// </summary>
         /// <value>누적 거래량 (UTC 0시 기준)</value>
         [DataMember(Name = "acc_trade_volume", EmitDefaultValue = false)]
-        public double AccTradeVolume { get; set; }
+        public decimal AccTradeVolume { get; set; }
 
         /// <summary>
         /// 24시간 누적 거래량
         /// </summary>
         /// <value>24시간 누적 거래량</value>
         [DataMember(Name = "acc_trade_volume_24h", EmitDefaultValue = false)]
-        public double AccTradeVolume24h { get; set; }
+        public decimal AccTradeVolume24h { get; set; }
 
         /// <summary>
         /// 52주 신고가
         /// </summary>
         /// <value>52주 신고가</value>
         [DataMember(Name = "highest_52_week_price", EmitDefaultValue = false)]
-        public double Highest52WeekPrice { get; set; }
+        public decimal Highest52WeekPrice { get; set; }
 
         /// <summary>
         /// 52주 신고가 달성일
@@ -175,7 +175,7 @@ namespace Universe.Coin.Upbit.Model
         /// </summary>
         /// <value>52주 신저가</value>
         [DataMember(Name = "lowest_52_week_price", EmitDefaultValue = false)]
-        public double Lowest52WeekPrice { get; set; }
+        public decimal Lowest52WeekPrice { get; set; }
 
         /// <summary>
         /// 52주 신저가 달성일
@@ -189,8 +189,7 @@ namespace Universe.Coin.Upbit.Model
         /// </summary>
         /// <value>타임스탬프</value>
         [DataMember(Name = "timestamp", EmitDefaultValue = false)]
-        public decimal Timestamp { get; set; }
-
+        public long Timestamp { get; set; }
 
         /// <summary>
         /// Returns the string presentation of the object

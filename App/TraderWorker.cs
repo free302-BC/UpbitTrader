@@ -29,15 +29,15 @@ namespace Universe.Coin.Upbit.App
             var uc = new Client(set.AccessKey, set.SecretKey, _sp.GetRequiredService<ILogger<Client>>());
             try
             {
-                //run(uc);
-                //var a1 = uc.ApiAccount();
-                var order = new CalcModel(uc.ApiOrderbook().OrderbookUnits[0]);//call price
-                order = new CalcModel(uc.ApiOrderbook().OrderbookUnits[0]);//call price
-                order = new CalcModel(uc.ApiOrderbook().OrderbookUnits[0]);//call price
+                run(uc);
+                //ticker(uc);
+                //account(uc);
+                //var order = new OrderbookModel(uc.ApiOrderbook());//call price
+                //info(order);
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                log("work():", e.Message);
+                log("work():", ex.Message);
             }
         }
         void run(Client uc)
@@ -47,14 +47,14 @@ namespace Universe.Coin.Upbit.App
             bool buy = false;
             while (true)
             {
-                Thread.Sleep(1000);
+                Thread.Sleep(5000);
                 var now = DateTime.Now;
                 if (now < sell)
                 {
-                    var order = new CalcModel(uc.ApiOrderbook().OrderbookUnits[0]);//call price
-                    info(order.ToOrderString());
+                    var order = new OrderbookModel(uc.ApiOrderbook());//call price
+                    report(order.ToString());
 
-                    var current = order.Ask;
+                    var current = order.askUP;
                     if (current > target && !buy)
                     {
                         var krw = uc.GetBalance(CurrencyId.KRW);//get balnace
@@ -68,8 +68,8 @@ namespace Universe.Coin.Upbit.App
                 }
                 else if (sell <= now && now < next)
                 {
-                    var btc = uc.GetBalance("BTC");//get btc
-                    if (btc > 0.00008)
+                    var btc = uc.GetBalance(CoinId.BTC);//get btc
+                    if (btc > 0.00008m)
                     {
                         ;//sell
                     }
@@ -83,7 +83,7 @@ namespace Universe.Coin.Upbit.App
                 }
             }//while
         }
-        (DateTime next, DateTime sell, double target) restart(Client uc)
+        (DateTime next, DateTime sell, decimal target) restart(Client uc)
         {
             var models = uc.ApiDayModels(2);
             var start = models[1].DateKST;
@@ -91,12 +91,25 @@ namespace Universe.Coin.Upbit.App
             var next = start.AddDays(1);
             var sell = next.AddSeconds(-60);
 
-            CalcModel.CalcRate(models, 0.5);
+            CandleModel.CalcRate(models, 0.5m);
             var target = models[1].Target;
 
-            return (next, sell, target);
+            return (next, sell, (decimal)target);//TODO: double? from source
         }
 
+        void ticker(Client uc)
+        {
+            var ticker = new TickerModel(uc.ApiTicker());
+            info(ticker.ToString());
+        }
+        void account(Client uc)
+        {
+            var a1 = uc.ApiAccount();
+            info(a1);
+            var krw = uc.GetBalance(CurrencyId.KRW);//get balnace
+            var btc = uc.GetBalance(CoinId.BTC);//get btc
+            info($"KRW= {krw}, BTC={btc}");
+        }
 
 
     }//class

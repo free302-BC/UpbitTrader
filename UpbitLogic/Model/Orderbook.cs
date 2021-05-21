@@ -30,21 +30,21 @@ namespace Universe.Coin.Upbit.Model
         /// </summary>
         /// <value>호가 생성 시각</value>
         [DataMember(Name = "timestamp", EmitDefaultValue = false)]
-        public decimal Timestamp { get; set; }
+        public long Timestamp { get; set; }
 
         /// <summary>
         /// 호가 매도 총 잔량
         /// </summary>
         /// <value>호가 매도 총 잔량</value>
         [DataMember(Name = "total_ask_size", EmitDefaultValue = false)]
-        public double TotalAskSize { get; set; }
+        public decimal TotalAskSize { get; set; }
 
         /// <summary>
         /// 호가 매수 총량
         /// </summary>
         /// <value>호가 매수 총량</value>
         [DataMember(Name = "total_bid_size", EmitDefaultValue = false)]
-        public double TotalBidSize { get; set; }
+        public decimal TotalBidSize { get; set; }
 
         /// <summary>
         /// 호가

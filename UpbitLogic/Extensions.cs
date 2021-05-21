@@ -18,10 +18,10 @@ namespace Universe.Coin.Upbit
 {
     public static class Extensions
     {
-        public static List<CalcModel> ApiDayModels(this Client client, int count) 
+        public static List<CandleModel> ApiDayModels(this Client client, int count) 
             => client.ApiCandle<CandleDay>(count).Select(x => x.ToModel()).Reverse().ToList();
 
-        public static CalcModel ToModel(this ICandle candle) => new(candle);
+        public static CandleModel ToModel(this ICandle candle) => new(candle);
 
         public static void SetAuthToken(this WebClient wc, KeyPair key) 
             => wc.Headers["Authorization"] = "Bearer " + Helper.BuildAuthToken(key);
@@ -30,6 +30,8 @@ namespace Universe.Coin.Upbit
             => wc.Headers["Accept"] = "application/json";
 
         public static void SetQueryString(this WebClient wc, string key, string value) => wc.QueryString[key] = value;
+        public static void SetQueryString(this WebClient wc, string key, CurrencyId currency, CoinId coin) 
+            => wc.QueryString[key] = Helper.GetMarketId(currency, coin);
         public static void RemoveQueryString(this WebClient wc, string key) => wc.QueryString.Remove(key);
 
         public static void LogWebException(this ILogger logger, WebException ex, ApiId api)
@@ -55,6 +57,7 @@ namespace Universe.Coin.Upbit
             145 ^ 0xFF, 240 ^ 0xFF, 030 ^ 0xFF, 72 ^ 0xFF, 113 ^ 0xFF, 062 ^ 0xFF, 81 ^ 0xFF, 205 ^ 0xFF
         };
         static string getKey() => new Guid(_key.Select(x => (byte)(x ^ 0xFF)).ToArray()).ToString();
+
 
     }//class
 }

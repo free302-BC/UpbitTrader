@@ -40,77 +40,77 @@ namespace Universe.Coin.Upbit.Model
         /// </summary>
         /// <value>시가</value>
         [DataMember(Name = "opening_price", EmitDefaultValue = false)]
-        public double OpeningPrice { get; set; }
+        public decimal OpeningPrice { get; set; }
 
         /// <summary>
         /// 고가
         /// </summary>
         /// <value>고가</value>
         [DataMember(Name = "high_price", EmitDefaultValue = false)]
-        public double HighPrice { get; set; }
+        public decimal HighPrice { get; set; }
 
         /// <summary>
         /// 저가
         /// </summary>
         /// <value>저가</value>
         [DataMember(Name = "low_price", EmitDefaultValue = false)]
-        public double LowPrice { get; set; }
+        public decimal LowPrice { get; set; }
 
         /// <summary>
         /// 종가
         /// </summary>
         /// <value>종가</value>
         [DataMember(Name = "trade_price", EmitDefaultValue = false)]
-        public double TradePrice { get; set; }
+        public decimal TradePrice { get; set; }
 
         /// <summary>
         /// 해당 캔들에서 마지막 틱이 저장된 시각
         /// </summary>
         /// <value>해당 캔들에서 마지막 틱이 저장된 시각</value>
         [DataMember(Name = "timestamp", EmitDefaultValue = false)]
-        public decimal Timestamp { get; set; }
+        public long Timestamp { get; set; }
 
         /// <summary>
         /// 누적 거래 금액
         /// </summary>
         /// <value>누적 거래 금액</value>
         [DataMember(Name = "candle_acc_trade_price", EmitDefaultValue = false)]
-        public double CandleAccTradePrice { get; set; }
+        public decimal CandleAccTradePrice { get; set; }
 
         /// <summary>
         /// 누적 거래량
         /// </summary>
         /// <value>누적 거래량</value>
         [DataMember(Name = "candle_acc_trade_volume", EmitDefaultValue = false)]
-        public double CandleAccTradeVolume { get; set; }
+        public decimal CandleAccTradeVolume { get; set; }
 
         /// <summary>
         /// 전일 종가 (UTC 0시 기준)
         /// </summary>
         /// <value>전일 종가 (UTC 0시 기준)</value>
         [DataMember(Name = "prev_closing_price", EmitDefaultValue = false)]
-        public double PrevClosingPrice { get; set; }
+        public decimal PrevClosingPrice { get; set; }
 
         /// <summary>
         /// 전일 종가 대비 변화 금액
         /// </summary>
         /// <value>전일 종가 대비 변화 금액</value>
         [DataMember(Name = "change_price", EmitDefaultValue = false)]
-        public double ChangePrice { get; set; }
+        public decimal ChangePrice { get; set; }
 
         /// <summary>
         /// 전일 종가 대비 변화량
         /// </summary>
         /// <value>전일 종가 대비 변화량</value>
         [DataMember(Name = "change_rate", EmitDefaultValue = false)]
-        public double ChangeRate { get; set; }
+        public decimal ChangeRate { get; set; }
 
         /// <summary>
         /// 종가 환산 화폐 단위로 환산된 가격 (요청에 convertingPriceUnit 파라미터 없을 시 해당 필드 포함되지 않음.) 
         /// </summary>
         /// <value>종가 환산 화폐 단위로 환산된 가격 (요청에 convertingPriceUnit 파라미터 없을 시 해당 필드 포함되지 않음.) </value>
         [DataMember(Name = "converted_trade_price", EmitDefaultValue = false)]
-        public double ConvertedTradePrice { get; set; }
+        public decimal ConvertedTradePrice { get; set; }
 
         const int w = 20;
 

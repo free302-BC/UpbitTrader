@@ -12,34 +12,33 @@ namespace Universe.Coin.Upbit.Model
     [DataContract]
     public class OrderbookUnit
     {
-        
         /// <summary>
         /// 매도호가
         /// </summary>
         /// <value>매도호가</value>
         [DataMember(Name = "ask_price", EmitDefaultValue = false)]
-        public double AskPrice { get; set; }
+        public decimal AskPrice { get; set; }
 
         /// <summary>
         /// 매수호가
         /// </summary>
         /// <value>매수호가</value>
         [DataMember(Name = "bid_price", EmitDefaultValue = false)]
-        public double BidPrice { get; set; }
+        public decimal BidPrice { get; set; }
 
         /// <summary>
         /// 매도 잔량
         /// </summary>
         /// <value>매도 잔량</value>
         [DataMember(Name = "ask_size", EmitDefaultValue = false)]
-        public double AskSize { get; set; }
+        public decimal AskSize { get; set; }
 
         /// <summary>
         /// 매수 잔량
         /// </summary>
         /// <value>매수 잔량</value>
         [DataMember(Name = "bid_size", EmitDefaultValue = false)]
-        public double BidSize { get; set; }
+        public decimal BidSize { get; set; }
 
         /// <summary>
         /// Returns the string presentation of the object

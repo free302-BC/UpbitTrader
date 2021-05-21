@@ -42,15 +42,15 @@ namespace Universe.Coin.Upbit.App
             }
         }
 
-        double findK(Client uc, int count)
+        decimal findK(Client uc, int count)
         {
             var sb = new StringBuilder();
             sb.AppendLine($"--- Finding K: count= {count} ----");
-            var list = new List<(double k, double rate, double mdd)>();
+            var list = new List<(decimal k, decimal rate, decimal mdd)>();
             var models = uc.ApiDayModels(count);
-            for (double k = 0.1; k <= 1.0; k += 0.1)
+            for (decimal k = 0.1m; k <= 1.0m; k += 0.1m)
             {
-                CalcModel.CalcRate(models, k);
+                CandleModel.CalcRate(models, k);
                 var (rate, mdd) = backTest(models, k);
                 list.Add((k, rate, mdd));
                 sb.AppendLine($"{k,6:N2}: {(rate - 1) * 100,10:N2}%, {mdd,10:N2}%");
@@ -63,7 +63,7 @@ namespace Universe.Coin.Upbit.App
             return max.k;
         }
         
-        void backTest(Client uc, int count, double k)
+        void backTest(Client uc, int count, decimal k)
         {
             var data = uc.ApiCandle<CandleDay>(count);
             //info(ICandle.Print(data));
@@ -71,23 +71,17 @@ namespace Universe.Coin.Upbit.App
             var models = data.Select(x => x.ToModel()).Reverse().ToList();
             var (finalRate, mdd) = backTest(models, k);
 
-            info(CalcModel.Print(models));
+            info(CandleModel.Print(models));
             info($"Final Profit Rate= {(finalRate - 1) * 100:N2}%", $"MDD= {mdd:N2}%");
         }
 
-        private static (double rate, double mdd) backTest(List<CalcModel> models, double k)
+        private static (decimal rate, decimal mdd) backTest(List<CandleModel> models, decimal k)
         {
-            CalcModel.CalcRate(models, k);
-            var rate = CalcModel.CalcCumRate(models);
-            var mdd = CalcModel.CalcDrawDown(models);
+            CandleModel.CalcRate(models, k);
+            var rate = CandleModel.CalcCumRate(models);
+            var mdd = CandleModel.CalcDrawDown(models);
             return (rate, mdd);
         }
-        void ticker(Client uc)
-        {
-            var ticker = new CalcModel(uc.ApiTicker());
-            info(ticker.ToTickerString());
-        }
-
 
         #region ---- TEST ----
 

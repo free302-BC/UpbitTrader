@@ -34,11 +34,11 @@ namespace Universe.Coin.Upbit
             }
         }
 
-        public Ticker ApiTicker(string market = _market)
+        public Ticker ApiTicker(CurrencyId currency = CurrencyId.KRW, CoinId coin = CoinId.BTC)
         {
             var api = ApiId.TradeTicker;
             _wc.QueryString.Clear();
-            _wc.SetQueryString("markets", market);
+            _wc.SetQueryString("markets", currency, coin);
             try
             {
                 string response = _wc.DownloadString(Helper.GetApiUrl(api));
@@ -52,10 +52,11 @@ namespace Universe.Coin.Upbit
             }
         }
 
-        public Orderbook ApiOrderbook()
+        public Orderbook ApiOrderbook(CurrencyId currency = CurrencyId.KRW, CoinId coin = CoinId.BTC)
         {
             var api = ApiId.OrderOrderbook;
-            _wc.RemoveQueryString("count");
+            _wc.QueryString.Clear();
+            _wc.SetQueryString("markets", currency, coin);
             try
             {
                 string response = _wc.DownloadString(Helper.GetApiUrl(api));

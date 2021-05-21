@@ -15,7 +15,7 @@ namespace Universe.Coin.Upbit.Model
     [DataContract]
     public class Account
     {
-        public Account() => Currency = Balance = Locked = AvgBuyPrice = UnitCurrency = string.Empty;
+        public Account() => Currency = UnitCurrency = string.Empty;
 
         /// <summary>
         /// 화폐를 의미하는 영문 대문자 코드
@@ -29,21 +29,21 @@ namespace Universe.Coin.Upbit.Model
         /// </summary>
         /// <value>주문가능 금액/수량</value>
         [DataMember(Name = "balance", EmitDefaultValue = false)]
-        public string Balance { get; set; }
+        public decimal Balance { get; set; }
 
         /// <summary>
         /// 주문 중 묶여있는 금액/수량
         /// </summary>
         /// <value>주문 중 묶여있는 금액/수량</value>
         [DataMember(Name = "locked", EmitDefaultValue = false)]
-        public string Locked { get; set; }
+        public decimal Locked { get; set; }
 
         /// <summary>
         /// 매수평균가
         /// </summary>
         /// <value>매수평균가</value>
         [DataMember(Name = "avg_buy_price", EmitDefaultValue = false)]
-        public string AvgBuyPrice { get; set; }
+        public decimal AvgBuyPrice { get; set; }
 
         /// <summary>
         /// 매수평균가 수정 여부

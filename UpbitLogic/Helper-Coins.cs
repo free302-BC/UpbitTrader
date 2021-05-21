@@ -16,18 +16,22 @@ using System.Text.Json;
 
 namespace Universe.Coin.Upbit
 {
+    using ApiDic = Dictionary<ApiId, (string Path, string Method, string Comment)>;
+    using CoinDic = Dictionary<CoinId, (string English, string Korean)>;
+    using CurrencyDic = Dictionary<CurrencyId, HashSet<CoinId>>;
+
     public partial class Helper
     {
         static readonly CoinDic _coinNames;
         static readonly CurrencyDic _marketCoins;
 
-        public static string GetMarketId(string coinId = "BTC", CurrencyId cid = CurrencyId.KRW)
+        public static string GetMarketId(CurrencyId currency = CurrencyId.KRW, CoinId coin = CoinId.BTC)
         {
-            if (_marketCoins[cid].Contains(coinId)) return $"{cid}-{coinId}";
-            else throw new Exception($"{nameof(GetMarketId)}(): unknown coin: {coinId}");
+            if (_marketCoins[currency].Contains(coin)) return $"{currency}-{coin}";
+            else throw new Exception($"{nameof(GetMarketId)}(): unknown coin: {coin}");
         }
 
-        public static string CoinName(string coinId, bool korean = true)
+        public static string CoinName(CoinId coinId, bool korean = true)
         {
             if (_coinNames.ContainsKey(coinId)) return korean ? _coinNames[coinId].Korean : _coinNames[coinId].English;
             else throw new Exception($"{nameof(CoinName)}(): unknown coin: {coinId}");
@@ -37,24 +41,27 @@ namespace Universe.Coin.Upbit
 
         const string _CoinNameFile = "coin-name.json";
         const string _MarketCoinsFile = "market-coins.json";
-        public static void buildCoinNameJson()
+
+        /// <summary>
+        /// Json file 생성시 
+        /// </summary>
+        public static void BuildCoinNameJson()
         {
-            //string[] _conisKRW = { }, _englishKRW = { }, _koreanKRW = { };
-            //string[] _coinsBTC = { }, _englishBTC = { }, _koreanBTC = { };
-            string[] _coinsUSDT = { "BTC", "ETH", "LTC", "XRP", "ETC", "OMG", "ADA", "TUSD", "SC", "TRX", "BCH", "DGB", "DOGE", "ZRX", "RVN", "BAT" };
+            string[] _coinsUSDT =
+            { "BTC", "ETH", "LTC", "XRP", "ETC", "OMG", "ADA", "TUSD", "SC", "TRX", "BCH", "DGB", "DOGE", "ZRX", "RVN", "BAT" };
 
             var opt = JsonSerializer.Deserialize<JsonSerializerOptions>(File.ReadAllText(_jsonOptionFile))!;
             opt.Encoder = JavaScriptEncoder.Create(UnicodeRanges.BasicLatin, UnicodeRanges.HangulSyllables);
             var coins = new CoinDic();
-            for (int i = 0; i < _conisKRW.Length; i++) coins[_conisKRW[i]] = (_englishKRW[i], _koreanKRW[i]);
-            for (int i = 0; i < _coinsBTC.Length; i++) coins[_coinsBTC[i]] = (_englishBTC[i], _koreanBTC[i]);
+            for (int i = 0; i < _conisKRW.Length; i++) coins[_conisKRW[i].To<CoinId>()] = (_englishKRW[i], _koreanKRW[i]);
+            for (int i = 0; i < _coinsBTC.Length; i++) coins[_coinsBTC[i].To<CoinId>()] = (_englishBTC[i], _koreanBTC[i]);
             File.WriteAllText(_CoinNameFile, JsonSerializer.Serialize(coins, opt));
 
-            var markets = new CurrencyDic
+            var markets = new Dictionary<CurrencyId, HashSet<string>>
             {
-                { CurrencyId.KRW, new HashSet<string>(_conisKRW) },
-                { CurrencyId.BTC, new HashSet<string>(_coinsBTC) },
-                { CurrencyId.USDT, new HashSet<string>(_coinsUSDT) }
+                { CurrencyId.KRW, new (_conisKRW) },
+                { CurrencyId.BTC, new (_coinsBTC) },
+                { CurrencyId.USDT, new (_coinsUSDT) }
             };
             File.WriteAllText(_MarketCoinsFile, JsonSerializer.Serialize(markets, opt));
         }

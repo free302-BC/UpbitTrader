@@ -9,10 +9,10 @@ namespace Universe.Coin.Upbit.Model
     public interface ICandle
     {
         public string CandleDateTimeKst { get; set; }
-        public double OpeningPrice { get; set; }
-        public double HighPrice { get; set; }
-        public double LowPrice { get; set; }
-        public double TradePrice { get; set; }
+        public decimal OpeningPrice { get; set; }
+        public decimal HighPrice { get; set; }
+        public decimal LowPrice { get; set; }
+        public decimal TradePrice { get; set; }
 
         public static string Print(IEnumerable<ICandle> models)
         {

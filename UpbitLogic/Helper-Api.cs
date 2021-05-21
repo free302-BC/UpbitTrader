@@ -16,25 +16,12 @@ using System.Text.Json;
 
 namespace Universe.Coin.Upbit
 {
+    using ApiDic = Dictionary<ApiId, (string Path, string Method, string Comment)>;
+    using CoinDic = Dictionary<CoinId, (string English, string Korean)>;
+    using CurrencyDic = Dictionary<CurrencyId, HashSet<CoinId>>;
+
     public partial class Helper
     {
-        static Helper()
-        {
-            var opt = JsonSerializer.Deserialize<JsonSerializerOptions>(File.ReadAllText(_jsonOptionFile));
-
-            //API url & path
-            var json = File.ReadAllText(_apiPathFile);
-            _apiDic = JsonSerializer.Deserialize<ApiDic>(json, opt) ?? new ApiDic();
-
-            //coin name dic
-            json = File.ReadAllText(_CoinNameFile);
-            _coinNames = JsonSerializer.Deserialize<CoinDic>(json, opt) ?? new CoinDic();
-
-            //currency-coin dic -> market
-            json = File.ReadAllText(_MarketCoinsFile);
-            _marketCoins = JsonSerializer.Deserialize<CurrencyDic>(json, opt) ?? new CurrencyDic();
-        }
-
         #region ---- API Path Json File ----
 
         const string _apiBaseUrl = "https://api.upbit.com/v1/";

@@ -35,17 +35,17 @@ namespace Universe.Coin.Upbit
             }
         }
 
-        public double GetBalance(CurrencyId currencyId)
+        public decimal GetBalance(CurrencyId currency)
         {
             var accounts = ApiAccount();
-            var krw = accounts.FirstOrDefault(a => a.Currency == currencyId.ToString());
-            return krw?.Balance?.To<double>() ?? 0.0;
+            var krw = accounts.FirstOrDefault(a => a.Currency == currency.ToString());
+            return krw?.Balance ?? 0m;
         }
-        public double GetBalance(string coinId)
+        public decimal GetBalance(CoinId coin)
         {
             var accounts = ApiAccount();
-            var krw = accounts.FirstOrDefault(a => a.Currency == coinId);
-            return krw?.Balance?.To<double>() ?? 0.0;
+            var krw = accounts.FirstOrDefault(a => a.Currency == coin.ToString());
+            return krw?.Balance ?? 0m;
         }
 
 
