@@ -1,6 +1,33 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <CodeSnippets xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+
   <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>Extension</Title>
+    </Header>
+    <Snippet>
+      <Code Language="CSharp">
+        <![CDATA[
+      public static class _$AM$Model
+      {
+          public static List<$AM$Model> ToModels(this IEnumerable<$AM$> models)
+             => models.Select(x => $AM$Model.ToModel(x)).Reverse().ToList();
+          public static $AM$Model ToModel(this $AM$ model)
+             => $AM$Model.ToModel(model);
+      }
+      ]]>
+      </Code>
+      <Declarations>
+        <Literal>
+          <ID>AM</ID>
+          <ToolTip>Choose API Model.</ToolTip>
+          <Default>Ticker</Default>
+        </Literal>
+      </Declarations>
+    </Snippet>
+  </CodeSnippet>
+  
+  <CodeSnippet Format="1.0.0">    
     <Header>
       <Title>Using Types</Title>
     </Header>

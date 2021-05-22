@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace Universe.Coin.Upbit.Model
 {
     [DataContract]
-    public class Ticker
+    public class Ticker : IApiModel
     {
         public Ticker()
             => Market = TradeDate = TradeTime = TradeDateKst = TradeTimeKst 

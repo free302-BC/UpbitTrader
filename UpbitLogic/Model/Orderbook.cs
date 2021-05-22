@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace Universe.Coin.Upbit.Model
 {
     [DataContract]
-    public class Orderbook
+    public class Orderbook : IApiModel
     {
         public Orderbook()
         {

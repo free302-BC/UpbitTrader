@@ -11,14 +11,14 @@ namespace Universe.Coin.Upbit.Model
     /// </summary>
     public interface IPrint
     {
-        public static string? Header { get; }
+        //public static string? Header { get; }
 
-        public static string Print(IEnumerable<IApiModel> models)
-        {
-            var sb = new StringBuilder();
-            sb.AppendLine(Header);
-            foreach (var m in models) sb.AppendLine(m.ToString());
-            return sb.ToString();
-        }
+        //public static string Print(IEnumerable<IApiModel> models)
+        //{
+        //    var sb = new StringBuilder();
+        //    sb.AppendLine(Header);
+        //    foreach (var m in models) sb.AppendLine(m.ToString());
+        //    return sb.ToString();
+        //}
     }
 }

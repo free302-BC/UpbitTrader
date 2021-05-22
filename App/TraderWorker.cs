@@ -29,10 +29,11 @@ namespace Universe.Coin.Upbit.App
             var uc = new Client(set.AccessKey, set.SecretKey, _sp.GetRequiredService<ILogger<Client>>());
             try
             {
-                //market(uc);
-                //ticker(uc);
-                //orderbook(uc);
-                //account(uc);
+                market(uc);
+                ticker(uc);
+                candle(uc);
+                orderbook(uc);
+                account(uc);
                 run(uc);
             }
             catch (Exception ex)
@@ -86,7 +87,7 @@ namespace Universe.Coin.Upbit.App
         }
         (DateTime next, DateTime sell, decimal target) restart(Client uc)
         {
-            var models = uc.ApiCandle<CandleDay>(count: 2).ToModel();
+            var models = uc.ApiCandle<CandleDay>(count: 2).ToModels();
             var start = models[1].DateKST;
             info($"Starting new period: {start}");
             var next = start.AddDays(1);
@@ -95,13 +96,19 @@ namespace Universe.Coin.Upbit.App
             CandleModel.CalcRate(models, 0.5m);
             var target = models[1].Target;
 
-            return (next, sell, (decimal)target);//TODO: double? from source
+            return (next, sell, target);
         }
 
         void market(Client uc)
         {
             var markets = uc.ApiMarketInfo();
-            info(IPrint.Print(markets));
+            info(IApiModel.Print(markets));
+        }
+        void candle(Client uc)
+        {
+            var candles = uc.ApiCandle<CandleDay>();
+            var models = candles.ToModels();
+            info(IViewModel.Print(models));
         }
         void account(Client uc)
         {
@@ -113,7 +120,12 @@ namespace Universe.Coin.Upbit.App
         }
         void ticker(Client uc)
         {
-            var ticker = new TickerModel(uc.ApiTicker());
+            var markets = new[] {
+                (CurrencyId.KRW, CoinId.BTC),
+                (CurrencyId.KRW, CoinId.ETH),
+                (CurrencyId.KRW, CoinId.DOGE)
+            };
+            var ticker = uc.ApiTicker(markets).ToModels();
             info(ticker);
         }
         void orderbook(Client uc)

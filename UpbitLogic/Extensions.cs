@@ -18,14 +18,12 @@ namespace Universe.Coin.Upbit
 {
     public static class Extensions
     {
-        public static CandleModel ToModel(this ICandle candle) => new(candle);
-        public static List<CandleModel> ToModel(this IEnumerable<ICandle> candles)
-            => candles.Select(x => x.ToModel()).Reverse().ToList();
+        public static string Print(this IEnumerable<IViewModel> models) => IViewModel.Print(models);
 
-        public static void SetAuthToken(this WebClient wc, KeyPair key) 
+        public static void SetAuthToken(this WebClient wc, KeyPair key)
             => wc.Headers["Authorization"] = "Bearer " + Helper.BuildAuthToken(key);
 
-        public static void SetAcceptance(this WebClient wc) 
+        public static void SetAcceptance(this WebClient wc)
             => wc.Headers["Accept"] = "application/json";
 
 

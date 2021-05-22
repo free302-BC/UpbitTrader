@@ -6,14 +6,15 @@ using System.Threading.Tasks;
 
 namespace Universe.Coin.Upbit.Model
 {
-    public class OrderbookModel
+    public class OrderbookModel : ViewModelBase<OrderbookModel, Orderbook>
     {
         public DateTime time;
         public decimal askUP, bidUP, deltaUP; //unit price (price per 1 coin)
         public decimal askA, bidA;//amount (number of coins)
         public decimal askP, bidP;
-
-        public OrderbookModel(Orderbook book)
+        public OrderbookModel() { }
+        public OrderbookModel(Orderbook book) => setApiModel(book);
+        protected override OrderbookModel setApiModel(Orderbook book)
         {
             var order = book.OrderbookUnits[0];
             time = DateTimeOffset.FromUnixTimeMilliseconds(book.Timestamp).LocalDateTime;
@@ -27,6 +28,7 @@ namespace Universe.Coin.Upbit.Model
 
             askP = askA * askUP;
             bidP = bidA * bidUP;
+            return this;
         }
         public override string ToString()
             => $"[{time:yyMMdd.HHmmss.fff}] {askA:F8} × {askUP,6:F1} = {askP,7:F1}  | {deltaUP,3:F1} | {bidP,7:F1} = {bidUP,6:F1} × {bidA:F8}";
@@ -38,6 +40,7 @@ namespace Universe.Coin.Upbit.Model
             foreach (var m in models) sb.AppendLine(m.ToString());
             return sb.ToString();
         }
+
         static readonly string _header;
         static OrderbookModel()
         {
@@ -45,6 +48,8 @@ namespace Universe.Coin.Upbit.Model
             foreach (var h in _names) sb.Append($"{{{h.name},{h.wdith}:{h.fmt}}} ");
             _header = sb.ToString();
         }
+
+        
         static readonly (string name, int wdith, string fmt)[] _names =
         {
             //$"{askA:F8} × {askUP,6:F1} = {askP,7:F1}  | {deltaUP,3:F1} | {bidP,7:F1} = {bidUP,6:F1} × {bidA:F8}";
@@ -58,6 +63,15 @@ namespace Universe.Coin.Upbit.Model
             (nameof(bidA), 10, "F8")
         };
 
-
     }//class
+
+    public static class _OrderbookModel
+    {
+        public static List<OrderbookModel> ToModels(this IEnumerable<Orderbook> models)
+           => models.Select(x => OrderbookModel.ToModel(x)).Reverse().ToList();
+        public static OrderbookModel ToModel(this Orderbook model)
+           => OrderbookModel.ToModel(model);
+    }
+
+
 }

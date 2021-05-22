@@ -23,11 +23,11 @@ namespace Universe.Coin.Upbit
             //TODO: decide apiID from M or from param
             //TODO: make candle BaseModel
             return InvokeApi<M>(ApiId.CandleDays, () =>
-                            {
-                                setQueryString("market", currency, coin);
-                                setQueryString("count", count.ToString());
-                            })
-                       ?? new();
+                {
+                    setQueryString("market", currency, coin);
+                    setQueryString("count", count.ToString());
+                })
+            ?? new();
         }
 
         public Ticker ApiTicker(CurrencyId currency = CurrencyId.KRW, CoinId coin = CoinId.BTC)
@@ -35,5 +35,13 @@ namespace Universe.Coin.Upbit
             ?.FirstOrDefault()
             ?? new();
 
+        public List<Ticker> ApiTicker(IEnumerable<(CurrencyId currency, CoinId coin)> markets)
+        {
+            void setQs()
+            {
+                foreach (var q in markets) _wc.QueryString.Add("markets", Helper.GetMarketId(q.currency, q.coin));
+            }
+            return InvokeApi<Ticker>(ApiId.TradeTicker, setQs) ?? new();
+        }
     }//class
 }

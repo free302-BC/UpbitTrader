@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Universe.Coin.Upbit.Model
 {
-    public class CandleModel
+    public class CandleModel : ViewModelBase<CandleModel, ICandle>
     {
         public DateTime DateKST;
         public decimal Opening;
@@ -22,8 +22,9 @@ namespace Universe.Coin.Upbit.Model
         const decimal _feeRate = 0.0005m * 2m;
         static readonly CandleModel _default = new();
 
-        CandleModel() { }
-        public CandleModel(ICandle candle)
+        public CandleModel() { }
+        public CandleModel(ICandle candle) => setApiModel(candle);
+        protected override CandleModel setApiModel(ICandle candle)
         {
             DateKST = DateTime.Parse(candle.CandleDateTimeKst);
             Opening = Math.Round(candle.OpeningPrice / 10000.0m, 1);
@@ -31,7 +32,9 @@ namespace Universe.Coin.Upbit.Model
             Low = Math.Round(candle.LowPrice / 10000.0m, 1);
             Closing = Math.Round(candle.TradePrice / 10000.0m, 1);
             Delta = High - Low;
+            return this;
         }
+
 
         void calcRate(CandleModel prev, decimal k)
         {
@@ -63,21 +66,28 @@ namespace Universe.Coin.Upbit.Model
             }
             return models.Max(m => m.DrawDown);
         }
-
-        public static string Print(IEnumerable<CandleModel> models)
+       
+        static readonly (string, int)[] _names =
         {
-            var sb = new StringBuilder();
-            sb.AppendLine(
-                $"{_names[0],11} {_names[1],8} {_names[2],8} {_names[3],8} {_names[4],8} : {_names[5],8} {_names[6],8} {_names[7],8}");
-            foreach (var m in models) sb.AppendLine(m.ToString());
-            return sb.ToString();
-        }
-        static readonly string[] _names =
-        {
-            nameof(DateKST), nameof(Opening), nameof(Target), nameof(High), nameof(Closing), nameof(Rate),
-            nameof(CumRate), nameof(DrawDown)
+            (nameof(DateKST), 11), 
+            (nameof(Opening),  8),
+            (nameof(Target),   8),
+            (nameof(High),     8),
+            (nameof(Closing),  8),
+            (nameof(Rate),     8),
+            (nameof(CumRate),  8),
+            (nameof(DrawDown), 8)
         };
-
-
+        static CandleModel() => IViewModel.buildHeader(_names);
+        
     }//class
+
+    public static class _CandleModel
+    {
+        public static List<CandleModel> ToModels(this IEnumerable<ICandle> models)
+           => models.Select(x => CandleModel.ToModel(x)).Reverse().ToList();
+        public static CandleModel ToModel(this ICandle model)
+           => CandleModel.ToModel(model);
+    }
+
 }

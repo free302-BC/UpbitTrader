@@ -48,7 +48,8 @@ namespace Universe.Coin.Upbit.App
             sb.AppendLine($"--- Finding K: count= {count} ----");
 
             var list = new List<(decimal k, decimal rate, decimal mdd)>();
-            var models = uc.ApiCandle<CandleDay>(count: count).ToModel();
+            var models = uc.ApiCandle<CandleDay>(count: count).ToModels();
+
             for (decimal k = 0.1m; k <= 1.0m; k += 0.1m)
             {
                 CandleModel.CalcRate(models, k);
@@ -68,12 +69,12 @@ namespace Universe.Coin.Upbit.App
         void backTest(Client uc, int count, decimal k)
         {
             var data = uc.ApiCandle<CandleDay>(count: count);
-            //info(ICandle.Print(data));
+            info(IApiModel.Print(data));
 
-            var models = data.Select(x => x.ToModel()).Reverse().ToList();
+            var models = data.ToModels();
             var (finalRate, mdd) = backTest(models, k);
 
-            info(CandleModel.Print(models));
+            info(IViewModel.Print(models));
             info($"Final Profit Rate= {(finalRate - 1) * 100:N2}%", $"MDD= {mdd:N2}%");
         }
 
