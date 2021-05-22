@@ -9,9 +9,7 @@ using System.Threading.Tasks;
 
 namespace Universe.Coin.Upbit
 {
-    using ApiDic = Dictionary<ApiId, (string Path, string Method, string Comment)>;
-    using CoinDic = Dictionary<CoinId, (string English, string Korean)>;
-    using CurrencyDic = Dictionary<CurrencyId, HashSet<CoinId>>;
+    public enum HttpMethod { GET, POST, DELETE }
 
     public enum ApiId
     {
@@ -70,6 +68,7 @@ namespace Universe.Coin.Upbit
     //public class ApiDic : Dictionary<ApiId, (string Path, string Method, string Comment)> { }
     //public class CoinDic : Dictionary<CoinId, (string English, string Korean)> { }
     //public class CurrencyDic : Dictionary<CurrencyId, HashSet<CoinId>> { }
+    //타입 호환성 부족, 속도 문제...
 
     public class KeyPair
     {

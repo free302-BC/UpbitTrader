@@ -18,9 +18,9 @@ using System.Collections.Specialized;
 
 namespace Universe.Coin.Upbit.App
 {
-    public class TestWorker : WorkerBase<TestWorker, WorkerSetting>
+    public class BackTestWorker : WorkerBase<BackTestWorker, WorkerSetting>
     {
-        public TestWorker(ILogger<TestWorker> logger, IOptionsMonitor<WorkerSetting> set, IServiceProvider sp)
+        public BackTestWorker(ILogger<BackTestWorker> logger, IOptionsMonitor<WorkerSetting> set, IServiceProvider sp)
             : base(logger, set, sp) { }
 
         protected override void work(WorkerSetting set)
@@ -46,8 +46,9 @@ namespace Universe.Coin.Upbit.App
         {
             var sb = new StringBuilder();
             sb.AppendLine($"--- Finding K: count= {count} ----");
+
             var list = new List<(decimal k, decimal rate, decimal mdd)>();
-            var models = uc.ApiDayModels(count);
+            var models = uc.ApiCandle<CandleDay>(count: count).ToModel();
             for (decimal k = 0.1m; k <= 1.0m; k += 0.1m)
             {
                 CandleModel.CalcRate(models, k);
@@ -57,6 +58,7 @@ namespace Universe.Coin.Upbit.App
             }
             var maxRate = list.Max(x => x.rate);
             var max = list.First(x => x.rate == maxRate);
+
             sb.AppendLine("---------------------------------------------------");
             sb.AppendLine($"{max.k,6:N2}: {(max.rate - 1) * 100,10:N2}%, {max.mdd,10:N2}%");
             info(sb);
@@ -65,7 +67,7 @@ namespace Universe.Coin.Upbit.App
         
         void backTest(Client uc, int count, decimal k)
         {
-            var data = uc.ApiCandle<CandleDay>(count);
+            var data = uc.ApiCandle<CandleDay>(count: count);
             //info(ICandle.Print(data));
 
             var models = data.Select(x => x.ToModel()).Reverse().ToList();

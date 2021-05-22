@@ -8,18 +8,10 @@ namespace Universe.Coin.Upbit.Model
 {
     public class TickerModel
     {
-        string TimeKST;
-        decimal Opening;
-        decimal High;
-        decimal Low;
-        decimal Closing;
-        decimal Delta;
-        string Change;
+        string TimeKST, Change;
+        decimal Opening, High, Low, Closing, Delta;
 
-        public TickerModel()
-        {
-            TimeKST = Change = "";
-        }
+        public TickerModel() => TimeKST = Change = "";
 
         public TickerModel(Ticker ticker)
         {
@@ -29,7 +21,7 @@ namespace Universe.Coin.Upbit.Model
             Low = Math.Round(ticker.LowPrice / 10000.0m, 1);
             Closing = Math.Round(ticker.TradePrice / 10000.0m, 1);
             Delta = Math.Round(ticker.SignedChangePrice / 10000.0m, 1);
-            Change = ticker.Change=="EVEN" ? "〓":$"{(ticker.Change == "RISE"? "▲" : "▽")}";
+            Change = ticker.Change=="EVEN" ? "〓":$"{(ticker.Change == "RISE"? "▲" : "▼")}";
         }
         public override string ToString()
             => $"{TimeKST,8} {Opening,8:F1} {High,8:F1} {Low,8:F1} {Closing,8:F1} : {Delta,8:F1} {Change}";

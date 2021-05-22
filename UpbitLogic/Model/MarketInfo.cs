@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace Universe.Coin.Upbit.Model
 {
     [DataContract]
-    public class MarketInfo
+    public class MarketInfo : IApiModel
     {
         public MarketInfo() => Market = KoreanName = EnglishName = MarketWarning = string.Empty;
 
@@ -49,10 +49,10 @@ namespace Universe.Coin.Upbit.Model
         public override string ToString()
         {
             var sb = new StringBuilder();
-            sb.Append($"Market: {Market}");
-            sb.Append($"KoreanName: {KoreanName}");
-            sb.Append($"EnglishName: {EnglishName}");
-            sb.Append($"MarketWarning: {MarketWarning}");
+            sb.AppendLine($"Market: {Market}");
+            sb.AppendLine($"KoreanName: {KoreanName}");
+            sb.AppendLine($"EnglishName: {EnglishName}");
+            sb.AppendLine($"MarketWarning: {MarketWarning}");
             return sb.ToString();
         }
 

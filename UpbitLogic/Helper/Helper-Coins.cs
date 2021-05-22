@@ -16,18 +16,29 @@ using System.Text.Json;
 
 namespace Universe.Coin.Upbit
 {
-    using ApiDic = Dictionary<ApiId, (string Path, string Method, string Comment)>;
     using CoinDic = Dictionary<CoinId, (string English, string Korean)>;
     using CurrencyDic = Dictionary<CurrencyId, HashSet<CoinId>>;
+    using _CurrencyDic = Dictionary<CurrencyId, HashSet<string>>;
 
     public partial class Helper
     {
         static readonly CoinDic _coinNames;
-        static readonly CurrencyDic _marketCoins;
+        static readonly CurrencyDic _currencyCoins;
 
+        static CoinDic loadCoinJson(JsonSerializerOptions opt)
+        {
+            var json = File.ReadAllText(_CoinNameFile);
+            return JsonSerializer.Deserialize<CoinDic>(json, opt) ?? new();
+        }
+        static CurrencyDic loadCurrencyJson(JsonSerializerOptions opt)
+        {
+            var json = File.ReadAllText(_MarketCoinsFile);
+            var markets = JsonSerializer.Deserialize<_CurrencyDic>(json, opt) ?? new _CurrencyDic();
+            return markets.ToDictionary(x => x.Key, x => x.Value.Select(y => y.To<CoinId>()).ToHashSet());
+        }
         public static string GetMarketId(CurrencyId currency = CurrencyId.KRW, CoinId coin = CoinId.BTC)
         {
-            if (_marketCoins[currency].Contains(coin)) return $"{currency}-{coin}";
+            if (_currencyCoins[currency].Contains(coin)) return $"{currency}-{coin}";
             else throw new Exception($"{nameof(GetMarketId)}(): unknown coin: {coin}");
         }
 

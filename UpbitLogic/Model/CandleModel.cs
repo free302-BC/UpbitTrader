@@ -41,6 +41,7 @@ namespace Universe.Coin.Upbit.Model
         public override string ToString()
             => $"{DateKST:yyMMdd.HHmm} {Opening,8:F1} {Target,8:F1} {High,8:F1} {Closing,8:F1} : {Rate,8:F4} {CumRate,8:F4} {DrawDown,8:F2}";
 
+        
         public static void CalcRate(IList<CandleModel> models, decimal k)
         {
             models.Insert(0, _default);

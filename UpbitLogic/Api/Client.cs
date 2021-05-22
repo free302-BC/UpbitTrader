@@ -20,25 +20,7 @@ namespace Universe.Coin.Upbit
         public Client(string accessKeyEnc, string secretKeyEnc, ILogger logger) : 
             base(accessKeyEnc, secretKeyEnc, logger) { }
 
-        public List<MarketInfo> ApiMarketInfo()
-        {
-            var api = ApiId.MarketInfoAll;
-            _wc.QueryString.Clear();
-            try
-            {
-                string response = _wc.DownloadString(Helper.GetApiUrl(api));
-                var list = JsonConvert.DeserializeObject<List<MarketInfo>>(response) ?? new List<MarketInfo>();
-                return list;
-            }
-            catch (WebException ex)
-            {
-                _logger.LogWebException(ex, api);
-                return new List<MarketInfo>();
-            }
-        }
-
-
-
+        public List<MarketInfo> ApiMarketInfo() => InvokeApi<MarketInfo>(ApiId.MarketInfoAll);
 
     }//class
 }

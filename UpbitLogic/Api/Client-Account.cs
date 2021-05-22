@@ -17,23 +17,7 @@ namespace Universe.Coin.Upbit
 {
     public partial class Client : ClientBase
     {
-        public List<Account> ApiAccount()
-        {
-            var api = ApiId.AccountInfo;
-            _wc.QueryString.Clear();
-            _wc.SetAuthToken(_key);
-            try
-            {
-                string response = _wc.DownloadString(Helper.GetApiUrl(api));
-                var list = JsonConvert.DeserializeObject<List<Account>>(response) ?? new List<Account>();
-                return list;
-            }
-            catch (WebException ex)
-            {
-                _logger.LogWebException(ex, api);
-                return new List<Account>();
-            }
-        }
+        public List<Account> ApiAccount() => InvokeApi<Account>(ApiId.AccountInfo);
 
         public decimal GetBalance(CurrencyId currency)
         {

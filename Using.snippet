@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>Using Types</Title>
+    </Header>
+    <Snippet>
+      <Code Language="CSharp">
+        <![CDATA[
+        using ApiDic = Dictionary<ApiId, (string Path, HttpMethod Method, string Comment, bool resetAuthToken)>;
+        using CoinDic = Dictionary<CoinId, (string English, string Korean)>;
+        using CurrencyDic = Dictionary<CurrencyId, HashSet<CoinId>>;
+    ]]>
+      </Code>
+
+      <!--<Imports>
+        <Import>
+          <Namespace>System.IO</Namespace>
+        </Import>
+      </Imports>-->
+
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

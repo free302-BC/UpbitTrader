@@ -29,17 +29,18 @@ namespace Universe.Coin.Upbit.App
             var uc = new Client(set.AccessKey, set.SecretKey, _sp.GetRequiredService<ILogger<Client>>());
             try
             {
-                run(uc);
+                //market(uc);
                 //ticker(uc);
+                //orderbook(uc);
                 //account(uc);
-                //var order = new OrderbookModel(uc.ApiOrderbook());//call price
-                //info(order);
+                run(uc);
             }
             catch (Exception ex)
             {
                 log("work():", ex.Message);
             }
         }
+
         void run(Client uc)
         {
             var (next, sell, target) = restart(uc);
@@ -85,7 +86,7 @@ namespace Universe.Coin.Upbit.App
         }
         (DateTime next, DateTime sell, decimal target) restart(Client uc)
         {
-            var models = uc.ApiDayModels(2);
+            var models = uc.ApiCandle<CandleDay>(count: 2).ToModel();
             var start = models[1].DateKST;
             info($"Starting new period: {start}");
             var next = start.AddDays(1);
@@ -97,10 +98,10 @@ namespace Universe.Coin.Upbit.App
             return (next, sell, (decimal)target);//TODO: double? from source
         }
 
-        void ticker(Client uc)
+        void market(Client uc)
         {
-            var ticker = new TickerModel(uc.ApiTicker());
-            info(ticker.ToString());
+            var markets = uc.ApiMarketInfo();
+            info(IPrint.Print(markets));
         }
         void account(Client uc)
         {
@@ -110,7 +111,16 @@ namespace Universe.Coin.Upbit.App
             var btc = uc.GetBalance(CoinId.BTC);//get btc
             info($"KRW= {krw}, BTC={btc}");
         }
-
+        void ticker(Client uc)
+        {
+            var ticker = new TickerModel(uc.ApiTicker());
+            info(ticker);
+        }
+        void orderbook(Client uc)
+        {
+            var order = new OrderbookModel(uc.ApiOrderbook());//call price
+            info(order);
+        }
 
     }//class
 }
