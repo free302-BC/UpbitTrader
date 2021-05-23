@@ -30,37 +30,29 @@ namespace Universe.Coin.Upbit.Model
             bidP = bidA * bidUP;
             return this;
         }
+        public override bool Equals(object? obj)
+        {
+            if (obj == null || !(obj is OrderbookModel)) return false;
+            var o = (OrderbookModel)obj;
+            return askUP == o.askUP && askA == o.askA && bidP == o.bidP && bidA == o.bidA;
+        }
+        public static bool operator ==(OrderbookModel? a, OrderbookModel? b) => a?.Equals(b) ?? false;
+        public static bool operator !=(OrderbookModel? a, OrderbookModel? b) => !(a?.Equals(b) ?? false);
+        public override int GetHashCode() => Utility.HashCode.Of(askUP).And(askA).And(bidUP).And(bidA);
+
         public override string ToString()
-            => $"[{time:yyMMdd.HHmmss.fff}] {askA:F8} × {askUP,6:F1} = {askP,7:F1}  | {deltaUP,3:F1} | {bidP,7:F1} = {bidUP,6:F1} × {bidA:F8}";
-
-        public static string Print(IEnumerable<OrderbookModel> models)
+            => $"[{time:HHmmss.fff}] {askA:F8} × {askUP,6:F1} = {askP,7:F1}  | {deltaUP,4:F1} | {bidP,7:F1} = {bidUP,6:F1} × {bidA:F8}";
+        static OrderbookModel() => IViewModel.buildHeader(_names);
+        static readonly (string name, int wdith)[] _names =
         {
-            var sb = new StringBuilder();
-            sb.AppendLine(_header);
-            foreach (var m in models) sb.AppendLine(m.ToString());
-            return sb.ToString();
-        }
-
-        static readonly string _header;
-        static OrderbookModel()
-        {
-            StringBuilder sb = new();
-            foreach (var h in _names) sb.Append($"{{{h.name},{h.wdith}:{h.fmt}}} ");
-            _header = sb.ToString();
-        }
-
-        
-        static readonly (string name, int wdith, string fmt)[] _names =
-        {
-            //$"{askA:F8} × {askUP,6:F1} = {askP,7:F1}  | {deltaUP,3:F1} | {bidP,7:F1} = {bidUP,6:F1} × {bidA:F8}";
-            (nameof(time), 17, ""),
-            (nameof(askA), 10, "F8"),
-            (nameof(askUP), 6, "F1"),
-            (nameof(askP),  7, "F1"),
-            (nameof(deltaUP), 3, "F1"),
-            (nameof(bidP), 7, "F1"),
-            (nameof(bidUP), 6, "F1"),
-            (nameof(bidA), 10, "F8")
+            (nameof(time),  10),
+            (nameof(askA),  10),
+            (nameof(askUP), 6),
+            (nameof(askP),  7),
+            (nameof(deltaUP), 3),
+            (nameof(bidP), 7),
+            (nameof(bidUP), 6),
+            (nameof(bidA), 10)
         };
 
     }//class

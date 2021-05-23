@@ -41,14 +41,10 @@
   <ItemGroup>
     <ProjectReference Include="..\AppBase\AppBase.csproj" />
     <ProjectReference Include="..\UpbitLogic\UpbitLogic.csproj" />
-    <ProjectReference Include="..\UpbitSwagger\UpbitSwagger.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <None Update="appsettings.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="authtoken.dat">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="authtoken.enc">

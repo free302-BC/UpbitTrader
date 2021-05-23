@@ -37,9 +37,6 @@
     <PackageReference Include="Universe.Utility" Version="3.3.0" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\UpbitSwagger\UpbitSwagger.csproj" />
-  </ItemGroup>
-  <ItemGroup>
     <None Update="api_json_option.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

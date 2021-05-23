@@ -1,0 +1,10 @@
+체결: 실시간 or 모두 받기 ~ 웹소켓?
+
+K 변경, 거래주기 변경~ 활성상태에서  --> 웹앱으로 변경, 
+ - 구조 설계 필요
+ - API, Service, MiddleWare 설계
+
+CandleModel: base model 만들기
+
+
+

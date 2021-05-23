@@ -8,9 +8,9 @@ namespace Universe.Coin.Upbit.Model
 {
     public class TickerModel : ViewModelBase<TickerModel, Ticker>
     {
-        string TimeKST, Change;
+        string Market, TimeKST, Change;
         decimal Opening, High, Low, Closing, Delta;
-        public TickerModel() => TimeKST = Change = "";
+        public TickerModel() => Market = TimeKST = Change = "";
 
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         public TickerModel(Ticker ticker) => setApiModel(ticker);
@@ -18,6 +18,7 @@ namespace Universe.Coin.Upbit.Model
 
         protected override TickerModel setApiModel(Ticker ticker)
         {
+            Market = ticker.Market;
             TimeKST = $"{ticker.TradeDateKst}.{ticker.TradeTimeKst}";
             Opening = Math.Round(ticker.OpeningPrice / 10000.0m, 1);
             High = Math.Round(ticker.HighPrice / 10000.0m, 1);
@@ -29,11 +30,12 @@ namespace Universe.Coin.Upbit.Model
         }
 
         public override string ToString()
-            => $"{TimeKST,8} {Opening,8:F1} {High,8:F1} {Low,8:F1} {Closing,8:F1} : {Delta,8:F1} {Change}";
+            => $"{Market,8} {TimeKST,15} {Opening,8:F1} {High,8:F1} {Low,8:F1} {Closing,8:F1} : {Delta,8:F1} {Change}";
 
         static readonly (string name, int wdith)[] _names =
         {
-            (nameof(TimeKST), 8), 
+            (nameof(Market), 8),
+            (nameof(TimeKST), 15), 
             (nameof(Opening), 8), 
             (nameof(High), 8), 
             (nameof(Low),  8),
@@ -47,7 +49,7 @@ namespace Universe.Coin.Upbit.Model
     public static class _TickerModel
     {
         public static List<TickerModel> ToModels(this IEnumerable<Ticker> models)
-           => models.Select(x => TickerModel.ToModel(x)).Reverse().ToList();
+           => models.Select(x => TickerModel.ToModel(x)).ToList();
         public static TickerModel ToModel(this Ticker model)
            => TickerModel.ToModel(model);
     }

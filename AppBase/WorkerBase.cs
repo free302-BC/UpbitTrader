@@ -26,15 +26,13 @@ namespace Universe.AppBase
             _sp = sp;
         }
 
-        protected void report(object message)
+        protected void report(object message, int color = 0)
         {
             var fg = Console.ForegroundColor;
-            var bg = Console.BackgroundColor;
-            Console.ForegroundColor = ConsoleColor.DarkGreen;
-            //Console.BackgroundColor = ConsoleColor.Gray;
-            Console.WriteLine($"[{DateTime.Now:yyMMdd.HHmmss}] {message}");
+            if (color != 0) Console.ForegroundColor = color > 0 ? ConsoleColor.DarkYellow : ConsoleColor.DarkGreen;
+            else Console.ForegroundColor = ConsoleColor.DarkGray;
+            Console.WriteLine($"[{DateTime.Now:yyMMdd.HHmmss.fff}] {message}");
             Console.ForegroundColor = fg;
-            //Console.BackgroundColor = bg;
         }
 
         protected void info(object? message) => _logger.LogInformation($"{message}");

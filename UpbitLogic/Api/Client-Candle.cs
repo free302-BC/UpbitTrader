@@ -17,7 +17,7 @@ namespace Universe.Coin.Upbit
 {
     public partial class Client : ClientBase
     {
-        public List<M> ApiCandle<M>(CurrencyId currency = CurrencyId.KRW, CoinId coin = CoinId.BTC, int count = 15)
+        public List<M> ApiCandle<M>(CurrencyId currency = CurrencyId.KRW, CoinId coin = CoinId.BTC, int count = 2)
             where M : class, new()
         {
             //TODO: decide apiID from M or from param
@@ -37,11 +37,10 @@ namespace Universe.Coin.Upbit
 
         public List<Ticker> ApiTicker(IEnumerable<(CurrencyId currency, CoinId coin)> markets)
         {
-            void setQs()
+            return InvokeApi<Ticker>(ApiId.TradeTicker, () => 
             {
                 foreach (var q in markets) _wc.QueryString.Add("markets", Helper.GetMarketId(q.currency, q.coin));
-            }
-            return InvokeApi<Ticker>(ApiId.TradeTicker, setQs) ?? new();
+            }) ?? new();
         }
     }//class
 }

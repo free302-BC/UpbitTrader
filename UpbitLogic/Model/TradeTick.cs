@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 namespace Universe.Coin.Upbit.Model
 {
     [DataContract]
-    public class TradeTicks
+    public class TradeTick : IApiModel
     {
-        public TradeTicks() => Market = TradeDateUtc = TradeTimeUtc = AskBid = "";
+        public TradeTick() => Market = TradeDateUtc = TradeTimeUtc = AskBid = "";
 
         /// <summary>
         /// 마켓 구분 코드
@@ -90,16 +90,16 @@ namespace Universe.Coin.Upbit.Model
         public override string ToString()
         {
             var sb = new StringBuilder();
-            sb.Append($"Market:       {Market}");
-            sb.Append($"TradeDateUtc: {TradeDateUtc}");
-            sb.Append($"TradeTimeUtc: {TradeTimeUtc}");
-            sb.Append($"Timestamp:    {Timestamp}");
-            sb.Append($"TradePrice:   {TradePrice}");
-            sb.Append($"TradeVolume:  {TradeVolume}");
-            sb.Append($"PrevPrice:    {PrevPrice}");
-            sb.Append($"ChangePrice:  {ChangePrice}");
-            sb.Append($"AskBid:       {AskBid}");
-            sb.Append($"SequentialId: {SequentialId}");
+            sb.AppendLine($"Market:       {Market}");
+            sb.AppendLine($"TradeDateUtc: {TradeDateUtc}");
+            sb.AppendLine($"TradeTimeUtc: {TradeTimeUtc}");
+            sb.AppendLine($"Timestamp:    {Timestamp}");
+            sb.AppendLine($"TradePrice:   {TradePrice}");
+            sb.AppendLine($"TradeVolume:  {TradeVolume}");
+            sb.AppendLine($"PrevPrice:    {PrevPrice}");
+            sb.AppendLine($"ChangePrice:  {ChangePrice}");
+            sb.AppendLine($"AskBid:       {AskBid}");
+            sb.AppendLine($"SequentialId: {SequentialId}");
             return sb.ToString();
         }
     }//class

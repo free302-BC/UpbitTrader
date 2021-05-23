@@ -24,6 +24,14 @@ namespace Universe.Coin.Upbit
                 ?? new();
             return res;
         }
+        public List<TradeTick> ApiTicks(CurrencyId currency = CurrencyId.KRW, CoinId coin = CoinId.BTC, int count = 1)
+        {
+            return InvokeApi<TradeTick>(ApiId.TradeTicks, () =>
+            {
+                setQueryString("market", currency, coin);
+                setQueryString("count", count);
+            });
+        }
 
     }//class
 }

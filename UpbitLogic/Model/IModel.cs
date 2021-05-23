@@ -19,20 +19,14 @@ namespace Universe.Coin.Upbit.Model
         protected static void buildHeader((string name, int wdith)[] names)
         {
             StringBuilder sb = new();
-            foreach (var h in names) sb.Append($"{{{h.name},{h.wdith}}} ");
+            foreach (var h in names) sb.AppendFormat($"{{0,{h.wdith}}} ", h.name);
             _header = sb.ToString();
-        }
-        protected static void buildHeader((string name, int wdith, string fmt)[] names)
-        {
-            StringBuilder sb = new();
-            foreach (var h in names) sb.Append($"{{{h.name},{h.wdith}:{h.fmt}}} ");
-            _header = sb.ToString();
-        }
+        }        
 
-        public static string Print(IEnumerable<IViewModel> models)
+        public static string Print(IEnumerable<IViewModel> models, bool printHeader = true)
         {
             var sb = new StringBuilder();
-            sb.AppendLine(_header);
+            if(printHeader) sb.AppendLine(_header);
             foreach (var m in models) sb.AppendLine(m.ToString());
             return sb.ToString();
         }

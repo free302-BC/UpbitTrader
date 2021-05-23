@@ -83,5 +83,12 @@ namespace Universe.Coin.Upbit
         public static implicit operator KeyPair((string access, string secret) key) => new KeyPair(key.access, key.secret);
     }
 
+    public enum TickDir
+    { 
+        D,   //ask 매도
+        U    //bid 매수
+    }
+
+
 
 }

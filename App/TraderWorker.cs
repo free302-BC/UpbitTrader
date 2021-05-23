@@ -29,11 +29,13 @@ namespace Universe.Coin.Upbit.App
             var uc = new Client(set.AccessKey, set.SecretKey, _sp.GetRequiredService<ILogger<Client>>());
             try
             {
-                market(uc);
+                //market(uc);
+                account(uc);
                 ticker(uc);
                 candle(uc);
                 orderbook(uc);
-                account(uc);
+                ticks(uc);
+
                 run(uc);
             }
             catch (Exception ex)
@@ -47,15 +49,58 @@ namespace Universe.Coin.Upbit.App
             var (next, sell, target) = restart(uc);
 
             bool buy = false;
+            var lastTicks = new List<long>();
+            var lastOrder = new OrderbookModel();
+            var numTicks = 50;
+            var deviation = 0;
+            info($"deviation= {deviation}, numTicks= {numTicks}");
+            var lastBook = DateTime.Now;
+
             while (true)
             {
-                Thread.Sleep(5000);
+                Thread.Sleep(90);
                 var now = DateTime.Now;
                 if (now < sell)
                 {
-                    var order = new OrderbookModel(uc.ApiOrderbook());//call price
-                    report(order.ToString());
+                    var order = uc.ApiOrderbook().ToModel();//1st call-price
+                    if ((now - lastBook).TotalSeconds > 1)
+                    {
+                        //report call-price
+                        if (lastOrder != order) report(order);
+                        lastOrder = order;
+                        lastBook = now;
+                    }
 
+                    //get new ticks
+                    var newTicks = uc.ApiTicks(count: numTicks).ToModels().Where(x => !lastTicks.Contains(x.Serial));
+                    var numNewTicks = newTicks.Count();
+                    if (numNewTicks > numTicks / 5) info($"numNewTicks= <{numNewTicks}>");
+                    foreach (var tick in newTicks) report(tick, tick.Dir == "▲" ? 1 : -1);
+                    lastTicks.AddRange(newTicks.Select(x => x.Serial));
+
+                    //check ticks buffer
+                    if (lastTicks.Count > 5 * numTicks)
+                    {
+                        var num0 = lastTicks.Count;
+                        lastTicks.RemoveRange(0, num0 - 3 * numTicks);
+                        info($"lastTicks full: {num0} -> {lastTicks.Count}, numTicsk={numTicks}");
+                        deviation++;
+                    }
+
+                    //update numTicks
+                    if (deviation < 0 && numNewTicks > numTicks / 2)
+                    {
+                        info($"numNewTicks= {numNewTicks}, numTicks -> {numTicks *= 2} ▲");
+                        deviation = 0;
+                    }
+                    else if (numNewTicks < numTicks / 10) deviation--;
+                    if (deviation < -100)
+                    {
+                        if (numTicks > 10) info($"deviation= {deviation}, numTicks -> {numTicks = numTicks * 10 / 11} ▼");
+                        deviation = 0;
+                    }
+
+                    //check buy condition
                     var current = order.askUP;
                     if (current > target && !buy)
                     {
@@ -71,13 +116,13 @@ namespace Universe.Coin.Upbit.App
                 else if (sell <= now && now < next)
                 {
                     var btc = uc.GetBalance(CoinId.BTC);//get btc
-                    if (btc > 0.00008m)
+                    if (btc > 0.0001m)
                     {
                         ;//sell
                     }
                     buy = false;//test
                     info($"=======> Selling KRW_BTC: {btc}BTC <=========");
-                    Thread.Sleep(60);
+                    Thread.Sleep(60000);
                 }
                 else//now >= next
                 {
@@ -88,7 +133,7 @@ namespace Universe.Coin.Upbit.App
         (DateTime next, DateTime sell, decimal target) restart(Client uc)
         {
             var models = uc.ApiCandle<CandleDay>(count: 2).ToModels();
-            var start = models[1].DateKST;
+            var start = models[1].TimeKST;
             info($"Starting new period: {start}");
             var next = start.AddDays(1);
             var sell = next.AddSeconds(-60);
@@ -104,16 +149,10 @@ namespace Universe.Coin.Upbit.App
             var markets = uc.ApiMarketInfo();
             info(IApiModel.Print(markets));
         }
-        void candle(Client uc)
-        {
-            var candles = uc.ApiCandle<CandleDay>();
-            var models = candles.ToModels();
-            info(IViewModel.Print(models));
-        }
         void account(Client uc)
         {
-            var a1 = uc.ApiAccount();
-            info(a1);
+            var accounts = uc.ApiAccount();
+            info(IApiModel.Print(accounts));
             var krw = uc.GetBalance(CurrencyId.KRW);//get balnace
             var btc = uc.GetBalance(CoinId.BTC);//get btc
             info($"KRW= {krw}, BTC={btc}");
@@ -126,13 +165,23 @@ namespace Universe.Coin.Upbit.App
                 (CurrencyId.KRW, CoinId.DOGE)
             };
             var ticker = uc.ApiTicker(markets).ToModels();
-            info(ticker);
+            info(IViewModel.Print(ticker));
+        }
+        void candle(Client uc)
+        {
+            var candles = uc.ApiCandle<CandleDay>();
+            var models = candles.ToModels();
+            info(IViewModel.Print(models));
         }
         void orderbook(Client uc)
         {
             var order = new OrderbookModel(uc.ApiOrderbook());//call price
             info(order);
         }
-
+        void ticks(Client uc)
+        {
+            var ticks = uc.ApiTicks(count: 10).ToModels();
+            info(IViewModel.Print(ticks));
+        }
     }//class
 }

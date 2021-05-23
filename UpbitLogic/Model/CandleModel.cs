@@ -8,7 +8,7 @@ namespace Universe.Coin.Upbit.Model
 {
     public class CandleModel : ViewModelBase<CandleModel, ICandle>
     {
-        public DateTime DateKST;
+        public DateTime TimeKST;
         public decimal Opening;
         public decimal High;
         public decimal Low;
@@ -26,7 +26,7 @@ namespace Universe.Coin.Upbit.Model
         public CandleModel(ICandle candle) => setApiModel(candle);
         protected override CandleModel setApiModel(ICandle candle)
         {
-            DateKST = DateTime.Parse(candle.CandleDateTimeKst);
+            TimeKST = DateTime.Parse(candle.CandleDateTimeKst);
             Opening = Math.Round(candle.OpeningPrice / 10000.0m, 1);
             High = Math.Round(candle.HighPrice / 10000.0m, 1);
             Low = Math.Round(candle.LowPrice / 10000.0m, 1);
@@ -42,7 +42,7 @@ namespace Universe.Coin.Upbit.Model
             Rate = (High > Target) ? Math.Round(Closing / Target - _feeRate, 4) : 1.0m;
         }
         public override string ToString()
-            => $"{DateKST:yyMMdd.HHmm} {Opening,8:F1} {Target,8:F1} {High,8:F1} {Closing,8:F1} : {Rate,8:F4} {CumRate,8:F4} {DrawDown,8:F2}";
+            => $"{TimeKST:yyMMdd.HHmm} {Opening,8:F1} {Target,8:F1} {High,8:F1} {Closing,8:F1} : {Rate,8:F4} {CumRate,8:F4} {DrawDown,8:F2}";
 
         
         public static void CalcRate(IList<CandleModel> models, decimal k)
@@ -69,12 +69,12 @@ namespace Universe.Coin.Upbit.Model
        
         static readonly (string, int)[] _names =
         {
-            (nameof(DateKST), 11), 
+            (nameof(TimeKST), 11), 
             (nameof(Opening),  8),
             (nameof(Target),   8),
             (nameof(High),     8),
             (nameof(Closing),  8),
-            (nameof(Rate),     8),
+            (nameof(Rate),     10),
             (nameof(CumRate),  8),
             (nameof(DrawDown), 8)
         };
