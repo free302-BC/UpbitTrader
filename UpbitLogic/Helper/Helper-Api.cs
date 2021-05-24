@@ -27,8 +27,22 @@ namespace Universe.Coin.Upbit
         const string _jsonOptionFile = "api_json_option.json";
         static readonly ApiDic _apiDic;
 
-        public static string GetApiPath(ApiId api) => $"{_apiBaseUrl}{_apiDic[api].Path}";
-        public static (string Path, HttpMethod Method, string Comment, bool ResetAuthToken) GetApi(ApiId api) => _apiDic[api];
+        public static string GetApiPath(ApiId api, string postPath = "") 
+            => $"{_apiBaseUrl}{_apiDic[api].Path}/{postPath}";
+
+        public static (string Path, HttpMethod Method, string Comment, bool ResetAuthToken) GetApi(ApiId api) 
+            => _apiDic[api];
+
+        /// <summary>
+        /// AuthKey reset이 필요한 API 목록
+        /// </summary>
+        static readonly HashSet<ApiId> _resetAuth = new()
+        {
+            ApiId.AccountInfo,
+            ApiId.APIKeyInfo
+        };
+
+        #region ---- Build Json ----
         static void buildApiJson()
         {
             var dic = new ApiDic();
@@ -60,7 +74,7 @@ namespace Universe.Coin.Upbit
 
         static readonly string[] _path =
         {
-            "api_keys", "accounts", "status/wallet", "candles/days", "candles/minutes/{unit}",
+            "api_keys", "accounts", "status/wallet", "candles/days", "candles/minutes",
             "candles/months", "candles/weeks", "deposits/coin_address", "deposits/coin_addresses",
             "deposits/generate_coin_address", "deposit", "deposits", "market/all", "order",
             "orders/chance", "order", "orders", "orders", "orderbook", "ticker", "trades/ticks",
@@ -82,11 +96,8 @@ namespace Universe.Coin.Upbit
             "주문 취소 접수","주문 가능 정보","개별 주문 조회","주문 리스트 조회","주문하기","시세 호가 정보(Orderbook) 조회",
             "시세 Ticker 조회","시세 체결 조회","출금 가능 정보","코인 출금하기","개별 출금 조회","출금 리스트 조회","원화 출금하기"
         };
-        static readonly HashSet<ApiId> _resetAuth = new()
-        {
-            ApiId.AccountInfo,
-            ApiId.APIKeyInfo
-        };
+        
+        #endregion
 
     }//class
 }

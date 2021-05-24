@@ -32,7 +32,7 @@ namespace Universe.Coin.Upbit
         }
         public void Dispose() => _wc?.Dispose();
 
-        public List<T> InvokeApi<T>(ApiId apiId, Action? queryAction = null) where T: class, new()
+        public List<T> InvokeApi<T>(ApiId apiId, Action? queryAction = null, string postPath = "") where T : IApiModel, new()
         {
             _wc.QueryString.Clear();
             if (Helper.GetApi(apiId).ResetAuthToken) _wc.SetAuthToken(_key);
@@ -40,7 +40,7 @@ namespace Universe.Coin.Upbit
 
             try
             {
-                string response = _wc.DownloadString(Helper.GetApiPath(apiId));
+                string response = _wc.DownloadString(Helper.GetApiPath(apiId, postPath));
                 var book = JsonConvert.DeserializeObject<List<T>>(response) ?? new List<T>();
                 return book;
             }

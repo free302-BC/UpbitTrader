@@ -8,24 +8,24 @@ namespace Universe.Coin.Upbit.Model
 {
     public class CandleModel : ViewModelBase<CandleModel, ICandle>
     {
+        //입력
+        public ApiId ApiId;
+        public CandleUnit Unit;
         public DateTime TimeKST;
-        public decimal Opening;
-        public decimal High;
-        public decimal Low;
-        public decimal Closing;
-        public decimal Delta;
+        public decimal Opening, High, Low, Closing, Delta;
 
-        public decimal Target;
-        public decimal Rate;
-        public decimal CumRate;
-        public decimal DrawDown;
+        //계산용
+        public decimal Target, Rate, CumRate, DrawDown;
         const decimal _feeRate = 0.0005m * 2m;
-        static readonly CandleModel _default = new();
+        static readonly CandleModel _empty = new();
 
         public CandleModel() { }
         public CandleModel(ICandle candle) => setApiModel(candle);
+
         protected override CandleModel setApiModel(ICandle candle)
         {
+            ApiId = candle.ApiId;
+            Unit = candle.CandleUnit;
             TimeKST = DateTime.Parse(candle.CandleDateTimeKst);
             Opening = Math.Round(candle.OpeningPrice / 10000.0m, 1);
             High = Math.Round(candle.HighPrice / 10000.0m, 1);
@@ -35,19 +35,18 @@ namespace Universe.Coin.Upbit.Model
             return this;
         }
 
-
         void calcRate(CandleModel prev, decimal k)
         {
             Target = Math.Round(Opening + prev.Delta * k, 2);
             Rate = (High > Target) ? Math.Round(Closing / Target - _feeRate, 4) : 1.0m;
         }
         public override string ToString()
-            => $"{TimeKST:yyMMdd.HHmm} {Opening,8:F1} {Target,8:F1} {High,8:F1} {Closing,8:F1} : {Rate,8:F4} {CumRate,8:F4} {DrawDown,8:F2}";
+            => $"{TimeKST:yyMMdd.HHmm} {ICandle.GetApiName(ApiId, Unit),8} {Opening,8:F1} {Target,8:F1} {High,8:F1} {Closing,8:F1} : {Rate,8:F4} {CumRate,8:F4} {DrawDown,8:F2}";
 
-        
+
         public static void CalcRate(IList<CandleModel> models, decimal k)
         {
-            models.Insert(0, _default);
+            models.Insert(0, _empty);
             for (int i = 1; i < models.Count; i++) models[i].calcRate(models[i - 1], k);
             models.RemoveAt(0);
         }
@@ -66,10 +65,11 @@ namespace Universe.Coin.Upbit.Model
             }
             return models.Max(m => m.DrawDown);
         }
-       
+
         static readonly (string, int)[] _names =
         {
-            (nameof(TimeKST), 11), 
+            (nameof(TimeKST), 11),
+            (nameof(ApiId), 8),
             (nameof(Opening),  8),
             (nameof(Target),   8),
             (nameof(High),     8),
@@ -79,7 +79,7 @@ namespace Universe.Coin.Upbit.Model
             (nameof(DrawDown), 8)
         };
         static CandleModel() => IViewModel.buildHeader(_names);
-        
+
     }//class
 
     public static class _CandleModel

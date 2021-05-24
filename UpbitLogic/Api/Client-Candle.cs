@@ -17,18 +17,28 @@ namespace Universe.Coin.Upbit
 {
     public partial class Client : ClientBase
     {
-        public List<M> ApiCandle<M>(CurrencyId currency = CurrencyId.KRW, CoinId coin = CoinId.BTC, int count = 2)
-            where M : class, new()
+        public List<C> ApiCandle<C>(CurrencyId currency = CurrencyId.KRW,
+                                    CoinId coin = CoinId.BTC,
+                                    int count = 2,
+                                    CandleUnit unit = CandleUnit.None)
+            where C : ICandle, new()
         {
-            //TODO: decide apiID from M or from param
-            //TODO: make candle BaseModel
-            return InvokeApi<M>(ApiId.CandleDays, () =>
+            ICandle.CheckParam<C>(unit);
+            var api = ICandle.GetApiId<C>();
+            var postPath = api == ApiId.CandleMinutes ? ((int)unit).ToString() : "";
+
+            return InvokeApi<C>(
+                api, 
+                postPath: postPath, 
+                queryAction: () =>
                 {
                     setQueryString("market", currency, coin);
                     setQueryString("count", count.ToString());
                 })
             ?? new();
         }
+
+        #region ---- Ticker : 현재시세 조회 ----
 
         public Ticker ApiTicker(CurrencyId currency = CurrencyId.KRW, CoinId coin = CoinId.BTC)
             => InvokeApi<Ticker>(ApiId.TradeTicker, () => setQueryString("markets", currency, coin))
@@ -37,10 +47,12 @@ namespace Universe.Coin.Upbit
 
         public List<Ticker> ApiTicker(IEnumerable<(CurrencyId currency, CoinId coin)> markets)
         {
-            return InvokeApi<Ticker>(ApiId.TradeTicker, () => 
+            return InvokeApi<Ticker>(ApiId.TradeTicker, () =>
             {
                 foreach (var q in markets) _wc.QueryString.Add("markets", Helper.GetMarketId(q.currency, q.coin));
             }) ?? new();
         }
+        #endregion
+
     }//class
 }

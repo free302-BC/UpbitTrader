@@ -13,6 +13,7 @@ namespace Universe.Coin.Upbit
 
     public enum ApiId
     {
+        None = 0,
         APIKeyInfo, AccountInfo,
         AccountWallet,
         CandleDays, CandleMinutes, CandleMonth, CandleWeeks,
@@ -84,11 +85,14 @@ namespace Universe.Coin.Upbit
     }
 
     public enum TickDir
-    { 
+    {
         D,   //ask 매도
         U    //bid 매수
     }
 
-
+    public enum CandleUnit
+    {
+        None = 0, U1 = 1, U3 = 3, U5 = 5, U15 = 15, U10 = 10, U30 = 30, U60 = 60, U240 = 240
+    }
 
 }

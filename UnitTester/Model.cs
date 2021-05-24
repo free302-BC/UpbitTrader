@@ -5,10 +5,10 @@ using Xunit.Abstractions;
 
 namespace UnitTester
 {
-    public class ModelTester
+    public class Model
     {
         private readonly ITestOutputHelper _out;
-        public ModelTester(ITestOutputHelper output) => _out = output;
+        public Model(ITestOutputHelper output) => _out = output;
 
         public class AM : IApiModel 
         {

@@ -30,13 +30,14 @@ namespace Universe.Coin.Upbit.App
             try
             {
                 //market(uc);
-                account(uc);
-                ticker(uc);
-                candle(uc);
-                orderbook(uc);
-                ticks(uc);
+                //account(uc);
+                //ticker(uc);
+                //candleDay(uc);
+                candleMinutes(uc);
+                //orderbook(uc);
+                //ticks(uc);
 
-                run(uc);
+                //run(uc);
             }
             catch (Exception ex)
             {
@@ -167,9 +168,15 @@ namespace Universe.Coin.Upbit.App
             var ticker = uc.ApiTicker(markets).ToModels();
             info(IViewModel.Print(ticker));
         }
-        void candle(Client uc)
+        void candleDay(Client uc)
         {
-            var candles = uc.ApiCandle<CandleDay>();
+            var candles = uc.ApiCandle<CandleDay>(count: 10);
+            var models = candles.ToModels();
+            info(IViewModel.Print(models));
+        }
+        void candleMinutes(Client uc)
+        {
+            var candles = uc.ApiCandle<CandleMinute>(count: 10, unit: CandleUnit.U60);
             var models = candles.ToModels();
             info(IViewModel.Print(models));
         }

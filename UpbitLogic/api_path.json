@@ -20,7 +20,7 @@
     "Item3": "시세 캔들 조회 (일 단위)"
   },
   "CandleMinutes": {
-    "Item1": "candles/minutes/{unit}",
+    "Item1": "candles/minutes",
     "Item2": "GET",
     "Item3": "시세 캔들 조회 (분 단위)"
   },
