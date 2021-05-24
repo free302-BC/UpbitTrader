@@ -52,13 +52,14 @@ namespace Universe.AppBase
             return builder;
         }//build
 
-        protected static void AddWorker<W,S>() where W : WorkerBase<W, S> where S: class
+        protected static void AddWorker<W,S>(string? settingsFile = null) where W : WorkerBase<W, S> where S: class
         {
             //config
             _configs.Add(ct =>
             { 
                 ct.Services.AddTransient<W>();
                 ct.AddSetting<S>(typeof(W).Name);
+                if (settingsFile != null) ct.Services.AddJsonFile(settingsFile);
             });
 
             //run

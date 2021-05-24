@@ -17,7 +17,7 @@ namespace Universe.Coin.Upbit.Model
         //계산용
         public decimal Target, Rate, CumRate, DrawDown;
         const decimal _feeRate = 0.0005m * 2m;
-        static readonly CandleModel _empty = new();
+        static readonly CandleModel _empty = new() { Delta = 99999m };
 
         public CandleModel() { }
         public CandleModel(ICandle candle) => setApiModel(candle);
@@ -35,20 +35,33 @@ namespace Universe.Coin.Upbit.Model
             return this;
         }
 
-        void calcRate(CandleModel prev, decimal k)
+        void calcRate_sellAtClosing(CandleModel prev, decimal k)
         {
             Target = Math.Round(Opening + prev.Delta * k, 2);
             Rate = (High > Target) ? Math.Round(Closing / Target - _feeRate, 4) : 1.0m;
         }
+        void calcRate_sellUnderTarget(CandleModel prev, decimal k)
+        {
+            Target = Math.Round(Opening + prev.Delta * k, 2);
+
+            var sellPrice = Target * 0.99m > Low ? Math.Max(Target * 0.985m, Low) : Closing;
+            //하락후 회복시 미반영
+
+            Rate = (High > Target) ? Math.Round(sellPrice / Target - _feeRate, 4) : 1.0m;
+        }
+
         public override string ToString()
-            => $"{TimeKST:yyMMdd.HHmm} {ICandle.GetApiName(ApiId, Unit),8} {Opening,8:F1} {Target,8:F1} {High,8:F1} {Closing,8:F1} : {Rate,8:F4} {CumRate,8:F4} {DrawDown,8:F2}";
+            => $"{TimeKST:yyMMdd.HHmm} {ICandle.GetApiName(ApiId, Unit),8} {Opening,8:F1} {Target,8:F1} {High,8:F1} {Closing,8:F1} {Rate,8:F4} {CumRate,8:F4} {DrawDown,8:F2}";
 
 
-        public static void CalcRate(IList<CandleModel> models, decimal k)
+        public static void CalcRate(IList<CandleModel> models, decimal k, bool stopLoss = false)
         {
             models.Insert(0, _empty);
-            for (int i = 1; i < models.Count; i++) models[i].calcRate(models[i - 1], k);
+
+            if(stopLoss) for (int i = 1; i < models.Count; i++) models[i].calcRate_sellUnderTarget(models[i - 1], k);
+            else for (int i = 1; i < models.Count; i++) models[i].calcRate_sellAtClosing(models[i - 1], k);
             models.RemoveAt(0);
+            //models.RemoveAt(0);
         }
         public static decimal CalcCumRate(IList<CandleModel> models)
         {

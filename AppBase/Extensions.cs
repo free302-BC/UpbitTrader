@@ -11,14 +11,10 @@ namespace Universe.AppBase
 {
     public static class Extensions
     {
+        public static IServiceCollection AddSetting<S>(this ConfigTuple ct, string key) where S : class 
+            => ct.Services.Configure<S>(ct.Config.GetSection(key));
+        //ct.Services.Configure<S>(s => ct.Config.GetSection(key).Bind(s));//이렇게 하면 change event 발생 안함
 
-        public static IServiceCollection AddJsonFile(this IServiceCollection sc, out IConfiguration config,
-            string jsonFile = "appsettings.json")
-            => sc.AddSingleton(
-                config = new ConfigurationBuilder().SetBasePath(Environment.CurrentDirectory).AddJsonFile(jsonFile).Build());
-
-        public static IServiceCollection AddSetting<S>(this ConfigTuple ct, string key) where S : class
-            => ct.Services.Configure<S>(s => ct.Config.GetSection(key).Bind(s));
 
         public static IServiceCollection AddSimpleConsole(this IServiceCollection sc)
             => sc.AddLogging(b => b.AddSimpleConsole(opt =>
@@ -26,13 +22,16 @@ namespace Universe.AppBase
                 opt.IncludeScopes = false;
                 opt.TimestampFormat = "[yyMMdd.HHmmss.fff] ";
             }));
+        
+        public static IServiceCollection AddJsonFile(
+            this IServiceCollection sc,
+            string jsonFile = "appsettings.json")
+            => sc.AddSingleton(
+                new ConfigurationBuilder()
+                .SetBasePath(Environment.CurrentDirectory)
+                .AddJsonFile(jsonFile, false, true)
+                .Build());
 
-        public static string ToText<T>(this IEnumerable<T> list)
-        {
-            var sb = new StringBuilder();
-            foreach (var i in list) sb.AppendLine($"{i}");
-            return sb.ToString();
-        }
 
     }//class
 }

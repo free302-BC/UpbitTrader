@@ -1,0 +1,8 @@
+{
+  "BackTestSettings": {
+    "Hours": 3,
+    "PrintCandle": 0,
+    "ApplyStopLoss": 0
+  }
+
+}

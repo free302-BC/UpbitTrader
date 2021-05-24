@@ -15,6 +15,8 @@ namespace Universe.Coin.Upbit.App
         public string SecretKey { get; init; } = "";
         public string TokenFile { get; init; } = "";
 
+        public int Hours { get; set; }
+
         //public static implicit operator KeyPair(WorkerSetting set) => (set.AccessKey, set.SecretKey);
         //public static implicit operator WorkerSetting((string AccessKey, string SecretKey) keys)
         //    => new WorkerSetting { AccessKey = keys.AccessKey, SecretKey = keys.SecretKey };

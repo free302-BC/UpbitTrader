@@ -24,9 +24,10 @@ namespace Universe.Coin.Upbit.App
         public TraderWorker(ILogger<TraderWorker> logger, IOptionsMonitor<WorkerSetting> set, IServiceProvider sp)
             : base(logger, set, sp) { }
 
-        protected override void work(WorkerSetting set)
+        protected override void work()
         {
-            var uc = new Client(set.AccessKey, set.SecretKey, _sp.GetRequiredService<ILogger<Client>>());
+            //var set = reloadSetting();
+            var uc = new Client(_set.AccessKey, _set.SecretKey, _sp.GetRequiredService<ILogger<Client>>());
             try
             {
                 //market(uc);
@@ -176,7 +177,7 @@ namespace Universe.Coin.Upbit.App
         }
         void candleMinutes(Client uc)
         {
-            var candles = uc.ApiCandle<CandleMinute>(count: 10, unit: CandleUnit.U60);
+            var candles = uc.ApiCandle<CandleMinute>(count: 20, unit: CandleUnit.U1);
             var models = candles.ToModels();
             info(IViewModel.Print(models));
         }

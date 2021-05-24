@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -17,7 +18,8 @@ namespace Universe.AppBase
         protected readonly ILogger _logger;
         readonly string _name = typeof(W).Name;
         protected readonly IServiceProvider _sp;
-        S _set { get; set; }
+        protected volatile S _set;
+
         public WorkerBase(ILogger<W> logger, IOptionsMonitor<S> set, IServiceProvider sp)
         {
             _logger = logger;
@@ -37,7 +39,7 @@ namespace Universe.AppBase
 
         protected void info(object? message) => _logger.LogInformation($"{message}");
         protected void info(object? msg1, object? msg2) => _logger.LogInformation($"{msg1}{Environment.NewLine}{msg2}");
-        protected void info(object? msg1, object? msg2, object? msg3) 
+        protected void info(object? msg1, object? msg2, object? msg3)
             => _logger.LogInformation($"{msg1}{Environment.NewLine}{msg2}{Environment.NewLine}{msg3}");
 
         protected void log(object message) => _logger.LogError($"{message}");
@@ -48,10 +50,10 @@ namespace Universe.AppBase
             return Task.Run(() =>
             {
                 info($"<{_name}> StartAsync()...");
-                work(_set);
+                work();
                 //info($"Worker Exiting StartAsync()...");
             }, cancellationToken)
-            .ContinueWith(t => 
+            .ContinueWith(t =>
             {
                 info($"<{_name}> done.");
             });
@@ -61,7 +63,8 @@ namespace Universe.AppBase
             info($"Worker StopAsync()...");
             return Task.CompletedTask;
         }
-        protected abstract void work(S set);
+
+        protected abstract void work();
 
     }//class
 }

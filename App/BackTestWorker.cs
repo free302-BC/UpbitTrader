@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -18,23 +19,31 @@ using System.Collections.Specialized;
 
 namespace Universe.Coin.Upbit.App
 {
+    using FindRes = ValueTuple<CandleUnit, decimal, decimal, decimal>;
+
     public class BackTestWorker : WorkerBase<BackTestWorker, WorkerSetting>
     {
-        public BackTestWorker(ILogger<BackTestWorker> logger, IOptionsMonitor<WorkerSetting> set, IServiceProvider sp)
-            : base(logger, set, sp) { }
+        public BackTestWorker(
+            ILogger<BackTestWorker> logger,
+            IOptionsMonitor<WorkerSetting> set,
+            IServiceProvider sp,
+            IConfigurationRoot config)
+            : base(logger, set, sp)
+        {
+            _testSettings = config.GetSection("BackTestSettings");
+        }
+        readonly IConfigurationSection _testSettings;
+        decimal _hours => _testSettings.GetValue<decimal>("Hours");
+        bool _printCandle => _testSettings.GetValue<int>("PrintCandle") != 0;
+        bool _applyStopLoss => _testSettings.GetValue<int>("ApplyStopLoss") != 0;
 
-        protected override void work(WorkerSetting set)
+        protected override void work()
         {
             var logger = _sp.GetRequiredService<ILogger<Client>>();
-            var uc = new Client(set.AccessKey, set.SecretKey, logger);
+            var uc = new Client(_set.AccessKey, _set.SecretKey, logger);
             try
             {
-                var k = findK(uc, 7);
-                findK(uc, 30);
-                findK(uc, 90);
-                backTest(uc, 7, k);
-                backTest(uc, 30, k);
-                backTest(uc, 90, k);
+                run(uc);
             }
             catch (Exception e)
             {
@@ -42,45 +51,84 @@ namespace Universe.Coin.Upbit.App
             }
         }
 
-        decimal findK(Client uc, int count)
+        void run(Client uc)
+        {
+            var units = new[] { CandleUnit.U60, CandleUnit.U30, CandleUnit.U15, CandleUnit.U10, CandleUnit.U3, CandleUnit.U1 };
+            var results = new List<(CandleUnit unit, decimal k, decimal rate, decimal mdd)>();
+            var sb = new StringBuilder();
+            while (true)
+            {
+                results.Clear();
+                sb.Clear();
+
+                var hours = _hours;
+                sb.AppendLine($"--------------------[ {hours}h, SL:{_applyStopLoss} ]-----------------------");
+
+                foreach (var unit in units)
+                {
+                    var count = (int)(hours * 60 / (int)unit);
+                    var x = to(findK(uc, count, unit));
+                    results.Add(x);
+                    sb.AppendLine($"{x.unit,6}: {x.k,6:N2} {x.rate,6:N2}%, {x.mdd,6:N2}%");
+                }
+                var maxRate = results.Max(x => x.rate);
+                var max = results.First(x => x.rate == maxRate);
+
+                sb.AppendLine("---------------------------------------------------");
+                sb.AppendLine($"{max.unit,6}: {max.k,6:N2}: {max.rate,6:N2}%, {max.mdd,6:N2}%");
+                info(sb.ToString());
+
+                backTest(uc, (int)(hours * 60 / (int)max.unit), max.k, max.unit);
+                Thread.Sleep(5000);
+            }
+
+            (CandleUnit unit, decimal k, decimal rate, decimal mdd) to(FindRes res) => res;
+        }
+
+        FindRes findK(Client uc, int count, CandleUnit unit = CandleUnit.U60)
         {
             var sb = new StringBuilder();
             sb.AppendLine($"--- Finding K: count= {count} ----");
 
-            var list = new List<(decimal k, decimal rate, decimal mdd)>();
-            var models = uc.ApiCandle<CandleDay>(count: count).ToModels();
+            var list = new List<(CandleUnit unit, decimal k, decimal rate, decimal mdd)>();
+            var models = uc.ApiCandle<CandleMinute>(count: count, unit: unit).ToModels();
 
-            for (decimal k = 0.1m; k <= 1.0m; k += 0.1m)
+            for (decimal k = 0.1m; k <= 1.5m; k += 0.1m)
             {
-                CandleModel.CalcRate(models, k);
-                var (rate, mdd) = backTest(models, k);
-                list.Add((k, rate, mdd));
+                //CandleModel.CalcRate(models, k);
+                var (rate, mdd) = calcBackTest(models, k);
+                list.Add((unit, k, rate, mdd));
                 sb.AppendLine($"{k,6:N2}: {(rate - 1) * 100,10:N2}%, {mdd,10:N2}%");
             }
             var maxRate = list.Max(x => x.rate);
             var max = list.First(x => x.rate == maxRate);
+            max.rate = Math.Round((max.rate - 1) * 100, 2);
 
             sb.AppendLine("---------------------------------------------------");
-            sb.AppendLine($"{max.k,6:N2}: {(max.rate - 1) * 100,10:N2}%, {max.mdd,10:N2}%");
-            info(sb);
-            return max.k;
+            sb.AppendLine($"{max.k,6:N2}: {max.rate,10:N2}%, {max.mdd,10:N2}%");
+            //info(sb);
+
+            return max;
         }
-        
-        void backTest(Client uc, int count, decimal k)
+
+        void backTest(Client uc, int count, decimal k, CandleUnit unit = CandleUnit.U15)
         {
-            var data = uc.ApiCandle<CandleDay>(count: count);
-            info(IApiModel.Print(data));
+            var data = uc.ApiCandle<CandleMinute>(count: count, unit: unit);
+            //info(IApiModel.Print(data));
 
             var models = data.ToModels();
-            var (finalRate, mdd) = backTest(models, k);
+            var (finalRate, mdd) = calcBackTest(models, k);
 
-            info(IViewModel.Print(models));
-            info($"Final Profit Rate= {(finalRate - 1) * 100:N2}%", $"MDD= {mdd:N2}%");
+            var down = IViewModel.Print(models.Where(x => x.Rate < 1));
+            var res = IViewModel.Print(models);
+            //File.WriteAllText($"backtest_{unit}_{k}.txt", res);
+            if (_printCandle) info(down);
+            //info($"Final Profit Rate= {(finalRate - 1) * 100:N2}%", $"MDD= {mdd:N2}%");
         }
 
-        private static (decimal rate, decimal mdd) backTest(List<CandleModel> models, decimal k)
+        (decimal rate, decimal mdd) calcBackTest(List<CandleModel> models, decimal k)
         {
-            CandleModel.CalcRate(models, k);
+            CandleModel.CalcRate(models, k, _applyStopLoss);
             var rate = CandleModel.CalcCumRate(models);
             var mdd = CandleModel.CalcDrawDown(models);
             return (rate, mdd);
