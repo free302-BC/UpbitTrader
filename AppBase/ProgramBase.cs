@@ -11,15 +11,20 @@ using Microsoft.Extensions.Logging;
 
 namespace Universe.AppBase
 {
+    using ACS = Action<HostBuilderContext, IServiceCollection>;//action configure service
+    using ACAC = Action<IConfigurationBuilder>;//action ConfigureAppConfiguration
+
     public class ProgramBase
     {
         protected static readonly Action<object?> log = Console.WriteLine;
-        static readonly List<Action<ConfigTuple>> _configs;
+        static readonly List<ACS> _acs;
+        static readonly List<ACAC> _acac;
         static readonly List<Type> _workers;
 
         static ProgramBase()
         {
-            _configs = new List<Action<ConfigTuple>>();
+            _acs = new List<ACS>();
+            _acac = new List<ACAC>();
             _workers = new List<Type>();
         }
         protected static void RunHost()
@@ -30,6 +35,9 @@ namespace Universe.AppBase
                 using CancellationTokenSource cts = new();
                 using IHost host = createHostBuilder().Build();
                 host.RunAsync(cts.Token).ContinueWith(t => log(t.Exception), TaskContinuationOptions.OnlyOnFaulted);
+
+                var a = host.Services.GetRequiredService<IConfiguration>();
+                //var b = host.Services.GetRequiredService<IConfigurationRoot>();
 
                 //run worker
                 foreach (var m in _workers) ((IHostedService)host.Services.GetRequiredService(m)).StartAsync(cts.Token);
@@ -47,19 +55,26 @@ namespace Universe.AppBase
             builder.ConfigureServices((context, services) =>
             {
                 services.AddSimpleConsole();
-                foreach (var config in _configs) config.Invoke((context.Configuration, services));
+                foreach (var a in _acs) a(context, services);
             });
+
+            //builder.ConfigureAppConfiguration(cb => 
+            //{
+            //    foreach (var a in _acac) a(cb);
+            //});
+            //builder.UseDefaultServiceProvider(opt => { });
+
             return builder;
         }//build
 
         protected static void AddWorker<W,S>(string? settingsFile = null) where W : WorkerBase<W, S> where S: class
         {
-            //config
-            _configs.Add(ct =>
-            { 
-                ct.Services.AddTransient<W>();
-                ct.AddSetting<S>(typeof(W).Name);
-                if (settingsFile != null) ct.Services.AddJsonFile(settingsFile);
+            //config            
+            if (settingsFile != null) _acac.Add(cb => cb.AddJsonFile(settingsFile, false, true));
+            _acs.Add((ctx, sc) =>
+            {
+                sc.AddTransient<W>();
+                sc.AddOptions<S>(ctx.Configuration, typeof(W).Name);
             });
 
             //run

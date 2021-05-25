@@ -177,7 +177,7 @@ namespace Universe.Coin.Upbit.App
         }
         void candleMinutes(Client uc)
         {
-            var candles = uc.ApiCandle<CandleMinute>(count: 20, unit: CandleUnit.U1);
+            var candles = uc.ApiCandle<CandleMinute>(count: 220, unit: CandleUnit.U1);
             var models = candles.ToModels();
             info(IViewModel.Print(models));
         }

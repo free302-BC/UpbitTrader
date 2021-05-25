@@ -14,6 +14,8 @@ namespace Universe.Coin.Upbit.Model
         #region ---- Public Properties ----
 
         public string CandleDateTimeKst { get; set; }
+        public string CandleDateTimeUtc { get; set; }
+        public long Timestamp { get; set; }
         public decimal OpeningPrice { get; set; }
         public decimal HighPrice { get; set; }
         public decimal LowPrice { get; set; }

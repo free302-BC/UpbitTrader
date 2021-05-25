@@ -19,18 +19,16 @@ namespace Universe.Coin.Upbit
     {
         public Orderbook ApiOrderbook(CurrencyId currency = CurrencyId.KRW, CoinId coin = CoinId.BTC)
         {
-            var res = InvokeApi<Orderbook>(ApiId.OrderOrderbook, () => setQueryString("markets", currency, coin))
-                ?.FirstOrDefault()
-                ?? new();
-            return res;
+            clearQueryString();
+            setQueryString("markets", currency, coin);
+            return InvokeApi<Orderbook>(ApiId.OrderOrderbook)?.FirstOrDefault()?? new();
         }
         public List<TradeTick> ApiTicks(CurrencyId currency = CurrencyId.KRW, CoinId coin = CoinId.BTC, int count = 1)
         {
-            return InvokeApi<TradeTick>(ApiId.TradeTicks, () =>
-            {
-                setQueryString("market", currency, coin);
-                setQueryString("count", count);
-            });
+            clearQueryString();
+            setQueryString("markets", currency, coin);
+            setQueryString("count", count);
+            return InvokeApi<TradeTick>(ApiId.TradeTicks);
         }
 
     }//class

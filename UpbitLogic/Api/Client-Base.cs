@@ -27,22 +27,27 @@ namespace Universe.Coin.Upbit
             _wc = new WebClient();
             _wc.SetAuthToken(_key);
             _wc.SetAcceptance();
-            //nvc.Add("to", "");// string | 마지막 캔들 시각 (exclusive). 포맷 : `yyyy-MM-dd'T'HH:mm:ssXXX` or `yyyy-MM-dd HH:mm:ss`. 비워서 요청 시 가장 최근 캔들  (optional) 
-            //nvc.Add("convertingPriceUnit", "KRW");
         }
         public void Dispose() => _wc?.Dispose();
 
-        public List<T> InvokeApi<T>(ApiId apiId, Action? queryAction = null, string postPath = "") where T : IApiModel, new()
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T">IApiModel</typeparam>
+        /// <param name="apiId"></param>
+        /// <param name="postPath">Api URL에 추가할 경로: ex) minutes candle의 unit</param>
+        /// <returns></returns>
+        public List<T> InvokeApi<T>(ApiId apiId, string postPath = "") where T : IApiModel, new()
         {
-            _wc.QueryString.Clear();
+            //if (clearQuery) _wc.QueryString.Clear();
+            //queryAction?.Invoke();
             if (Helper.GetApi(apiId).ResetAuthToken) _wc.SetAuthToken(_key);
-            queryAction?.Invoke();
 
             try
             {
-                string response = _wc.DownloadString(Helper.GetApiPath(apiId, postPath));
-                var book = JsonConvert.DeserializeObject<List<T>>(response) ?? new List<T>();
-                return book;
+                string json = _wc.DownloadString(Helper.GetApiPath(apiId, postPath));
+                var modles = JsonConvert.DeserializeObject<List<T>>(json) ?? new List<T>();
+                return modles;
             }
             catch (WebException ex)
             {
@@ -50,6 +55,7 @@ namespace Universe.Coin.Upbit
                 return new List<T>();
             }
         }
+        
         protected void clearQueryString() => _wc.QueryString.Clear();
         protected void setQueryString(string name, string value) => _wc.QueryString[name] = value;
         protected void setQueryString(string name, int count) => _wc.QueryString[name] = count.ToString();

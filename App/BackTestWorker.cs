@@ -53,33 +53,42 @@ namespace Universe.Coin.Upbit.App
 
         void run(Client uc)
         {
-            var units = new[] { CandleUnit.U60, CandleUnit.U30, CandleUnit.U15, CandleUnit.U10, CandleUnit.U3, CandleUnit.U1 };
+            var units = new[] { CandleUnit.U240, CandleUnit.U60, CandleUnit.U30, CandleUnit.U15, CandleUnit.U10, CandleUnit.U3, CandleUnit.U1 };
             var results = new List<(CandleUnit unit, decimal k, decimal rate, decimal mdd)>();
             var sb = new StringBuilder();
+
+            var hours = _hours;
             while (true)
             {
                 results.Clear();
                 sb.Clear();
 
-                var hours = _hours;
-                sb.AppendLine($"--------------------[ {hours}h, SL:{_applyStopLoss} ]-----------------------");
+                //var hours = _hours;
+                sb.AppendLine($"-----------[ {(int)(hours / 24)}.{hours % 24}, SL:{_applyStopLoss} ]------------");
 
+                //for (int i = 0; i < 20; i++)
                 foreach (var unit in units)
                 {
+                    //Thread.Sleep(100);
+                    //hours += 1 * 20;
+                    //var unit = CandleUnit.U60;
                     var count = (int)(hours * 60 / (int)unit);
                     var x = to(findK(uc, count, unit));
                     results.Add(x);
-                    sb.AppendLine($"{x.unit,6}: {x.k,6:N2} {x.rate,6:N2}%, {x.mdd,6:N2}%");
+                    sb.AppendLine($"{count,6} {x.unit,6}: {x.k,6:N2} {x.rate,6:N2}%, {x.mdd,6:N2}%");
                 }
+                //info(sb.ToString());
+
                 var maxRate = results.Max(x => x.rate);
                 var max = results.First(x => x.rate == maxRate);
 
-                sb.AppendLine("---------------------------------------------------");
+                sb.AppendLine("-------------------------------------------");
                 sb.AppendLine($"{max.unit,6}: {max.k,6:N2}: {max.rate,6:N2}%, {max.mdd,6:N2}%");
                 info(sb.ToString());
 
-                backTest(uc, (int)(hours * 60 / (int)max.unit), max.k, max.unit);
-                Thread.Sleep(5000);
+                //backTest(uc, (int)(hours * 60 / (int)max.unit), max.k, max.unit);
+                Thread.Sleep(1000);
+                hours += 3;
             }
 
             (CandleUnit unit, decimal k, decimal rate, decimal mdd) to(FindRes res) => res;
@@ -90,24 +99,27 @@ namespace Universe.Coin.Upbit.App
             var sb = new StringBuilder();
             sb.AppendLine($"--- Finding K: count= {count} ----");
 
-            var list = new List<(CandleUnit unit, decimal k, decimal rate, decimal mdd)>();
             var models = uc.ApiCandle<CandleMinute>(count: count, unit: unit).ToModels();
-
-            for (decimal k = 0.1m; k <= 1.5m; k += 0.1m)
+            (CandleUnit unit, decimal k, decimal rate, decimal mdd) max;
+            if (models.Count == 0) max = (unit, 0m, 0m, 0m);
+            else
             {
-                //CandleModel.CalcRate(models, k);
-                var (rate, mdd) = calcBackTest(models, k);
-                list.Add((unit, k, rate, mdd));
-                sb.AppendLine($"{k,6:N2}: {(rate - 1) * 100,10:N2}%, {mdd,10:N2}%");
+                var list = new List<(CandleUnit unit, decimal k, decimal rate, decimal mdd)>();
+                for (decimal k = 0.1m; k <= 1.5m; k += 0.1m)
+                {
+                    //CandleModel.CalcRate(models, k);
+                    var (rate, mdd) = calcBackTest(models, k);
+                    list.Add((unit, k, rate, mdd));
+                    sb.AppendLine($"{k,6:N2}: {(rate - 1) * 100,10:N2}%, {mdd,10:N2}%");
+                }
+                var maxRate = list.Max(x => x.rate);
+                max = list.First(x => x.rate == maxRate);
+                max.rate = Math.Round((max.rate - 1) * 100, 2);
+
+                sb.AppendLine("---------------------------------------------------");
+                sb.AppendLine($"{max.k,6:N2}: {max.rate,10:N2}%, {max.mdd,10:N2}%");                
             }
-            var maxRate = list.Max(x => x.rate);
-            var max = list.First(x => x.rate == maxRate);
-            max.rate = Math.Round((max.rate - 1) * 100, 2);
-
-            sb.AppendLine("---------------------------------------------------");
-            sb.AppendLine($"{max.k,6:N2}: {max.rate,10:N2}%, {max.mdd,10:N2}%");
             //info(sb);
-
             return max;
         }
 

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Universe.AppBase
 {
-
+    
     public class ConfigTuple : Tuple<IConfiguration, IServiceCollection>
     {
         public ConfigTuple(IConfiguration item1, IServiceCollection item2) : base(item1, item2) { }
