@@ -52,17 +52,17 @@ namespace Universe.AppBase
         static IHostBuilder createHostBuilder()
         {
             var builder = Host.CreateDefaultBuilder();
+
             builder.ConfigureServices((context, services) =>
             {
                 services.AddSimpleConsole();
                 foreach (var a in _acs) a(context, services);
             });
 
-            //builder.ConfigureAppConfiguration(cb => 
+            //builder.ConfigureAppConfiguration(cb =>
             //{
             //    foreach (var a in _acac) a(cb);
             //});
-            //builder.UseDefaultServiceProvider(opt => { });
 
             return builder;
         }//build
@@ -70,11 +70,13 @@ namespace Universe.AppBase
         protected static void AddWorker<W,S>(string? settingsFile = null) where W : WorkerBase<W, S> where S: class
         {
             //config            
-            if (settingsFile != null) _acac.Add(cb => cb.AddJsonFile(settingsFile, false, true));
+            //if (settingsFile != null) _acac.Add(cb => cb.AddJsonFile(settingsFile, false, true));
+
+            //services
             _acs.Add((ctx, sc) =>
             {
                 sc.AddTransient<W>();
-                sc.AddOptions<S>(ctx.Configuration, typeof(W).Name);
+                //sc.AddOptions<S>(ctx.Configuration, typeof(W).Name);
             });
 
             //run

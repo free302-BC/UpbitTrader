@@ -12,11 +12,11 @@ namespace Universe.AppBase
     public static class Extensions
     {
         //ct.Services.Configure<S>(s => ct.Config.GetSection(key).Bind(s));//이렇게 하면 change event 발생 안함
-        public static IServiceCollection AddOptions<S>(this IServiceCollection sc, 
-            IConfiguration config, string sectionName) where S : class
-        {
-            return sc.Configure<S>(config.GetSection(sectionName));
-        }
+        //public static IServiceCollection AddOptions<S>(this IServiceCollection sc, 
+        //    IConfiguration configSection) where S : class
+        //{
+        //    return sc.Configure<S>(configSection);
+        //}
 
         public static IServiceCollection AddSimpleConsole(this IServiceCollection sc)
         {
