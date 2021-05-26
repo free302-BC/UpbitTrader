@@ -20,6 +20,8 @@ namespace Universe.AppBase
         protected readonly IServiceProvider _sp;
         protected S _set;
 
+        public void Reload(S set) => _set.Reload(set);
+
         public WorkerBase(ILogger<W> logger, IServiceProvider sp, IOptionsMonitor<S> set, string? id = null)
         {
             _logger = logger;
@@ -56,8 +58,8 @@ namespace Universe.AppBase
         protected void info(object? msg1, object? msg2, object? msg3)
             => _logger.LogInformation($"{msg1}{Environment.NewLine}{msg2}{Environment.NewLine}{msg3}");
 
-        protected void log(object message) => _logger.LogError($"{message}");
-        protected void log(object msg1, object msg2) => _logger.LogError($"{msg1}{Environment.NewLine}{msg2}");
+        protected void log(object? message) => _logger.LogError($"{message}");
+        protected void log(object? msg1, object? msg2) => _logger.LogError($"{msg1}{Environment.NewLine}{msg2}");
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
@@ -66,10 +68,10 @@ namespace Universe.AppBase
                 info($"<{Id}> StartAsync()...");
                 work();
             }, cancellationToken)
-            .ContinueWith(t =>
-            {
-                info($"<{Id}> done.");
-            });
+            .ContinueWith(t => info($"<{Id}> done."))
+            .ContinueWith(
+                t => log($"{nameof(WorkerBase<W, S>)}.{nameof(StartAsync)}():", t.Exception), 
+                TaskContinuationOptions.OnlyOnFaulted);
         }
         public Task StopAsync(CancellationToken cancellationToken)
         {

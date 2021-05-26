@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
@@ -20,6 +21,9 @@ namespace Universe.Coin.Upbit
     public partial class Client : ClientBase
     {
         const string _utcFmt = "yyyy-MM-ddTHH:mm:ssZ";
+        static long _lastCallTime_Candle = 0;
+        static readonly Stopwatch _watch = Stopwatch.StartNew();
+
         public List<C> ApiCandle<C>(CurrencyId currency = CurrencyId.KRW,
                                     CoinId coin = CoinId.BTC,
                                     int count = 2,
@@ -35,7 +39,7 @@ namespace Universe.Coin.Upbit
             clearQueryString();
             setQueryString("market", currency, coin);
             if (localTo != null) setQueryString("to", $"{localTo?.ToUniversalTime():_utcFmt}");
-
+            
             while (count > 0)
             {
                 setQueryString("count", count.ToString());
@@ -48,13 +52,17 @@ namespace Universe.Coin.Upbit
                     continue;
                 }
 
-                count -= 200;
+                count -= res.Count;
                 if (count > 0)
                 {
                     var to = DateTimeOffset.FromUnixTimeMilliseconds(res.Last().Timestamp).UtcDateTime;
                     setQueryString("to", to.ToString(_utcFmt));
                     Thread.Sleep(110);
                 }
+
+                if(_watch.ElapsedMilliseconds - _lastCallTime_Candle < 1000) 
+                    Thread.Sleep((int)(_watch.ElapsedMilliseconds - _lastCallTime_Candle));
+                _lastCallTime_Candle = _watch.ElapsedMilliseconds;
             }
 
             return result;//.OrderBy(x => x.Timestamp).ToList();

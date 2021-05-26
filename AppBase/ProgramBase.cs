@@ -34,9 +34,11 @@ namespace Universe.AppBase
             {
                 //run host
                 using CancellationTokenSource cts = new();
-                using IHost host = createHostBuilder().Build();
+                using IHost host = createHostBuilder(cts).Build();
                 host.RunAsync(cts.Token)
-                    .ContinueWith(t => log(t.Exception), TaskContinuationOptions.OnlyOnFaulted);
+                    .ContinueWith(
+                        t => log($"{nameof(ProgramBase)}.{nameof(RunHost)}(): {t.Exception}"), 
+                        TaskContinuationOptions.OnlyOnFaulted);
 
                 //run worker
                 foreach (var action in _workerActions) action(host.Services, cts.Token);
@@ -48,7 +50,7 @@ namespace Universe.AppBase
                 log(ex);
             }
         }
-        static IHostBuilder createHostBuilder()
+        static IHostBuilder createHostBuilder(CancellationTokenSource cts)
         {
             var builder = Host.CreateDefaultBuilder();
             builder.ConfigureAppConfiguration(cb =>
@@ -58,6 +60,7 @@ namespace Universe.AppBase
 
             builder.ConfigureServices((context, services) =>
             {
+                services.AddSingleton(cts);
                 services.AddSimpleConsole();
                 foreach (var action in _serviceActions) action(context, services);
             });            
@@ -67,7 +70,8 @@ namespace Universe.AppBase
 
         protected static void AddWorker<W, S>(
             string? settingsFile = null, 
-            IList<string>? names = null) 
+            IList<string>? names = null,
+            Func<IServiceProvider,W>? factory = null) 
             where W : WorkerBase<W, S> 
             where S : class, IWorkerOptions
         {
@@ -77,7 +81,8 @@ namespace Universe.AppBase
             //services
             _serviceActions.Add((ctx, sc) =>
             {
-                sc.AddTransient<W>();
+                if (factory == null) sc.AddTransient<W>();
+                else sc.AddSingleton(factory);
 
                 //options
                 if (names == null) 

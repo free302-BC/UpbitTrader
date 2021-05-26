@@ -38,8 +38,17 @@ namespace Universe.Coin.Upbit.App
             var uc = new Client(_set.AccessKey, _set.SecretKey, logger);
             try
             {
-                runSingle(uc);
-                runMulti(uc);
+                var iw = _sp.GetRequiredService<InputWorker>();
+                iw.AddCmd(ConsoleKey.F2, () => runHotkey(3m));
+                iw.AddCmd(ConsoleKey.F3, () => runHotkey(-3m));
+
+                while (_set.Hours > 0)
+                {
+                    runSingle(uc);
+                    runMulti(uc);
+                    Thread.Sleep(3000);
+                }
+                void runHotkey(decimal hours) => info($"Reloaded: Hours = {_set.Hours += hours}");
             }
             catch (Exception e)
             {
@@ -57,10 +66,10 @@ namespace Universe.Coin.Upbit.App
             { CandleUnit.U240, CandleUnit.U60, CandleUnit.U30, CandleUnit.U15, CandleUnit.U10, CandleUnit.U3, CandleUnit.U1 };
             var results = new List<FindRes>();
             var sb = new StringBuilder();
-
             var hours = _set.Hours;
-            sb.AppendLine($"-----------[ {(int)(hours / 24)}d {hours % 24}h ]------------");
 
+            sb.Clear();
+            sb.AppendLine($"-----------[ {(int)(hours / 24)}d {hours % 24}h ]------------");
             foreach (var unit in units)
             {
                 var count = (int)(hours * 60 / (int)unit);
@@ -68,17 +77,12 @@ namespace Universe.Coin.Upbit.App
                 results.Add(x);
                 sb.AppendLine($"{count,6} {x.unit,6}: {x.k,6:N2} {x.rate,6:N2}%, {x.mdd,6:N2}%");
             }
-            //info(sb.ToString());
-
             var maxRate = cast(results).Max(x => x.rate);
             var max = cast(results).First(x => x.rate == maxRate);
 
             sb.AppendLine("-------------------------------------------");
             sb.AppendLine($"{max.unit,6}: {max.k,6:N2}: {max.rate,6:N2}%, {max.mdd,6:N2}%");
             info(sb.ToString());
-
-            //Thread.Sleep(3000);
-            //hours += 3;            
         }
 
         void runMulti(Client uc)
