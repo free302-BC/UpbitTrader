@@ -39,8 +39,6 @@ namespace Universe.Coin.Upbit
         /// <returns></returns>
         public List<T> InvokeApi<T>(ApiId apiId, string postPath = "") where T : IApiModel, new()
         {
-            //if (clearQuery) _wc.QueryString.Clear();
-            //queryAction?.Invoke();
             if (Helper.GetApi(apiId).ResetAuthToken) _wc.SetAuthToken(_key);
 
             try

@@ -36,6 +36,7 @@ namespace Universe.Coin.Upbit.App
         {
             var logger = _sp.GetRequiredService<ILogger<Client>>();
             var uc = new Client(_set.AccessKey, _set.SecretKey, logger);
+            var ev = new AutoResetEvent(false);
             try
             {
                 var iw = _sp.GetRequiredService<InputWorker>();
@@ -46,9 +47,16 @@ namespace Universe.Coin.Upbit.App
                 {
                     runSingle(uc);
                     runMulti(uc);
-                    Thread.Sleep(3000);
+                    //Thread.Sleep(3000);
+                    info($"<{Id}> Waiting...");
+                    ev.WaitOne();
+                    Thread.Sleep(1000);
                 }
-                void runHotkey(decimal hours) => info($"Reloaded: Hours = {_set.Hours += hours}");
+                void runHotkey(decimal hours)
+                {
+                    info($"Reloaded: Hours = {_set.Hours += hours}");
+                    ev.Set();
+                }
             }
             catch (Exception e)
             {
@@ -96,6 +104,8 @@ namespace Universe.Coin.Upbit.App
 
             var sb = new StringBuilder();
             sb.AppendLine($"-----------[ {(int)(hours / 24)}d {hours % 24}h ]------------");
+
+            var kDic = new Dictionary<CandleUnit, List<FindRes>>();//
             var summary = new List<(CandleUnit unit, decimal rate)>();
             foreach (var unit in units)
             {
@@ -117,11 +127,16 @@ namespace Universe.Coin.Upbit.App
                 sb.AppendLine($"| {cumRate,6:N2}%");
                 //sb.AppendLine("-------------------------------------------");
                 summary.Add((unit, cumRate));
+                kDic.Add(unit, results);
             }
             var maxRate = summary.Max(x => x.rate);
             var max = summary.First(x => x.rate == maxRate);
             sb.AppendLine("-------------------------------------------");
-            sb.AppendLine($"MAX: {max.unit,6}: {max.rate,6:N2}%");
+            sb.AppendLine($"{max.unit,6}: {max.rate,6:N2}%");
+            info(sb);
+
+            sb.Clear();
+            foreach (var x in kDic[max.unit]) sb.AppendLine(x.ToString());
             info(sb);
         }
 
@@ -145,7 +160,7 @@ namespace Universe.Coin.Upbit.App
             else
             {
                 var list = new List<FindRes>();// (CandleUnit unit, decimal k, decimal rate, decimal mdd)>();
-                for (decimal k = 0.1m; k <= 1.5m; k += 0.1m)
+                for (decimal k = 0.1m; k <= 2m; k += 0.1m)
                 {
                     //CandleModel.CalcRate(models, k);
                     var (rate, mdd) = backTest(models, k);

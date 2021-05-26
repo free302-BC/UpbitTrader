@@ -15,21 +15,12 @@ namespace Universe.Coin.Upbit.App
         static void Main(string[] args)
         {
             //Helper.buildCoinNameJson();
-            AddWorker<InputWorker, WorkerOptionsBase>(factory: sp =>
+            AddWorker<InputWorker, WorkerOptionsBase>(workerFactory: sp =>
             {
                 var logger = sp.GetRequiredService<ILogger<InputWorker>>();
                 var opt = sp.GetRequiredService<IOptionsMonitor<WorkerOptionsBase>>();
                 var iw = new InputWorker(logger, sp, opt);
-                iw.AddCmd(ConsoleKey.F1, () => log("test cmd <1> executing..."));
-                //iw.AddCmd(() =>
-                //{
-                //    //var w = sp.GetRequiredService<BackTestWorker>();
-                //    //var cts = sp.GetRequiredService<CancellationTokenSource>();
-                //    //var om = sp.GetRequiredService<IOptionsMonitor<BackTestOptions>>();
-                //    //w.Reload(om.Get(w.Id));
-                //    //iw.info($"Executing '{w.Id}'...");
-                //    //w.StartAsync(cts.Token);
-                //});
+                iw.AddCmd(ConsoleKey.F1, () => log("test cmd <1> executing..."));                
                 return iw;
             });
 

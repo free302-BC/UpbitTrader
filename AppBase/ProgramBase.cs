@@ -37,7 +37,7 @@ namespace Universe.AppBase
                 using IHost host = createHostBuilder(cts).Build();
                 host.RunAsync(cts.Token)
                     .ContinueWith(
-                        t => log($"{nameof(ProgramBase)}.{nameof(RunHost)}(): {t.Exception}"), 
+                        t => log($"{nameof(ProgramBase)}.{nameof(RunHost)}(): {t.Exception}"),
                         TaskContinuationOptions.OnlyOnFaulted);
 
                 //run worker
@@ -63,32 +63,32 @@ namespace Universe.AppBase
                 services.AddSingleton(cts);
                 services.AddSimpleConsole();
                 foreach (var action in _serviceActions) action(context, services);
-            });            
+            });
 
             return builder;
         }//build
 
         protected static void AddWorker<W, S>(
-            string? settingsFile = null, 
-            IList<string>? names = null,
-            Func<IServiceProvider,W>? factory = null) 
-            where W : WorkerBase<W, S> 
+            string? workerConfigFile = null,
+            IList<string>? workerNames = null,
+            Func<IServiceProvider, W>? workerFactory = null)
+            where W : WorkerBase<W, S>
             where S : class, IWorkerOptions
         {
             //config            
-            if (settingsFile != null) _configActions.Add(cb => cb.AddJsonFile(settingsFile, false, true));
+            if (workerConfigFile != null) _configActions.Add(cb => cb.AddJsonFile(workerConfigFile, false, true));
 
             //services
             _serviceActions.Add((ctx, sc) =>
             {
-                if (factory == null) sc.AddTransient<W>();
-                else sc.AddSingleton(factory);
+                if (workerFactory == null) sc.AddTransient<W>();
+                else sc.AddSingleton(workerFactory);
 
                 //options
-                if (names == null) 
+                if (workerNames == null)
                     sc.AddOptions<S>(ctx.Configuration.GetSection(typeof(W).Name));
-                else 
-                    foreach (var name in names) 
+                else
+                    foreach (var name in workerNames)
                         sc.AddOptions<S>(name, ctx.Configuration.GetSection(name));
             });
 
@@ -101,3 +101,4 @@ namespace Universe.AppBase
 
     }//class
 }
+
