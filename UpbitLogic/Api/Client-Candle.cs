@@ -52,10 +52,6 @@ namespace Universe.Coin.Upbit
                 if (count > 0)
                 {
                     var to = DateTimeOffset.FromUnixTimeMilliseconds(res.Last().Timestamp).UtcDateTime;
-                    //DateTime.Parse(res.Last().CandleDateTimeUtc, styles: DateTimeStyles.AssumeUniversal);
-                    var to2 = DateTimeOffset.FromUnixTimeMilliseconds(res.Min(x => x.Timestamp)).UtcDateTime;
-                    //res.Min(c => DateTime.Parse(c.CandleDateTimeUtc, styles: DateTimeStyles.AssumeUniversal));
-                    if (to != to2) throw new Exception($"--TEST--: last != min datetime");
                     setQueryString("to", to.ToString(_utcFmt));
                     Thread.Sleep(110);
                 }

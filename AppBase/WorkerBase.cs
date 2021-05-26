@@ -13,19 +13,33 @@ using Microsoft.Extensions.Options;
 
 namespace Universe.AppBase
 {
-    public abstract class WorkerBase<W, S> : IHostedService where W : WorkerBase<W, S> where S : class
+    public abstract class WorkerBase<W, S> : IHostedService where W : WorkerBase<W, S> where S : IWorkerOptions
     {
         protected readonly ILogger _logger;
-        readonly string _name = typeof(W).Name;
+        public string Id { get; set; }
         protected readonly IServiceProvider _sp;
-        protected volatile S _set;
+        protected S _set;
 
-        public WorkerBase(ILogger<W> logger, IOptionsMonitor<S> set, IServiceProvider sp)
+        public WorkerBase(ILogger<W> logger, IServiceProvider sp, IOptionsMonitor<S> set, string? id = null)
         {
             _logger = logger;
-            _set = set.CurrentValue;
-            set.OnChange(s => _set = s);
             _sp = sp;
+
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                Id = typeof(W).Name;
+                _set = set.CurrentValue;
+                set.OnChange(s => _set.Reload(s));
+            }
+            else
+            {
+                Id = id;
+                _set = set.Get(Id);
+                set.OnChange((s, n) =>
+                {
+                    if (n == Id) _set.Reload(s);
+                });
+            }
         }
 
         protected void report(object message, int color = 0)
@@ -49,13 +63,12 @@ namespace Universe.AppBase
         {
             return Task.Run(() =>
             {
-                info($"<{_name}> StartAsync()...");
+                info($"<{Id}> StartAsync()...");
                 work();
-                //info($"Worker Exiting StartAsync()...");
             }, cancellationToken)
             .ContinueWith(t =>
             {
-                info($"<{_name}> done.");
+                info($"<{Id}> done.");
             });
         }
         public Task StopAsync(CancellationToken cancellationToken)

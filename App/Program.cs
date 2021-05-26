@@ -14,8 +14,8 @@ namespace Universe.Coin.Upbit.App
         {
             //Helper.buildCoinNameJson();
 
-            AddWorker<BackTestWorker, WorkerSetting>("backtest.json");
-            //AddWorker<TraderWorker, WorkerSetting>();
+            AddWorker<BackTestWorker, BackTestOptions>("backtest.json", BackTestWorker.GetIds());
+            //AddWorker<TraderWorker, TraderOptions>();
             RunHost();
         }
 

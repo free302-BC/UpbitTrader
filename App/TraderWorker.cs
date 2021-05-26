@@ -19,10 +19,15 @@ using Universe.Utility;
 
 namespace Universe.Coin.Upbit.App
 {
-    public class TraderWorker : WorkerBase<TraderWorker, WorkerSetting>
+    public class TraderWorker : WorkerBase<TraderWorker, TraderOptions>
     {
-        public TraderWorker(ILogger<TraderWorker> logger, IOptionsMonitor<WorkerSetting> set, IServiceProvider sp)
-            : base(logger, set, sp) { }
+        public TraderWorker(
+            ILogger<TraderWorker> logger, 
+            IOptionsMonitor<TraderOptions> set, 
+            IServiceProvider sp)
+            : base(logger, sp, set) 
+        { 
+        }
 
         protected override void work()
         {

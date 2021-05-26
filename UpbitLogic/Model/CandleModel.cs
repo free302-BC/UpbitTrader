@@ -40,6 +40,7 @@ namespace Universe.Coin.Upbit.Model
             Target = Math.Round(Opening + prev.Delta * k, 2);
             Rate = (High > Target) ? Math.Round(Closing / Target - _feeRate, 4) : 1.0m;
         }
+
         void calcRate_sellUnderTarget(CandleModel prev, decimal k)
         {
             Target = Math.Round(Opening + prev.Delta * k, 2);
@@ -56,11 +57,21 @@ namespace Universe.Coin.Upbit.Model
 
         public static void CalcRate(IList<CandleModel> models, decimal k, bool stopLoss = false)
         {
-            models.Insert(0, _empty);
+            //models.Insert(0, _empty);
 
-            if(stopLoss) for (int i = 1; i < models.Count; i++) models[i].calcRate_sellUnderTarget(models[i - 1], k);
-            else for (int i = 1; i < models.Count; i++) models[i].calcRate_sellAtClosing(models[i - 1], k);
-            models.RemoveAt(0);
+            if (stopLoss)
+            {
+                models[0].calcRate_sellUnderTarget(_empty, k);
+                for (int i = 1; i < models.Count; i++)
+                    models[i].calcRate_sellUnderTarget(models[i - 1], k);
+            }
+            else
+            {
+                models[0].calcRate_sellAtClosing(_empty, k);
+                for (int i = 1; i < models.Count; i++)
+                    models[i].calcRate_sellAtClosing(models[i - 1], k);
+            }
+
             //models.RemoveAt(0);
         }
         public static decimal CalcCumRate(IList<CandleModel> models)
@@ -101,6 +112,9 @@ namespace Universe.Coin.Upbit.Model
            => models.Select(x => CandleModel.ToModel(x)).Reverse().ToList();
         public static CandleModel ToModel(this ICandle model)
            => CandleModel.ToModel(model);
+
+        public static CandleModel[] ToModelArray(this IEnumerable<ICandle> models)
+           => models.Select(x => CandleModel.ToModel(x)).Reverse().ToArray();
     }
 
 }
