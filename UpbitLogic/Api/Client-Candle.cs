@@ -24,11 +24,12 @@ namespace Universe.Coin.Upbit
         static long _lastCallTime_Candle = 0;
         static readonly Stopwatch _watch = Stopwatch.StartNew();
 
-        public List<C> ApiCandle<C>(CurrencyId currency = CurrencyId.KRW,
-                                    CoinId coin = CoinId.BTC,
-                                    int count = 2,
-                                    CandleUnit unit = CandleUnit.None,
-                                    DateTime? localTo = null)
+        public List<C> ApiCandle<C>(
+            CurrencyId currency = CurrencyId.KRW,
+            CoinId coin         = CoinId.BTC,
+            int count           = 2,
+            CandleUnit unit     = CandleUnit.None,
+            DateTime localTo    = default)
             where C : ICandle, new()
         {
             ICandle.CheckParam<C>(unit);
@@ -38,30 +39,25 @@ namespace Universe.Coin.Upbit
             var result = new List<C>();
             clearQueryString();
             setQueryString("market", currency, coin);
-            if (localTo != null) setQueryString("to", $"{localTo?.ToUniversalTime():_utcFmt}");
-            
+            if (localTo != default) setQueryString("to", $"{localTo.ToUniversalTime():_utcFmt}");
+
             while (count > 0)
             {
                 setQueryString("count", count.ToString());
 
                 var res = InvokeApi<C>(api, postPath);
-                if(res.Count > 0) result.AddRange(res);
-                else
+                if (res.Count > 0)
                 {
-                    Thread.Sleep(100);
-                    continue;
+                    count -= res.Count;
+                    if (count > 0)
+                    {
+                        var to = DateTimeOffset.FromUnixTimeMilliseconds(res.Last().Timestamp).UtcDateTime;
+                        setQueryString("to", to.ToString(_utcFmt));
+                    }
                 }
 
-                count -= res.Count;
-                if (count > 0)
-                {
-                    var to = DateTimeOffset.FromUnixTimeMilliseconds(res.Last().Timestamp).UtcDateTime;
-                    setQueryString("to", to.ToString(_utcFmt));
-                    Thread.Sleep(110);
-                }
-
-                if(_watch.ElapsedMilliseconds - _lastCallTime_Candle < 1000) 
-                    Thread.Sleep((int)(_watch.ElapsedMilliseconds - _lastCallTime_Candle));
+                var dt = _watch.ElapsedMilliseconds - _lastCallTime_Candle;
+                if (dt < 100) Thread.Sleep((int)(100 - dt));
                 _lastCallTime_Candle = _watch.ElapsedMilliseconds;
             }
 

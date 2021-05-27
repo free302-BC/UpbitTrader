@@ -19,7 +19,6 @@ using Universe.Utility;
 
 namespace Universe.Coin.Upbit.App
 {
-    using CMD = Action;
     public class InputWorker : WorkerBase<InputWorker, WorkerOptionsBase>
     {
         public InputWorker(
@@ -32,11 +31,12 @@ namespace Universe.Coin.Upbit.App
             _lock = new();
         }
 
-        Dictionary<ConsoleKey, CMD> _listeners;
-        public void AddCmd(ConsoleKey key, CMD cmd)
+        readonly Dictionary<ConsoleKey, Action> _listeners;
+        public void AddCmd(ConsoleKey key, Action cmd)
         {
             lock (_lock) _listeners.Add(key, cmd);
         }
+        
         public new void info(object? message) => base.info(message);
 
         object _lock = new object();
@@ -47,13 +47,12 @@ namespace Universe.Coin.Upbit.App
                 var ki = Console.ReadKey(true);
                 info($"Invoking {ki.Key} cmd...");
 
-                CMD? cmd = null;
+                Action? cmd = null;
                 lock (_lock)
                 {
                     if(_listeners.ContainsKey(ki.Key)) cmd = _listeners[ki.Key];
                 }
                 cmd?.Invoke();
-
                 //Thread.Sleep(100);
             }
         }

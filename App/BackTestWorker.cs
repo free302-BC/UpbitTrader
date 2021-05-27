@@ -32,38 +32,43 @@ namespace Universe.Coin.Upbit.App
         {
         }
 
+        volatile bool _repeat = false;
         protected override void work()
         {
             var logger = _sp.GetRequiredService<ILogger<Client>>();
             var uc = new Client(_set.AccessKey, _set.SecretKey, logger);
-            var ev = new AutoResetEvent(false);
-            try
+            using var ev = new AutoResetEvent(false);
+            registerHotkey(ev);
+            while (_set.Hours > 0)
             {
-                var iw = _sp.GetRequiredService<InputWorker>();
-                iw.AddCmd(ConsoleKey.F5, () => runHotkey(0m));
-                iw.AddCmd(ConsoleKey.F4, () => runHotkey(_set.Hours));
-                iw.AddCmd(ConsoleKey.F3, () => runHotkey(3m));
-                iw.AddCmd(ConsoleKey.F2, () => runHotkey(-3m));
-                iw.AddCmd(ConsoleKey.F1, () => runHotkey(-_set.Hours / 2));
+                runSingle(uc);
+                runMulti(uc);
+                //Thread.Sleep(3000);
+                info($"<{Id}> Waiting...");
 
-                while (_set.Hours > 0)
-                {
-                    runSingle(uc);
-                    runMulti(uc);
-                    //Thread.Sleep(3000);
-                    info($"<{Id}> Waiting...");
-                    ev.WaitOne();
-                    Thread.Sleep(1000);
-                }
-                void runHotkey(decimal hours)
-                {
-                    info($"Reloaded: Hours = {_set.Hours += hours}");
-                    ev.Set();
-                }
+                if (_repeat) Thread.Sleep(3000);
+                else ev.WaitOne();
             }
-            catch (Exception e)
+        }
+
+        private void registerHotkey(AutoResetEvent ev)
+        {
+            var iw = _sp.GetRequiredService<InputWorker>();
+            iw.AddCmd(ConsoleKey.F4, () => runHotkey(_set.Hours));
+            iw.AddCmd(ConsoleKey.F3, () => runHotkey(3m));
+            iw.AddCmd(ConsoleKey.F2, () => runHotkey(-3m));
+            iw.AddCmd(ConsoleKey.F1, () => runHotkey(-_set.Hours / 2));
+            iw.AddCmd(ConsoleKey.F5, () =>
             {
-                log("work():", e.Message);
+                _repeat = !_repeat;
+                info($"Reloaded: Repeat = {_repeat}");
+                if (_repeat) ev.Set();
+            });
+            
+            void runHotkey(decimal hours)
+            {
+                info($"Reloaded: Hours = {_set.Hours += hours}");
+                ev.Set();
             }
         }
 

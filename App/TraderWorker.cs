@@ -31,24 +31,17 @@ namespace Universe.Coin.Upbit.App
 
         protected override void work()
         {
-            //var set = reloadSetting();
             var uc = new Client(_set.AccessKey, _set.SecretKey, _sp.GetRequiredService<ILogger<Client>>());
-            try
-            {
-                //market(uc);
-                //account(uc);
-                //ticker(uc);
-                //candleDay(uc);
-                candleMinutes(uc);
-                //orderbook(uc);
-                //ticks(uc);
 
-                //run(uc);
-            }
-            catch (Exception ex)
-            {
-                log("work():", ex.Message);
-            }
+            //market(uc);
+            //account(uc);
+            //ticker(uc);
+            //candleDay(uc);
+            candleMinutes(uc);
+            //orderbook(uc);
+            //ticks(uc);
+
+            //run(uc);
         }
 
         void run(Client uc)

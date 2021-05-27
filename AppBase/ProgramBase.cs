@@ -69,7 +69,7 @@ namespace Universe.AppBase
         }//build
 
         protected static void AddWorker<W, S>(
-            string? workerConfigFile = null,
+            string workerConfigFile = "",
             IList<string>? workerNames = null,
             Func<IServiceProvider, W>? workerFactory = null,
             ServiceLifetime lifeTime = ServiceLifetime.Transient)
@@ -77,7 +77,8 @@ namespace Universe.AppBase
             where S : class, IWorkerOptions
         {
             //config            
-            if (workerConfigFile != null) _configActions.Add(cb => cb.AddJsonFile(workerConfigFile, false, true));
+            if (string.IsNullOrWhiteSpace(workerConfigFile)) 
+                _configActions.Add(cb => cb.AddJsonFile(workerConfigFile, false, true));
 
             //services
             _serviceActions.Add((ctx, sc) =>

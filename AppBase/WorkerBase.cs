@@ -22,7 +22,7 @@ namespace Universe.AppBase
 
         public void Reload(S set) => _set.Reload(set);
 
-        public WorkerBase(ILogger<W> logger, IServiceProvider sp, IOptionsMonitor<S> set, string? id = null)
+        public WorkerBase(ILogger<W> logger, IServiceProvider sp, IOptionsMonitor<S> set, string id = "")
         {
             _logger = logger;
             _sp = sp;
