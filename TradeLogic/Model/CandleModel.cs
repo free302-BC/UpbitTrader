@@ -16,8 +16,8 @@ namespace Universe.Coin.TradeLogic.Model
 
         //계산용
         public decimal Target, Rate, CumRate, DrawDown;
-        const decimal _feeRate = 0.0005m * 2m;
-        static readonly CandleModel _empty = new() { Delta = 99999m };
+        public const decimal FeeRate = 0.0005m * 2m;
+        public static readonly CandleModel _empty = new() { Delta = 99999m };
 
         public CandleModel() { }
         public CandleModel(ICandle candle) => setApiModel(candle);
@@ -38,12 +38,12 @@ namespace Universe.Coin.TradeLogic.Model
         void calcRate_OverDelta(CandleModel prev, decimal k)
         {
             Target = Math.Round(Opening + prev.Delta * k, 2);
-            Rate = (High > Target) ? Math.Round(Closing / Target - _feeRate, 4) : 1.0m;
+            Rate = (High > Target) ? Math.Round(Closing / Target - FeeRate, 4) : 1.0m;
         }
         void calcRate_OverDeltaMA(CandleModel prev, decimal k, decimal ma)
         {
             Target = Math.Round(Opening + prev.Delta * k, 2);
-            Rate = (High > Target && Opening >= ma) ? Math.Round(Closing / Target - _feeRate, 4) : 1.0m;
+            Rate = (High > Target && Opening >= ma) ? Math.Round(Closing / Target - FeeRate, 4) : 1.0m;
         }
         void calcRate_StopLoss(CandleModel prev, decimal k)
         {
@@ -52,7 +52,7 @@ namespace Universe.Coin.TradeLogic.Model
             var sellPrice = Target * 0.99m > Low ? Math.Max(Target * 0.985m, Low) : Closing;
             //하락후 회복시 미반영
 
-            Rate = (High > Target) ? Math.Round(sellPrice / Target - _feeRate, 4) : 1.0m;
+            Rate = (High > Target) ? Math.Round(sellPrice / Target - FeeRate, 4) : 1.0m;
         }
 
         public override string ToString()

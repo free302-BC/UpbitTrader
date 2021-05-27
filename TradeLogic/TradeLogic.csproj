@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <Version>1.0</Version>
@@ -20,7 +20,11 @@
     <Description>Coin Trade Logic library</Description>
     <Copyright>Copyright (c) 2021 UniverseSoft</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-  </PropertyGroup>  
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="NewFolder\" />
+  </ItemGroup>  
   
   <UsingTask TaskName="GetCurrentBuildVersion" AssemblyFile="..\Universe.BuildVersion.dll" />
   <Target Name="BeforeBuildActionsProject1" BeforeTargets="BeforeBuild">
