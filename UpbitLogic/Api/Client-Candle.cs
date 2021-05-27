@@ -13,6 +13,8 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
+using Universe.Coin.TradeLogic;
+using Universe.Coin.TradeLogic.Model;
 using Universe.Coin.Upbit.Model;
 using Universe.Utility;
 
@@ -27,13 +29,13 @@ namespace Universe.Coin.Upbit
         public List<C> ApiCandle<C>(
             CurrencyId currency = CurrencyId.KRW,
             CoinId coin         = CoinId.BTC,
+            ApiId api           = ApiId.CandleMinutes,
             int count           = 2,
             CandleUnit unit     = CandleUnit.None,
             DateTime localTo    = default)
             where C : ICandle, new()
         {
-            ICandle.CheckParam<C>(unit);
-            var api = ICandle.GetApiId<C>();
+            ICandle.CheckParam<C>(api, unit);
             var postPath = api == ApiId.CandleMinutes ? ((int)unit).ToString() : "";
 
             var result = new List<C>();
@@ -48,6 +50,7 @@ namespace Universe.Coin.Upbit
                 var res = InvokeApi<C>(api, postPath);
                 if (res.Count > 0)
                 {
+                    result.AddRange(res);
                     count -= res.Count;
                     if (count > 0)
                     {

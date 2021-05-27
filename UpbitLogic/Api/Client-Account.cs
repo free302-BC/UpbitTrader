@@ -10,6 +10,7 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
+using Universe.Coin.TradeLogic;
 using Universe.Coin.Upbit.Model;
 using Universe.Utility;
 

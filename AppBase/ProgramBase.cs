@@ -77,7 +77,7 @@ namespace Universe.AppBase
             where S : class, IWorkerOptions
         {
             //config            
-            if (string.IsNullOrWhiteSpace(workerConfigFile)) 
+            if (!string.IsNullOrWhiteSpace(workerConfigFile)) 
                 _configActions.Add(cb => cb.AddJsonFile(workerConfigFile, false, true));
 
             //services

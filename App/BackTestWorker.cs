@@ -16,6 +16,8 @@ using System.Text.Json;
 using Universe.Coin.Upbit.Model;
 using System.IO;
 using System.Collections.Specialized;
+using Universe.Coin.TradeLogic;
+using Universe.Coin.TradeLogic.Model;
 
 namespace Universe.Coin.Upbit.App
 {

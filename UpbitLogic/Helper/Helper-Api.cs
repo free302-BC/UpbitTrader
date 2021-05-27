@@ -14,6 +14,7 @@ using Universe.Utility;
 using Universe.CryptoLogic;
 using System.Text.Json;
 using System.Diagnostics.CodeAnalysis;
+using Universe.Coin.TradeLogic;
 
 namespace Universe.Coin.Upbit
 {

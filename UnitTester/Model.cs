@@ -2,6 +2,7 @@ using System;
 using Xunit;
 using Universe.Coin.Upbit.Model;
 using Xunit.Abstractions;
+using Universe.Coin.TradeLogic.Model;
 
 namespace UnitTester
 {

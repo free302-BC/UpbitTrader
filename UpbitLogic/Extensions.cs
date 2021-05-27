@@ -13,6 +13,8 @@ using System.Threading.Tasks;
 using Universe.Coin.Upbit.Model;
 using Universe.Utility;
 using Universe.CryptoLogic;
+using Universe.Coin.TradeLogic;
+using Universe.Coin.TradeLogic.Model;
 
 namespace Universe.Coin.Upbit
 {

@@ -9,6 +9,8 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
+using Universe.Coin.TradeLogic;
+using Universe.Coin.TradeLogic.Model;
 using Universe.Coin.Upbit.Model;
 
 namespace Universe.Coin.Upbit

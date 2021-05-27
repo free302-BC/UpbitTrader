@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Universe.Coin.Upbit.Model
+namespace Universe.Coin.TradeLogic.Model
 {
     /// <summary>
     /// 계산용 모델(xxxModel)의 베이스

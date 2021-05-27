@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Universe.Coin.Upbit.Model
+namespace Universe.Coin.TradeLogic
 {
     /// <summary>
     /// model list를 테이블 형식 문자열로 변환

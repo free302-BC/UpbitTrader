@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Universe.Coin.Upbit.Model
+namespace Universe.Coin.TradeLogic.Model
 {
     /// <summary>
     /// Candle API의 리턴 모델 - CandleModel로 변환시
@@ -29,14 +29,14 @@ namespace Universe.Coin.Upbit.Model
 
         #region ---- ICandle Type ~ ApiId Map ----
 
-        public static ApiId GetApiId<C>() where C : ICandle
-        {
-            var type = typeof(C);
-            if (!_typeApiDic.ContainsKey(type))
-                throw new Exception($"{nameof(ICandle)}.{nameof(GetApiId)}(): Can't get ApiId of <{type.Name}>");
-            return _typeApiDic[typeof(C)];
-        }
-        static Dictionary<Type, ApiId> _typeApiDic;
+        //public static ApiId GetApiId<C>() where C : ICandle
+        //{
+        //    var type = typeof(C);
+        //    if (!_typeApiDic.ContainsKey(type))
+        //        throw new Exception($"{nameof(ICandle)}.{nameof(GetApiId)}(): Can't get ApiId of <{type.Name}>");
+        //    return _typeApiDic[typeof(C)];
+        //}
+        //static Dictionary<Type, ApiId> _typeApiDic;
 
         #endregion
 
@@ -48,9 +48,8 @@ namespace Universe.Coin.Upbit.Model
             if (!_apiNameDic.ContainsKey(api))
                 throw new ArgumentException($"{nameof(ICandle)}: ApiId '{api}' not allowed.");
         }
-        public static void CheckParam<C>(CandleUnit unit) where C : ICandle//CandleBase<C>
+        public static void CheckParam<C>(ApiId api, CandleUnit unit) where C : ICandle
         {
-            var api = GetApiId<C>();
             if (api == ApiId.CandleMinutes)
             {
                 if (_units.Contains(unit)) return;
@@ -83,12 +82,12 @@ namespace Universe.Coin.Upbit.Model
                 { ApiId.CandleMonth, "Month" },
             };
 
-            _typeApiDic = new()
-            {
-                { typeof(CandleDay), ApiId.CandleDays },
-                { typeof(CandleMinute), ApiId.CandleMinutes },
+            //_typeApiDic = new()
+            //{
+            //    { typeof(CandleDay), ApiId.CandleDays },
+            //    { typeof(CandleMinute), ApiId.CandleMinutes },
 
-            };
+            //};
 
             _units = Enum.GetValues<CandleUnit>().Where(x => x != CandleUnit.None)?.ToArray()!;
         }

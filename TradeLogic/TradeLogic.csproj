@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Version>1.0</Version>
+    <TargetFramework>net5.0</TargetFramework>
+    <RootNamespace>Universe.Coin.TradeLogic</RootNamespace>
+    <AssemblyName>Universe.Coin.TradeLogic</AssemblyName>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <LangVersion>9.0</LangVersion>
+    <Nullable>enable</Nullable>
+    <WarningsAsErrors>CS8600;CS8602;CS8603;CS8625;CS8604</WarningsAsErrors>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <Company>UniverseSoft</Company>
+    <Product>Universe.Coin.TradeLogic</Product>
+    <Authors>UniverseSoft</Authors>
+    <Description>Coin Trade Logic library</Description>
+    <Copyright>Copyright (c) 2021 UniverseSoft</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+  </PropertyGroup>  
+  
+  <UsingTask TaskName="GetCurrentBuildVersion" AssemblyFile="..\Universe.BuildVersion.dll" />
+  <Target Name="BeforeBuildActionsProject1" BeforeTargets="BeforeBuild">
+    <GetCurrentBuildVersion BaseVersion="$(Version)">
+      <Output TaskParameter="Version" PropertyName="FileVersion" />
+      <Output TaskParameter="Version" PropertyName="AssemblyVersion" />
+    </GetCurrentBuildVersion>
+  </Target>
+
+</Project>

@@ -6,6 +6,8 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
+using Universe.Coin.TradeLogic;
+using Universe.Coin.TradeLogic.Model;
 
 namespace Universe.Coin.Upbit.Model
 {
@@ -14,12 +16,16 @@ namespace Universe.Coin.Upbit.Model
     {
         public CandleBase()
         {
-            ApiId = ICandle.GetApiId<C>();
             Market = CandleDateTimeUtc = CandleDateTimeKst = string.Empty;
         }
-        public CandleBase(CandleUnit unit = CandleUnit.None) : this()
+        public CandleBase(ApiId api) : this()
         {
-            ICandle.CheckParam<C>(unit);
+            ICandle.CheckParam(api);
+            ApiId = api;// ICandle.GetApiId<C>();
+        }
+        public CandleBase(ApiId apiId, CandleUnit unit) : this(apiId)
+        {
+            ICandle.CheckParam<C>(apiId, unit);
             CandleUnit = unit; 
         }        
 

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Universe.Coin.Upbit.Model
+namespace Universe.Coin.TradeLogic.Model
 {
     public class CandleModel : ViewModelBase<CandleModel, ICandle>
     {
@@ -35,13 +35,17 @@ namespace Universe.Coin.Upbit.Model
             return this;
         }
 
-        void calcRate_sellAtClosing(CandleModel prev, decimal k)
+        void calcRate_OverDelta(CandleModel prev, decimal k)
         {
             Target = Math.Round(Opening + prev.Delta * k, 2);
             Rate = (High > Target) ? Math.Round(Closing / Target - _feeRate, 4) : 1.0m;
         }
-
-        void calcRate_sellUnderTarget(CandleModel prev, decimal k)
+        void calcRate_OverDeltaMA(CandleModel prev, decimal k, decimal ma)
+        {
+            Target = Math.Round(Opening + prev.Delta * k, 2);
+            Rate = (High > Target && Opening >= ma) ? Math.Round(Closing / Target - _feeRate, 4) : 1.0m;
+        }
+        void calcRate_StopLoss(CandleModel prev, decimal k)
         {
             Target = Math.Round(Opening + prev.Delta * k, 2);
 
@@ -61,15 +65,15 @@ namespace Universe.Coin.Upbit.Model
 
             if (stopLoss)
             {
-                models[0].calcRate_sellUnderTarget(_empty, k);
+                models[0].calcRate_StopLoss(_empty, k);
                 for (int i = 1; i < models.Count; i++)
-                    models[i].calcRate_sellUnderTarget(models[i - 1], k);
+                    models[i].calcRate_StopLoss(models[i - 1], k);
             }
             else
             {
-                models[0].calcRate_sellAtClosing(_empty, k);
+                models[0].calcRate_OverDelta(_empty, k);
                 for (int i = 1; i < models.Count; i++)
-                    models[i].calcRate_sellAtClosing(models[i - 1], k);
+                    models[i].calcRate_OverDelta(models[i - 1], k);
             }
 
             //models.RemoveAt(0);

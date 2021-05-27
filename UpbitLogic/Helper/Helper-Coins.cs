@@ -13,6 +13,7 @@ using System.Text.Encodings.Web;
 using Universe.Utility;
 using Universe.CryptoLogic;
 using System.Text.Json;
+using Universe.Coin.TradeLogic;
 
 namespace Universe.Coin.Upbit
 {
