@@ -24,9 +24,9 @@ namespace Universe.AppBase
 
         static ProgramBase()
         {
-            _serviceActions = new List<ServiceAction>();
-            _configActions = new List<ConfigAction>();
-            _workerActions = new List<WorkerAction>();
+            _serviceActions = new();
+            _configActions = new();
+            _workerActions = new();
         }
         protected static void RunHost()
         {
@@ -71,7 +71,8 @@ namespace Universe.AppBase
         protected static void AddWorker<W, S>(
             string? workerConfigFile = null,
             IList<string>? workerNames = null,
-            Func<IServiceProvider, W>? workerFactory = null)
+            Func<IServiceProvider, W>? workerFactory = null,
+            ServiceLifetime lifeTime = ServiceLifetime.Transient)
             where W : WorkerBase<W, S>
             where S : class, IWorkerOptions
         {
@@ -81,8 +82,14 @@ namespace Universe.AppBase
             //services
             _serviceActions.Add((ctx, sc) =>
             {
-                if (workerFactory == null) sc.AddTransient<W>();
-                else sc.AddSingleton(workerFactory);
+                _ = lifeTime switch
+                {
+                    ServiceLifetime.Transient => sc.AddTransient<W>(),
+                    ServiceLifetime.Singleton
+                        => workerFactory == null ? sc.AddSingleton<W>() : sc.AddSingleton(workerFactory),
+                    ServiceLifetime.Scoped => sc.AddScoped<W>(),
+                    _ => sc.AddTransient<W>(),
+                };
 
                 //options
                 if (workerNames == null)

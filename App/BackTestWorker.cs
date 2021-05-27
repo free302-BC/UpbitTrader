@@ -40,8 +40,11 @@ namespace Universe.Coin.Upbit.App
             try
             {
                 var iw = _sp.GetRequiredService<InputWorker>();
-                iw.AddCmd(ConsoleKey.F2, () => runHotkey(3m));
-                iw.AddCmd(ConsoleKey.F3, () => runHotkey(-3m));
+                iw.AddCmd(ConsoleKey.F5, () => runHotkey(0m));
+                iw.AddCmd(ConsoleKey.F4, () => runHotkey(_set.Hours));
+                iw.AddCmd(ConsoleKey.F3, () => runHotkey(3m));
+                iw.AddCmd(ConsoleKey.F2, () => runHotkey(-3m));
+                iw.AddCmd(ConsoleKey.F1, () => runHotkey(-_set.Hours / 2));
 
                 while (_set.Hours > 0)
                 {

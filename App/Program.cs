@@ -14,16 +14,7 @@ namespace Universe.Coin.Upbit.App
     {
         static void Main(string[] args)
         {
-            //Helper.buildCoinNameJson();
-            AddWorker<InputWorker, WorkerOptionsBase>(workerFactory: sp =>
-            {
-                var logger = sp.GetRequiredService<ILogger<InputWorker>>();
-                var opt = sp.GetRequiredService<IOptionsMonitor<WorkerOptionsBase>>();
-                var iw = new InputWorker(logger, sp, opt);
-                iw.AddCmd(ConsoleKey.F1, () => log("test cmd <1> executing..."));                
-                return iw;
-            });
-
+            AddWorker<InputWorker, WorkerOptionsBase>(lifeTime: ServiceLifetime.Singleton);
             AddWorker<BackTestWorker, BackTestOptions>("backtest.json", BackTestWorker.GetIds());
             //AddWorker<TraderWorker, TraderOptions>();
             RunHost();
