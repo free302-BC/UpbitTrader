@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <Version>1.0</Version>
@@ -24,6 +24,10 @@
 
   <ItemGroup>
     <Folder Include="NewFolder\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Data.Analysis" Version="0.4.0" />
   </ItemGroup>  
   
   <UsingTask TaskName="GetCurrentBuildVersion" AssemblyFile="..\Universe.BuildVersion.dll" />

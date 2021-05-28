@@ -43,9 +43,12 @@ namespace Universe.Coin.Upbit.App
             registerHotkey(ev);
             while (_set.Hours > 0)
             {
+                BuyOverDelta.TestDataFrame(info);
+                break;
+
                 runSingle(uc);
                 runMulti(uc);
-                //Thread.Sleep(3000);
+
                 info($"<{Id}> Waiting...");
 
                 if (_repeat) Thread.Sleep(3000);
