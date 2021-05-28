@@ -48,10 +48,10 @@ namespace Universe.Coin.Upbit
                 setQueryString("count", count.ToString());
 
                 var res = InvokeApi<C>(api, postPath);
-                if (res.Count > 0)
+                if (res.Length > 0)
                 {
                     result.AddRange(res);
-                    count -= res.Count;
+                    count -= res.Length;
                     if (count > 0)
                     {
                         var to = DateTimeOffset.FromUnixTimeMilliseconds(res.Last().Timestamp).UtcDateTime;
@@ -76,11 +76,11 @@ namespace Universe.Coin.Upbit
             return InvokeApi<Ticker>(ApiId.TradeTicker)?.FirstOrDefault() ?? new();
         }
 
-        public List<Ticker> ApiTicker(IEnumerable<(CurrencyId currency, CoinId coin)> markets)
+        public Ticker[] ApiTicker(IEnumerable<(CurrencyId currency, CoinId coin)> markets)
         {
             clearQueryString();
             foreach (var q in markets) _wc.QueryString.Add("markets", Helper.GetMarketId(q.currency, q.coin));
-            return InvokeApi<Ticker>(ApiId.TradeTicker) ?? new();
+            return InvokeApi<Ticker>(ApiId.TradeTicker) ?? Array.Empty<Ticker>();
         }
         #endregion
 

@@ -39,20 +39,20 @@ namespace Universe.Coin.Upbit
         /// <param name="apiId"></param>
         /// <param name="postPath">Api URL에 추가할 경로: ex) minutes candle의 unit</param>
         /// <returns></returns>
-        public List<T> InvokeApi<T>(ApiId apiId, string postPath = "") where T : IApiModel, new()
+        public T[] InvokeApi<T>(ApiId apiId, string postPath = "") where T : IApiModel, new()
         {
             if (Helper.GetApi(apiId).ResetAuthToken) _wc.SetAuthToken(_key);
 
             try
             {
                 string json = _wc.DownloadString(Helper.GetApiPath(apiId, postPath));
-                var modles = JsonConvert.DeserializeObject<List<T>>(json) ?? new List<T>();
+                var modles = JsonConvert.DeserializeObject<T[]>(json) ?? Array.Empty<T>();
                 return modles;
             }
             catch (WebException ex)
             {
                 _logger.LogWebException(ex, apiId);
-                return new List<T>();
+                return Array.Empty<T>();
             }
         }
         

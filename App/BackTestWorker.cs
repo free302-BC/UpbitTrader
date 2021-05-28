@@ -18,6 +18,7 @@ using System.IO;
 using System.Collections.Specialized;
 using Universe.Coin.TradeLogic;
 using Universe.Coin.TradeLogic.Model;
+using System.Diagnostics;
 
 namespace Universe.Coin.Upbit.App
 {
@@ -41,11 +42,21 @@ namespace Universe.Coin.Upbit.App
             var uc = new Client(_set.AccessKey, _set.SecretKey, logger);
             using var ev = new AutoResetEvent(false);
             registerHotkey(ev);
+
+            //test
+            void test(Client uc)
+            {
+                var w = Stopwatch.StartNew();
+                var models = uc.ApiCandle<CandleMinute>(count: 10000, unit: CandleUnit.U1).ToModels();
+                info($"Δt= {w.ElapsedMilliseconds}ms: {models[0]}");
+
+                w.Restart();
+                ITradeLogic.CalcMovingAvg(models, 15);
+                info($"Δt= {w.ElapsedMilliseconds}ms: {models[0]}");
+            }
+
             while (_set.Hours > 0)
             {
-                BuyOverDelta.TestDataFrame(info);
-                break;
-
                 runSingle(uc);
                 runMulti(uc);
 
@@ -124,17 +135,19 @@ namespace Universe.Coin.Upbit.App
             {
                 var count = (int)(hours * 60 / (int)unit);
                 var totalCount = (int)(totalHours * 60 / (int)unit);
-                var models = uc.ApiCandle<CandleMinute>(count: totalCount, unit: unit).ToModelArray();
+                var models = uc.ApiCandle<CandleMinute>(count: totalCount, unit: unit).ToModels();
 
                 var results = new List<FindRes>();
                 sb.Append($"{unit,6}: ");
+
                 for (int i = 0; i < numTest; i++)
                 {
-                    var currents = new ArraySegment<CandleModel>(models, count * i, count);
-                    var x = cast(findK(currents, unit));
+                    //var currents = new ArraySegment<CandleModel>(models, count * i, count);
+                    var x = cast(findK(models, unit, count * i, count));
                     results.Add(x);
                     //sb.Append($"{(x.rate - 1) * 100,6:N2} ");
                 }
+
                 //sb.AppendLine("-------------------------------------------");
                 var cumRate = 100 * (cast(results).Aggregate(1m, (p, x) => p * x.rate) - 1);
                 sb.AppendLine($"| {cumRate,6:N2}%");
@@ -167,16 +180,18 @@ namespace Universe.Coin.Upbit.App
             return max;
         }
 
-        FindRes findK(IList<CandleModel> models, CandleUnit unit, StringBuilder? sb = null)
+        FindRes findK(CandleModel[] models, CandleUnit unit, StringBuilder? sb = null) 
+            => findK(models, unit, 0, models.Length, sb);
+
+        FindRes findK(CandleModel[] models, CandleUnit unit, int offset, int count, StringBuilder? sb = null)
         {
-            if (models.Count == 0) return (unit, 0m, 0m, 0m);
+            if (models.Length == 0) return (unit, 0m, 0m, 0m);
             else
             {
                 var list = new List<FindRes>();// (CandleUnit unit, decimal k, decimal rate, decimal mdd)>();
                 for (decimal k = 0.1m; k <= 2m; k += 0.1m)
                 {
-                    //CandleModel.CalcRate(models, k);
-                    var (rate, mdd) = backTest(models, k);
+                    var (rate, mdd) = backTest(models, k, offset, count);
                     list.Add((unit, k, rate, mdd));
                     sb?.AppendLine($"{k,6:N2}: {(rate - 1) * 100,10:N2}%, {mdd,10:N2}%");
                 }
@@ -194,20 +209,24 @@ namespace Universe.Coin.Upbit.App
             var models = data.ToModels();
             var (finalRate, mdd) = backTest(models, k);
 
-            var down = IViewModel.Print(models.Where(x => x.Rate < 1));
+            var lossModels = IViewModel.Print(models.Where(x => x.Rate < 1));
             var res = IViewModel.Print(models);
             //File.WriteAllText($"backtest_{unit}_{k}.txt", res);
-            if (_set.PrintCandle) info(down);
+            if (_set.PrintCandle) info(lossModels);
             //info($"Final Profit Rate= {(finalRate - 1) * 100:N2}%", $"MDD= {mdd:N2}%");
         }
 
-        (decimal rate, decimal mdd) backTest(IList<CandleModel> models, decimal k)
+        (decimal rate, decimal mdd) backTest(CandleModel[] models, decimal k) 
+            => backTest(models, k, 0, models.Length);
+        (decimal rate, decimal mdd) backTest(CandleModel[] models, decimal k, int offset, int count)
         {
-            CandleModel.CalcRate(models, k, _set.ApplyStopLoss);
-            var rate = CandleModel.CalcCumRate(models);
-            var mdd = CandleModel.CalcDrawDown(models);
+            BuyOverDelta.Default.CalcProfitRate(models, k, offset, count);
+
+            var rate = ITradeLogic.CalcCumRate(models, offset, count);
+            var mdd = ITradeLogic.CalcDrawDown(models, offset, count);
             return (rate, mdd);
         }
+
 
         #region ---- Work ID ----
 

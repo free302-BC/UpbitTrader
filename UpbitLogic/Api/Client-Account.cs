@@ -18,7 +18,7 @@ namespace Universe.Coin.Upbit
 {
     public partial class Client : ClientBase
     {
-        public List<Account> ApiAccount() => InvokeApi<Account>(ApiId.AccountInfo);
+        public Account[] ApiAccount() => InvokeApi<Account>(ApiId.AccountInfo);
 
         public decimal GetBalance(CurrencyId currency)
         {
