@@ -8,9 +8,9 @@ using Universe.Coin.TradeLogic.Model;
 
 namespace Universe.Coin.TradeLogic
 {
-    public class BuyOverDelta : ITradeLogic
+    public class SimpleTL : ITradeLogic
     {
-        public void CalcProfitRate(CandleModel[] models, decimal k) 
+        public void CalcProfitRate(CandleModel[] models, decimal k)
             => CalcProfitRate(models, k, 0, models.Length);
 
         public void CalcProfitRate(CandleModel[] models, decimal k, int offset, int count)
@@ -28,18 +28,23 @@ namespace Universe.Coin.TradeLogic
                 : 1.0000m;
         }
 
-        public static BuyOverDelta Default = new();
+        public static SimpleTL Default = new();
 
     }//class
 
-    public class BuyOverDeltaMA : ITradeLogic
+    public class MovingAvgTL : ITradeLogic
     {
+        readonly int _maSize;
+        public MovingAvgTL(int maSize)
+        {
+            _maSize = maSize;
+        }
         public void CalcProfitRate(CandleModel[] models, decimal k) 
             => CalcProfitRate(models, k, 0, models.Length);
 
         public void CalcProfitRate(CandleModel[] models, decimal k, int offset, int count)
         {
-            ITradeLogic.CalcMovingAvg(models, 5);
+            ITradeLogic.CalcMovingAvg(models, _maSize);
 
             calcProfitRate(models[offset], offset > 0 ? models[offset - 1] : CandleModel.Empty, k);
             for (int i = offset + 1; i < offset + count && i < models.Length; i++)
@@ -49,12 +54,12 @@ namespace Universe.Coin.TradeLogic
         static void calcProfitRate(CandleModel model, CandleModel prev, decimal k)
         {
             model.Target = Math.Round(model.Opening + prev.Delta * k, 2);
-            model.Rate = (model.High > model.Target && model.Opening >= model.MovingAvg)
+            model.Rate = (model.High > model.Target && model.Opening >= prev.MovingAvg)
                 ? Math.Round(model.Closing / model.Target - CandleModel.FeeRate, 4)
                 : 1.0m;
         }
 
-        public static BuyOverDeltaMA Default = new();
+        public static MovingAvgTL Default = new(5);
 
     }//class
 

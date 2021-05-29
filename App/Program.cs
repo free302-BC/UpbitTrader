@@ -26,7 +26,7 @@ namespace Universe.Coin.Upbit.App
                     iw.AddCmd(ConsoleKey.Escape, quit);
                     return iw;
 
-                    void quit() => sp.GetRequiredService<IHost>().StopAsync().Wait();
+                    void quit(ConsoleModifiers modifiers) => sp.GetRequiredService<IHost>().StopAsync().Wait();
                 });
 
             AddWorker<BackTestWorker, BackTestOptions>("backtest.json", BackTestWorker.GetIds());

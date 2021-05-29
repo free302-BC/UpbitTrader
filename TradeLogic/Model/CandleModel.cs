@@ -45,7 +45,7 @@ namespace Universe.Coin.TradeLogic.Model
             (nameof(Target),   8),
             (nameof(High),     8),
             (nameof(Closing),  8),
-            (nameof(Rate),     10),
+            (nameof(Rate),     8),
             (nameof(CumRate),  8),
             (nameof(DrawDown), 8)
         };

@@ -140,7 +140,7 @@ namespace Universe.Coin.Upbit.App
             var next = start.AddDays(1);
             var sell = next.AddSeconds(-60);
 
-            BuyOverDelta.Default.CalcProfitRate(models, 0.5m);
+            SimpleTL.Default.CalcProfitRate(models, 0.5m);
             var target = models[1].Target;
 
             return (next, sell, target);

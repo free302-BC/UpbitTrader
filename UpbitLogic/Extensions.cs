@@ -20,8 +20,6 @@ namespace Universe.Coin.Upbit
 {
     public static class Extensions
     {
-        public static string Print(this IEnumerable<IViewModel> models) => IViewModel.Print(models);
-
         public static void SetAuthToken(this WebClient wc, KeyPair key)
             => wc.Headers["Authorization"] = "Bearer " + Helper.BuildAuthToken(key);
 

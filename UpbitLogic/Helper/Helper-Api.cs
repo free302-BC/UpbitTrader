@@ -56,8 +56,7 @@ namespace Universe.Coin.Upbit
             opt.IncludeFields = true;
             opt.WriteIndented = true;
             opt.PropertyNameCaseInsensitive = true;
-            var optJson = JsonSerializer.Serialize(opt, opt);
-            File.WriteAllText(_jsonOptionFile, optJson, Encoding.UTF8);
+            File.WriteAllText(_jsonOptionFile, JsonSerializer.Serialize(opt, opt), Encoding.UTF8);
 
             //save api path file
             var optEncoder = new JsonSerializerOptions(opt);
