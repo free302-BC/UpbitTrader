@@ -7,7 +7,7 @@ using Universe.AppBase;
 
 namespace Universe.Coin.Upbit.App
 {
-    public class TraderOptions : WorkerOptionsBase
+    public class TraderOptions : WorkerOptions
     {
         public override void Reload(IWorkerOptions source)
         {

@@ -19,12 +19,15 @@ using Universe.Utility;
 
 namespace Universe.Coin.Upbit.App
 {
-    public class InputWorker : WorkerBase<InputWorker, WorkerOptionsBase>
+
+    public delegate void CmdReq();
+
+    public class InputWorker : WorkerBase<InputWorker, WorkerOptions>
     {
         public InputWorker(
             ILogger<InputWorker> logger,
             IServiceProvider sp,
-            IOptionsMonitor<WorkerOptionsBase> set)
+            IOptionsMonitor<WorkerOptions> set)
             : base(logger, sp, set)
         {
             _listeners = new();
@@ -34,7 +37,11 @@ namespace Universe.Coin.Upbit.App
         readonly Dictionary<ConsoleKey, Action> _listeners;
         public void AddCmd(ConsoleKey key, Action cmd)
         {
-            lock (_lock) _listeners.Add(key, cmd);
+            lock (_lock) 
+            {
+                if (_listeners.ContainsKey(key)) _listeners[key] += cmd;
+                else _listeners[key] = cmd;
+            }
         }
         
         public new void info(object? message) => base.info(message);

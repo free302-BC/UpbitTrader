@@ -34,13 +34,15 @@ namespace Universe.Coin.TradeLogic
         public static decimal CalcCumRate(CandleModel[] models) => CalcCumRate(models, 0, models.Length);
         public static decimal CalcCumRate(CandleModel[] models, int offset, int count)
         {
-            var rate =  models.Skip(offset).Take(count).Aggregate(1.0m, (cr, m) => m.CumRate = Math.Round(cr *= m.Rate, 4));
+            var seed = offset > 0 ? models[offset - 1].CumRate : 1m;
+            var rate =  models.Skip(offset).Take(count).Aggregate(seed, (cr, m) => m.CumRate = Math.Round(cr *= m.Rate, 4));
             return Math.Round(rate, 4);
         }
 
         public static decimal CalcDrawDown(CandleModel[] models) => CalcDrawDown(models, 0, models.Length);
         public static decimal CalcDrawDown(CandleModel[] models, int offset, int count)
         {
+            //TODO: max 구하기? 현재영역 or 전체
             var max = decimal.MinValue;
             var sub = models.Skip(offset).Take(count);
             foreach (var m in sub)

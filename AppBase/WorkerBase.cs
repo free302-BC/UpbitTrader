@@ -31,7 +31,11 @@ namespace Universe.AppBase
             {
                 Id = typeof(W).Name;
                 _set = set.CurrentValue;
-                set.OnChange(s => _set.Reload(s));
+                set.OnChange(s => 
+                { 
+                    _set.Reload(s);
+                    onOptionsUpdate?.Invoke();
+                });
             }
             else
             {
@@ -39,7 +43,11 @@ namespace Universe.AppBase
                 _set = set.Get(Id);
                 set.OnChange((s, n) =>
                 {
-                    if (n == Id) _set.Reload(s);
+                    if (n == Id)
+                    {
+                        _set.Reload(s);
+                        onOptionsUpdate?.Invoke();
+                    }
                 });
             }
         }
@@ -80,6 +88,7 @@ namespace Universe.AppBase
         }
 
         protected abstract void work();
+        protected event Action? onOptionsUpdate;
 
     }//class
 }

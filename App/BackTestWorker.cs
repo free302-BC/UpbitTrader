@@ -19,13 +19,16 @@ using System.Collections.Specialized;
 using Universe.Coin.TradeLogic;
 using Universe.Coin.TradeLogic.Model;
 using System.Diagnostics;
+using System.Numerics;
 
 namespace Universe.Coin.Upbit.App
 {
-    using FindRes = ValueTuple<CandleUnit, decimal, decimal, decimal>;
-    //(CandleUnit unit, decimal k, decimal rate, decimal mdd)
+    //(decimal k, decimal rate, decimal mdd)
+    using FindRes = ValueTuple<decimal, decimal, decimal>;
+    using FindList = List<(decimal k, decimal rate, decimal mdd)>;
+    using FindList2 = List<(CandleUnit unit, (decimal k, decimal rate, decimal mdd) res)>;
 
-    public class BackTestWorker : WorkerBase<BackTestWorker, BackTestOptions>
+    public class BackTestWorker : WorkerBase<BackTestWorker, BackTestOptions>, IDisposable
     {
         public BackTestWorker(
             ILogger<BackTestWorker> logger,
@@ -33,87 +36,85 @@ namespace Universe.Coin.Upbit.App
             IServiceProvider sp)
             : base(logger, sp, set, GetNewId())
         {
+            _ev = new(false);
+            onOptionsUpdate += () => _ev.Set();
         }
+        public void Dispose() => _ev?.Dispose();
 
         volatile bool _repeat = false;
+        readonly ManualResetEvent _ev;
         protected override void work()
         {
             var logger = _sp.GetRequiredService<ILogger<Client>>();
             var uc = new Client(_set.AccessKey, _set.SecretKey, logger);
-            using var ev = new AutoResetEvent(false);
-            registerHotkey(ev);
-
-            //test
-            void test(Client uc)
-            {
-                var w = Stopwatch.StartNew();
-                var models = uc.ApiCandle<CandleMinute>(count: 10000, unit: CandleUnit.U1).ToModels();
-                info($"Δt= {w.ElapsedMilliseconds}ms: {models[0]}");
-
-                w.Restart();
-                ITradeLogic.CalcMovingAvg(models, 15);
-                info($"Δt= {w.ElapsedMilliseconds}ms: {models[0]}");
-            }
+            registerHotkey(_ev);
 
             while (_set.Hours > 0)
             {
                 runSingle(uc);
                 runMulti(uc);
 
-                info($"<{Id}> Waiting...");
+                if (_repeat)
+                {
+                    info($"<{Id}> Sleeping 3000...");
+                    Thread.Sleep(3000);
+                }
+                else
+                {
+                    info($"<{Id}> Waiting...");
+                    _ev.Reset();
+                    _ev.WaitOne();
+                }
+            }
 
-                if (_repeat) Thread.Sleep(3000);
-                else ev.WaitOne();
+            void registerHotkey(EventWaitHandle ev)
+            {
+                var iw = _sp.GetRequiredService<InputWorker>();
+                iw.AddCmd(ConsoleKey.F4, () => runHotkey(_set.Hours));
+                iw.AddCmd(ConsoleKey.F3, () => runHotkey(3m));
+                iw.AddCmd(ConsoleKey.F2, () => runHotkey(-3m));
+                iw.AddCmd(ConsoleKey.F1, () => runHotkey(-_set.Hours / 2));
+                iw.AddCmd(ConsoleKey.F5, () =>
+                {
+                    _repeat = !_repeat;
+                    info($"Reloaded: Repeat = {_repeat}");
+                    if (_repeat) ev.Set();
+                });
+                iw.AddCmd(ConsoleKey.Spacebar, () => ev.Set());
+                iw.AddCmd(ConsoleKey.Enter, () => ev.Set());
+
+                void runHotkey(decimal hours)
+                {
+                    info($"Reloaded: Hours = {_set.Hours += hours}");
+                    ev.Set();
+                }
             }
         }
-
-        private void registerHotkey(AutoResetEvent ev)
-        {
-            var iw = _sp.GetRequiredService<InputWorker>();
-            iw.AddCmd(ConsoleKey.F4, () => runHotkey(_set.Hours));
-            iw.AddCmd(ConsoleKey.F3, () => runHotkey(3m));
-            iw.AddCmd(ConsoleKey.F2, () => runHotkey(-3m));
-            iw.AddCmd(ConsoleKey.F1, () => runHotkey(-_set.Hours / 2));
-            iw.AddCmd(ConsoleKey.F5, () =>
-            {
-                _repeat = !_repeat;
-                info($"Reloaded: Repeat = {_repeat}");
-                if (_repeat) ev.Set();
-            });
-            
-            void runHotkey(decimal hours)
-            {
-                info($"Reloaded: Hours = {_set.Hours += hours}");
-                ev.Set();
-            }
-        }
-
-        static (CandleUnit unit, decimal k, decimal rate, decimal mdd) cast(FindRes res) => res;
-        static List<(CandleUnit unit, decimal k, decimal rate, decimal mdd)> cast(IList<FindRes> res)
-            => (List<(CandleUnit unit, decimal k, decimal rate, decimal mdd)>)res;
 
         void runSingle(Client uc)
         {
             var units = new[]
             { CandleUnit.U240, CandleUnit.U60, CandleUnit.U30, CandleUnit.U15, CandleUnit.U10, CandleUnit.U3, CandleUnit.U1 };
-            var results = new List<FindRes>();
+            var results = new FindList2();
             var sb = new StringBuilder();
             var hours = _set.Hours;
 
+            info($"Entering {nameof(runSingle)}()...");
             sb.Clear();
             sb.AppendLine($"-----------[ {(int)(hours / 24)}d {hours % 24}h ]------------");
             foreach (var unit in units)
             {
                 var count = (int)(hours * 60 / (int)unit);
-                var x = cast(findK(uc, count, unit));
-                results.Add(x);
-                sb.AppendLine($"{count,6} {x.unit,6}: {x.k,6:N2} {x.rate,6:N2}%, {x.mdd,6:N2}%");
+                var models = uc.ApiCandle<CandleMinute>(count: count, unit: unit).ToModels();
+                var x = cast(findK(models));
+                results.Add((unit, x));
+                sb.AppendLine($"{count,6} {unit,6}: {x.k,6:N2} {x.rate,6:N2}%, {x.mdd,6:N2}%");
             }
-            var maxRate = cast(results).Max(x => x.rate);
-            var max = cast(results).First(x => x.rate == maxRate);
+            var maxRate = results.Max(x => x.res.rate);
+            var max = results.First(x => x.res.rate == maxRate);
 
             sb.AppendLine("-------------------------------------------");
-            sb.AppendLine($"{max.unit,6}: {max.k,6:N2}: {max.rate,6:N2}%, {max.mdd,6:N2}%");
+            sb.AppendLine($"{max.unit,6}: {max.res.k,6:N2}: {max.res.rate,6:N2}%, {max.res.mdd,6:N2}%");
             info(sb.ToString());
         }
 
@@ -126,80 +127,101 @@ namespace Universe.Coin.Upbit.App
             var hours = 3m;
             var numTest = (int)(totalHours / hours);
 
+            info($"Entering {nameof(runMulti)}()...");
             var sb = new StringBuilder();
             sb.AppendLine($"-----------[ {(int)(hours / 24)}d {hours % 24}h ]------------");
 
-            var kDic = new Dictionary<CandleUnit, List<FindRes>>();//
-            var summary = new List<(CandleUnit unit, decimal rate)>();
+            var kDic = new Dictionary<CandleUnit, FindList>();//
+            var summary = new List<(CandleUnit unit, BigInteger rate)>();
             foreach (var unit in units)
             {
                 var count = (int)(hours * 60 / (int)unit);
                 var totalCount = (int)(totalHours * 60 / (int)unit);
                 var models = uc.ApiCandle<CandleMinute>(count: totalCount, unit: unit).ToModels();
 
-                var results = new List<FindRes>();
+                var results = new FindList();
                 sb.Append($"{unit,6}: ");
 
                 for (int i = 0; i < numTest; i++)
                 {
                     //var currents = new ArraySegment<CandleModel>(models, count * i, count);
-                    var x = cast(findK(models, unit, count * i, count));
+                    var x = cast(findK(models, count * i, count));
                     results.Add(x);
                     //sb.Append($"{(x.rate - 1) * 100,6:N2} ");
                 }
+                kDic.Add(unit, results);
 
                 //sb.AppendLine("-------------------------------------------");
-                var cumRate = 100 * (cast(results).Aggregate(1m, (p, x) => p * x.rate) - 1);
-                sb.AppendLine($"| {cumRate,6:N2}%");
+                var seed = BigInteger.One;
+                var cumRate0 = results.Aggregate(1m, (p, x) => p * x.rate);
+                var cumRateInteger = results.Aggregate(seed, (p, x) => p * (int)(10000 * x.rate));
+                var cumRate = cumRateInteger / BigInteger.Pow(10000, results.Count - 1) - 10000;
+
+                sb.AppendLine($"| {cumRate,6}%%");
                 //sb.AppendLine("-------------------------------------------");
                 summary.Add((unit, cumRate));
-                kDic.Add(unit, results);
             }
             var maxRate = summary.Max(x => x.rate);
             var max = summary.First(x => x.rate == maxRate);
             sb.AppendLine("-------------------------------------------");
-            sb.AppendLine($"{max.unit,6}: {max.rate,6:N2}%");
+            sb.AppendLine($"{max.unit,6}: {max.rate}%%");
             info(sb);
 
             sb.Clear();
-            foreach (var x in kDic[max.unit]) sb.AppendLine(x.ToString());
+            foreach (var u in kDic.Keys) sb.Append($"{u,12} ");
+            sb.AppendLine();
+            for (int i = 0; i < numTest; i++)
+            {
+                foreach (var key in kDic.Keys) sb.Append($"{kDic[key][i].k,4:F1} {kDic[key][i].rate,6}% ");
+                sb.AppendLine();
+            }
             info(sb);
         }
 
-        FindRes findK(Client uc, int count, CandleUnit unit = CandleUnit.U60)
+
+        #region ---- Find K ----
+
+        FindRes runFindK(Client uc, int count, CandleUnit unit = CandleUnit.U60)
         {
             var sb = new StringBuilder();
-            sb.AppendLine($"--- Finding K: count= {count} ----");
+            sb.AppendLine($"--- Finding K: {count} {unit} ----");
 
             var models = uc.ApiCandle<CandleMinute>(count: count, unit: unit).ToModels();
-            var max = cast(findK(models, unit, sb));
+            var max = cast(findK(models, sb));
             max.rate = Math.Round((max.rate - 1) * 100, 2);
             sb.AppendLine("---------------------------------------------------");
             sb.AppendLine($"{max.k,6:N2}: {max.rate,10:N2}%, {max.mdd,10:N2}%");
-            //info(sb);
+            info(sb);
             return max;
         }
 
-        FindRes findK(CandleModel[] models, CandleUnit unit, StringBuilder? sb = null) 
-            => findK(models, unit, 0, models.Length, sb);
+        FindRes findK(CandleModel[] models, StringBuilder? sb = null)
+            => findK(models, 0, models.Length, sb);
 
-        FindRes findK(CandleModel[] models, CandleUnit unit, int offset, int count, StringBuilder? sb = null)
+        FindRes findK(CandleModel[] models, int offset, int count, StringBuilder? sb = null)
         {
-            if (models.Length == 0) return (unit, 0m, 0m, 0m);
+            if (models.Length == 0) return (0m, 0m, 0m);
             else
             {
-                var list = new List<FindRes>();// (CandleUnit unit, decimal k, decimal rate, decimal mdd)>();
+                var list = new FindList();// (CandleUnit unit, decimal k, decimal rate, decimal mdd)>();
                 for (decimal k = 0.1m; k <= 2m; k += 0.1m)
                 {
                     var (rate, mdd) = backTest(models, k, offset, count);
-                    list.Add((unit, k, rate, mdd));
+                    list.Add((k, rate, mdd));
                     sb?.AppendLine($"{k,6:N2}: {(rate - 1) * 100,10:N2}%, {mdd,10:N2}%");
                 }
-                var maxRate = cast(list).Max(x => x.rate);
-                var max = cast(list).First(x => x.rate == maxRate);
+                var maxRate = list.Max(x => x.rate);
+                var max = list.First(x => x.rate == maxRate);
                 return max;
             }
         }
+
+        static (decimal k, decimal rate, decimal mdd) cast(FindRes res) => res;
+
+        #endregion
+
+
+        #region ---- BackTest ----
 
         void backTest(Client uc, int count, decimal k, CandleUnit unit = CandleUnit.U15)
         {
@@ -216,7 +238,7 @@ namespace Universe.Coin.Upbit.App
             //info($"Final Profit Rate= {(finalRate - 1) * 100:N2}%", $"MDD= {mdd:N2}%");
         }
 
-        (decimal rate, decimal mdd) backTest(CandleModel[] models, decimal k) 
+        (decimal rate, decimal mdd) backTest(CandleModel[] models, decimal k)
             => backTest(models, k, 0, models.Length);
         (decimal rate, decimal mdd) backTest(CandleModel[] models, decimal k, int offset, int count)
         {
@@ -227,8 +249,10 @@ namespace Universe.Coin.Upbit.App
             return (rate, mdd);
         }
 
+        #endregion
 
-        #region ---- Work ID ----
+
+        #region ---- Worker ID ----
 
         static object _lock;
         static List<string> _ids;
@@ -273,10 +297,11 @@ namespace Universe.Coin.Upbit.App
             nvc.Add("count", "123");
             Helper.buildQueryHash(nvc);
         }
-        void saveKey(WorkerOptionsBase set)
+        void saveKey(WorkerOptions set)
         {
             Helper.SaveEncrptedKey(set.AccessKey, set.SecretKey, "key.txt");
         }
+
 
         #endregion
 

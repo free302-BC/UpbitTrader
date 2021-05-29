@@ -7,6 +7,7 @@ using Universe.Coin.Upbit;
 using Universe.AppBase;
 using Microsoft.Extensions.Options;
 using System.Threading;
+using Microsoft.Extensions.Hosting;
 
 namespace Universe.Coin.Upbit.App
 {
@@ -14,7 +15,20 @@ namespace Universe.Coin.Upbit.App
     {
         static void Main(string[] args)
         {
-            AddWorker<InputWorker, WorkerOptionsBase>(lifeTime: ServiceLifetime.Singleton);
+            AddWorker<InputWorker, WorkerOptions>(
+                lifeTime: ServiceLifetime.Singleton,
+                workerFactory: sp =>
+                {
+                    var opt = sp.GetRequiredService<IOptionsMonitor<WorkerOptions>>();
+                    var logger = sp.GetRequiredService<ILogger<InputWorker>>();
+                    var iw = new InputWorker(logger, sp, opt);
+                    //iw.AddCmd(ConsoleKey.Enter, quit);
+                    iw.AddCmd(ConsoleKey.Escape, quit);
+                    return iw;
+
+                    void quit() => sp.GetRequiredService<IHost>().StopAsync().Wait();
+                });
+
             AddWorker<BackTestWorker, BackTestOptions>("backtest.json", BackTestWorker.GetIds());
             //AddWorker<TraderWorker, TraderOptions>();
             RunHost();

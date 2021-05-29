@@ -10,15 +10,12 @@ namespace Universe.Coin.TradeLogic
 {
     public class BuyOverDelta : ITradeLogic
     {
-        public void CalcProfitRate(CandleModel[] models, decimal k)
-        {
-            calcProfitRate(models[0], CandleModel.Empty, k);
-            for (int i = 1; i < models.Length; i++)
-                calcProfitRate(models[i], models[i - 1], k);
-        }
+        public void CalcProfitRate(CandleModel[] models, decimal k) 
+            => CalcProfitRate(models, k, 0, models.Length);
+
         public void CalcProfitRate(CandleModel[] models, decimal k, int offset, int count)
         {
-            calcProfitRate(models[offset > 0 ? offset - 1 : 0], CandleModel.Empty, k);
+            calcProfitRate(models[offset], offset > 0 ? models[offset - 1] : CandleModel.Empty, k);
             for (int i = offset + 1; i < offset + count && i < models.Length; i++)
                 calcProfitRate(models[i], models[i - 1], k);
         }
@@ -26,18 +23,26 @@ namespace Universe.Coin.TradeLogic
         void calcProfitRate(CandleModel model, CandleModel prev, decimal k)
         {
             model.Target = Math.Round(model.Opening + prev.Delta * k, 2);
-            model.Rate = (model.High > model.Target) ? Math.Round(model.Closing / model.Target - CandleModel.FeeRate, 4) : 1.0m;
+            model.Rate = (model.High > model.Target) 
+                ? Math.Round(model.Closing / model.Target - CandleModel.FeeRate, 4) 
+                : 1.0000m;
         }
 
-        public static BuyOverDelta Default = new BuyOverDelta();
-    }
+        public static BuyOverDelta Default = new();
+
+    }//class
 
     public class BuyOverDeltaMA : ITradeLogic
     {
-        public void CalcProfitRate(CandleModel[] models, decimal k)
+        public void CalcProfitRate(CandleModel[] models, decimal k) 
+            => CalcProfitRate(models, k, 0, models.Length);
+
+        public void CalcProfitRate(CandleModel[] models, decimal k, int offset, int count)
         {
             ITradeLogic.CalcMovingAvg(models, 5);
-            for (int i = 1; i < models.Length; i++)
+
+            calcProfitRate(models[offset], offset > 0 ? models[offset - 1] : CandleModel.Empty, k);
+            for (int i = offset + 1; i < offset + count && i < models.Length; i++)
                 calcProfitRate(models[i], models[i - 1], k);
         }
 
@@ -49,10 +54,8 @@ namespace Universe.Coin.TradeLogic
                 : 1.0m;
         }
 
-        public void CalcProfitRate(CandleModel[] models, decimal k, int offset, int count)
-        {
-            throw new NotImplementedException();
-        }
-    }
+        public static BuyOverDeltaMA Default = new();
+
+    }//class
 
 }

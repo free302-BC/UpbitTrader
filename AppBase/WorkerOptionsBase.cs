@@ -8,20 +8,15 @@ using System.Text;
 using System.Threading.Tasks;
 using Universe.AppBase;
 
-namespace Universe.Coin.Upbit.App
+namespace Universe.AppBase
 {
     public class WorkerOptionsBase : IWorkerOptions
     {
-        public string AccessKey { get; set; } = "";
-        public string SecretKey { get; set; } = "";
-
         public virtual void Reload(IWorkerOptions source)
         {
             var src = source as WorkerOptionsBase;
             if (src == null)  throw new ArgumentException(
                 $"{nameof(WorkerOptionsBase)}.{nameof(Reload)}(): can't reload from type <{source.GetType().Name}>");
-            AccessKey = src.AccessKey;
-            SecretKey = src.SecretKey;            
         }
 
         //public static implicit operator KeyPair(WorkerSetting set) => (set.AccessKey, set.SecretKey);

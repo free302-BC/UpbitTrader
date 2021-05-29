@@ -7,7 +7,7 @@ using Universe.AppBase;
 
 namespace Universe.Coin.Upbit.App
 {
-    public class BackTestOptions : WorkerOptionsBase
+    public class BackTestOptions : WorkerOptions
     {
         public decimal Hours { get; set; }
         public bool PrintCandle { get; set; }
