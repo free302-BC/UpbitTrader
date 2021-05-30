@@ -140,7 +140,7 @@ namespace Universe.Coin.Upbit.App
             var next = start.AddDays(1);
             var sell = next.AddSeconds(-60);
 
-            SimpleTL.Default.CalcProfitRate(models, 0.5m);
+            SimplePR.Default.CalcProfitRate(models, 0.5m);
             var target = models[1].Target;
 
             return (next, sell, target);
@@ -177,7 +177,7 @@ namespace Universe.Coin.Upbit.App
         }
         void candleMinutes(Client uc)
         {
-            var candles = uc.ApiCandle<CandleMinute>(count: 220, unit: CandleUnit.U1);
+            var candles = uc.ApiCandle<CandleMinute>(count: 220, unit: CandleUnit.M1);
             var models = candles.ToModels();
             info(IViewModel.Print(models));
         }

@@ -48,11 +48,11 @@ namespace UnitTester
                     "D4CFF355ED1A7D21C4B14709400E00A1DAA9C267EF360032DAC06F06134625AED9F9F256D230181F", logger);
 
                 var w = Stopwatch.StartNew();
-                var models = uc.ApiCandle<CandleMinute>(count: 10000, unit: CandleUnit.U1).ToModels();
+                var models = uc.ApiCandle<CandleMinute>(count: 10000, unit: CandleUnit.M1).ToModels();
                 info($"Δt= {w.ElapsedMilliseconds,6}ms: {models[0]}");
 
                 w.Restart();
-                ITradeLogic.CalcMovingAvg(models, 15);
+                IModelCalc.CalcMovingAvg(models, 15);
                 info($"Δt= {w.ElapsedMilliseconds,6}ms: {models[0]}");
 
                 _sp.GetRequiredService<IHost>().StopAsync().Wait();

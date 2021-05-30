@@ -7,19 +7,8 @@ using Universe.Coin.TradeLogic.Model;
 
 namespace Universe.Coin.TradeLogic
 {
-    public interface ITradeLogic
+    public interface IModelCalc
     {
-        void CalcProfitRate(CandleModel[] models, decimal k);
-
-        /// <summary>
-        /// models[offset..offset+count]
-        /// </summary>
-        /// <param name="models"></param>
-        /// <param name="k"></param>
-        /// <param name="offset"></param>
-        /// <param name="count"></param>
-        void CalcProfitRate(CandleModel[] models, decimal k, int offset, int count);
-
         public static void CalcMovingAvg(CandleModel[] models, int size)
         {
             for (int i = 0; i < models.Length; i++)
@@ -50,7 +39,8 @@ namespace Universe.Coin.TradeLogic
                 max = max > m.CumRate ? max : m.CumRate;
                 m.DrawDown = max > m.CumRate ? Math.Round(100 * (max - m.CumRate) / max, 2) : 0m;
             }
-            return sub.Max(m => m.DrawDown);
+
+            return sub.Count() > 0 ? sub.Max(m => m.DrawDown) : 0m;
         }
 
 

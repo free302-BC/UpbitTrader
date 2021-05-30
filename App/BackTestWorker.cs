@@ -22,15 +22,21 @@ using System.Diagnostics;
 using System.Numerics;
 using System.Text.Encodings.Web;
 using System.Text.Unicode;
+using System.Linq.Expressions;
 
 namespace Universe.Coin.Upbit.App
 {
-    using FindRes = ValueTuple<decimal, decimal, decimal>;//(k, rate, mdd)
-    using FindList = List<(decimal k, decimal rate, decimal mdd)>;
-    using FindList2 = List<(CandleUnit unit, (decimal k, decimal rate, decimal mdd) res)>;
+    using FindRes = ValueTuple<int, decimal, decimal, decimal>;//(k, rate, mdd)
+    using FindList = List<(int trades, decimal k, decimal rate, decimal mdd)>;
+    using FindList2 = List<(CandleUnit unit, int count, (int trades, decimal k, decimal rate, decimal mdd) res)>;
+
+    using BtRes = ValueTuple<int, decimal, decimal>;//(trades, rate, mdd)
+    using BtList = List<(CandleUnit unit, int count, (int trades, decimal rate, decimal mdd) res)>;
 
     public class BackTestWorker : WorkerBase<BackTestWorker, BackTestOptions>, IDisposable
     {
+        #region ---- Ctor ----
+
         public BackTestWorker(
             ILogger<BackTestWorker> logger,
             IOptionsMonitor<BackTestOptions> set,
@@ -44,7 +50,13 @@ namespace Universe.Coin.Upbit.App
         }
         public void Dispose() => _ev?.Dispose();
 
+        #endregion
+
+        static (int trades, decimal k, decimal rate, decimal mdd) cast(FindRes res) => res;
+        static (int trades, decimal rate, decimal mdd) cast(BtRes res) => res;
+
         volatile bool _repeat = false;
+        volatile bool _doFindK = false;
         readonly ManualResetEvent _ev;
         protected override void work()
         {
@@ -54,11 +66,20 @@ namespace Universe.Coin.Upbit.App
 
             while (_set.Hours > 0)
             {
-                _set.ApplyMovingAvg = false;
-                run_Units(uc);
-                _set.ApplyMovingAvg = true;
-                run_Units(uc);
-                //runMulti(uc);
+                if(!_doFindK)
+                {
+                    _set.ApplyMovingAvg = false;
+                    run_K_Units(uc);
+                    _set.ApplyMovingAvg = true;
+                    run_K_Units(uc);
+                }
+                else
+                {
+                    _set.ApplyMovingAvg = false;
+                    run_Units_FindK(uc);
+                    _set.ApplyMovingAvg = true;
+                    run_Units_FindK(uc);
+                }
 
                 if (_repeat)
                 {
@@ -76,102 +97,100 @@ namespace Universe.Coin.Upbit.App
             void registerHotkey(EventWaitHandle ev)
             {
                 var iw = _sp.GetRequiredService<InputWorker>();
-                iw.AddCmd(ConsoleKey.F4, resetHours);                
-                iw.AddCmd(ConsoleKey.F5, resetMa);
+                iw.AddCmd(ConsoleKey.F1, onFuncChange);
+                iw.AddCmd(ConsoleKey.F2, m => onParamChange(m, 3, () => _set.Hours));
+                iw.AddCmd(ConsoleKey.F3, m => onParamChange(m, 0.1m, () => _set.FactorK));
+                iw.AddCmd(ConsoleKey.F4, m => onParamChange(m, 3, () => _set.MovingAvgSize));
                 iw.AddCmd(ConsoleKey.Spacebar, (m) => ev.Set());
                 iw.AddCmd(ConsoleKey.Enter, (m) => ev.Set());
 
-                void resetHours(ConsoleModifiers modifier)
+                void onFuncChange(ConsoleModifiers modifier)
                 {
-                    if (modifier.HasFlag(ConsoleModifiers.Control))
-                    {
-                        if (modifier.HasFlag(ConsoleModifiers.Shift))
-                            _set.Hours /= 2;
-                        else
-                            _set.Hours *= 2;
-                    }
-                    else
-                    {
-                        _set.Hours += modifier.HasFlag(ConsoleModifiers.Shift) ? -3 : +3;
-                    }
-                    info($"Reloaded: hours={_set.Hours}, ma={_set.MovingAvgSize}");
-                    ev.Set();
+                    _doFindK = !_doFindK;
+                    _ev.Set();
                 }
-                void resetMa(ConsoleModifiers modifier)
+                void onParamChange<P>(ConsoleModifiers modifier, P delta, Expression<Func<P>> selector)
                 {
+                    var set = selector.ToDelegate();
+                    dynamic dv = delta!;
+                    dynamic v0 = set.currentValue!;
+
                     if (modifier.HasFlag(ConsoleModifiers.Control))
                     {
                         if (modifier.HasFlag(ConsoleModifiers.Shift))
-                            _set.MovingAvgSize /= 2;
+                            set.setter(v0 / 2);
                         else
-                            _set.MovingAvgSize *= 2;
+                            set.setter(v0 * 2);
                     }
                     else
                     {
-                        _set.MovingAvgSize += modifier.HasFlag(ConsoleModifiers.Shift) ? -3 : +3;
+                        set.setter(
+                            set.currentValue 
+                            + (modifier.HasFlag(ConsoleModifiers.Shift) ? -dv : +dv));
                     }
-                    if (_set.MovingAvgSize < 1) _set.MovingAvgSize = 1;
-                    info($"Reloaded: hours={_set.Hours}, ma={_set.MovingAvgSize}");
+                    info($"Reloaded: k={_set.FactorK}, hours={_set.Hours}, ma={_set.MovingAvgSize}");
                     ev.Set();
                 }
             }
         }
 
-        void run_K(Client uc, decimal k)
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="uc"></param>
+        /// <param name="k"></param>
+        void run_K_Units(Client uc)
         {
             var units = new[]
-            { CandleUnit.U240, CandleUnit.U60, CandleUnit.U30, CandleUnit.U15, CandleUnit.U10, CandleUnit.U3, CandleUnit.U1 };
-            var results = new FindList2();
+            { CandleUnit.M240, CandleUnit.M60, CandleUnit.M30, CandleUnit.M15, CandleUnit.M10, CandleUnit.M3, CandleUnit.M1 };
+            var results = new BtList();
             var sb = new StringBuilder();
             var hours = _set.Hours;
+            var k = _set.FactorK;
 
-            info($"Entering {nameof(run_Units)}()...");
+            info($"Entering {nameof(run_K_Units)}()...");
             sb.Clear();
-            sb.AppendLine($"-----------[ {(int)(hours / 24)}d {hours % 24}h : ma={(_set.ApplyMovingAvg ? _set.MovingAvgSize : 1)} ]------------");
+            sb.AppendLine($"-----------[ {(int)(hours / 24)}d {hours % 24}h : k={k:F1} ma={(_set.ApplyMovingAvg ? _set.MovingAvgSize : 1)} ]------------");
 
             foreach (var unit in units)
             {
                 var count = (int)(hours * 60 / (int)unit);
-                var models = load(unit);
-                if (models.Length == 0)
-                {
-                    models = uc.ApiCandle<CandleMinute>(count: count, unit: unit).ToModels();
-                    save(models, unit);
-                }
+                var models = prepareModels(uc, unit, count);
 
-                var x = cast(findK(models, 0, count));
-                results.Add((unit, x));
-                sb.AppendLine($"{count,6} {unit,6}: {x.k,6:F2} {x.rate,8:F4} {x.mdd,6:F2}%");
+                var x = IBackTest.backTest(models, k, 0, count, _set.ApplyMovingAvg);
+                results.Add((unit, count, x));
+                sb.AppendLine($"{count,6} {unit,6}: {k,6:F2} {x.rate,8:F4} {x.mdd,6:F2}%");
             }
             var maxRate = results.Max(x => x.res.rate);
             var max = results.First(x => x.res.rate == maxRate);
 
             sb.AppendLine("-------------------------------------------");
-            sb.AppendLine($"{max.unit,13}: {max.res.k,6:F2} {(max.res.rate - 1) * 100,6:F2}%, {max.res.mdd,6:F2}%");
+            sb.Append($"{max.count,6} {max.unit,6}: {k,6:F2} {(max.res.rate - 1) * 100,7:F2}% {max.res.mdd,6:F2}%");
+            sb.AppendLine($" | {max.res.trades}/{max.count}Tr");
             sb.AppendLine("-------------------------------------------");
-            info(sb.ToString());
 
-            //
-            var countMax = (int)(hours * 60 / (int)max.unit);
-            runBackTest(uc, countMax, max.res.k, max.unit);
+            info(sb.ToString());
         }
+
 
         /// <summary>
         /// 각 CandleUnit 별로 최적 k를 구해 backtest 수행
+        /// 전체 구간에 대한 최적 k를 구했을 경우 ~ 고정 k에 대한 이론적 최대 수익율
         /// </summary>
         /// <param name="uc"></param>
-        void run_Units(Client uc)
+        void run_Units_FindK(Client uc)
         {
             var units = new[]
-            { CandleUnit.U240, CandleUnit.U60, CandleUnit.U30, CandleUnit.U15, CandleUnit.U10, CandleUnit.U3, CandleUnit.U1 };
+            { CandleUnit.M240, CandleUnit.M60, CandleUnit.M30, CandleUnit.M15, CandleUnit.M10, CandleUnit.M3, CandleUnit.M1 };
             var results = new FindList2();
             var sb = new StringBuilder();
             var hours = _set.Hours;
 
-            info($"Entering {nameof(run_Units)}()...");
+            info($"Entering {nameof(run_Units_FindK)}()...");
             sb.Clear();
             sb.AppendLine($"-----------[ {(int)(hours / 24)}d {hours % 24}h : ma={(_set.ApplyMovingAvg ? _set.MovingAvgSize : 1)} ]------------");
-            
+
             foreach (var unit in units)
             {
                 var count = (int)(hours * 60 / (int)unit);
@@ -182,38 +201,39 @@ namespace Universe.Coin.Upbit.App
                     save(models, unit);
                 }
 
-                var x = cast(findK(models, 0, count));
-                results.Add((unit, x));
+                var x = IFindK.findK(models, 0, count, _set.ApplyMovingAvg);
+                results.Add((unit, count, x));
                 sb.AppendLine($"{count,6} {unit,6}: {x.k,6:F2} {x.rate,8:F4} {x.mdd,6:F2}%");
             }
             var maxRate = results.Max(x => x.res.rate);
             var max = results.First(x => x.res.rate == maxRate);
 
             sb.AppendLine("-------------------------------------------");
-            sb.AppendLine($"{max.unit,13}: {max.res.k,6:F2} {(max.res.rate - 1) * 100,6:F2}%, {max.res.mdd,6:F2}%");
+            sb.Append($"{max.count,6} {max.unit,6}: {max.res.k,6:F2} {(max.res.rate - 1) * 100,6:F2}%, {max.res.mdd,6:F2}%");
+            sb.AppendLine($" | {max.res.trades}/{max.count}Tr");
             sb.AppendLine("-------------------------------------------");
             info(sb.ToString());
 
             //
-            var countMax = (int)(hours * 60 / (int)max.unit);
-            runBackTest(uc, countMax, max.res.k, max.unit);
+            //runBackTest(uc, max.unit, max.count, max.res.k);
         }
 
 
         /// <summary>
         /// 주어진 시간을 3시간 구간으로 나누어 각 구간별 최적 k를 찾아서 backtest 수행
+        /// 각3시간 구간별 최적 k를 찾았을 경우 ~ 변동 k에 대한 이론적 최대 이익
         /// </summary>
         /// <param name="uc"></param>
-        void run_Units_3Hours(Client uc)
+        void run_Units_FindK_3Hours(Client uc)
         {
             var units = new[]
-            { /*CandleUnit.U240, */CandleUnit.U60, CandleUnit.U30, CandleUnit.U15, CandleUnit.U10, CandleUnit.U3, CandleUnit.U1 };
+            { /*CandleUnit.U240, */CandleUnit.M60, CandleUnit.M30, CandleUnit.M15, CandleUnit.M10, CandleUnit.M3, CandleUnit.M1 };
 
             var totalHours = _set.Hours;
             var hours = 3m;
             var numTest = (int)(totalHours / hours);
 
-            info($"Entering {nameof(run_Units_3Hours)}()...");
+            info($"Entering {nameof(run_Units_FindK_3Hours)}()...");
             var sb = new StringBuilder();
             sb.AppendLine($"-----------[ {(int)(hours / 24)}d {hours % 24}h ]------------");
 
@@ -231,7 +251,7 @@ namespace Universe.Coin.Upbit.App
                 for (int i = 0; i < numTest; i++)
                 {
                     //var currents = new ArraySegment<CandleModel>(models, count * i, count);
-                    var x = cast(findK(models, count * i, count));
+                    var x = IFindK.findK(models, count * i, count, _set.ApplyMovingAvg);
                     results.Add(x);
                     //sb.Append($"{(x.rate - 1) * 100,6:N2} ");
                 }
@@ -253,6 +273,7 @@ namespace Universe.Coin.Upbit.App
             sb.AppendLine($"{max.unit,6}: {max.rate}%%");
             info(sb);
 
+            //
             sb.Clear();
             foreach (var u in kDic.Keys) sb.Append($"{u,12} ");
             sb.AppendLine();
@@ -268,19 +289,14 @@ namespace Universe.Coin.Upbit.App
 
         #region ---- Find K ----
 
-        FindRes runFindK(Client uc, int count, CandleUnit unit = CandleUnit.U60)
+        FindRes runFindK(Client uc, CandleUnit unit, int count)
         {
             var sb = new StringBuilder();
             sb.AppendLine($"--- Finding K: {count} {unit} ----");
 
-            var models = load(unit);
-            if (models.Length == 0)
-            {
-                models = uc.ApiCandle<CandleMinute>(count: count, unit: unit).ToModels();
-                save(models, unit);
-            }
+            var models = prepareModels(uc, unit, count);
 
-            var max = cast(findK(models, 0, count, sb));
+            var max = IFindK.findK(models, 0, count, _set.ApplyMovingAvg, sb);
             max.rate = Math.Round((max.rate - 1) * 100, 2);
             sb.AppendLine("---------------------------------------------------");
             sb.AppendLine($"{max.k,6:N2}: {max.rate,10:N2}%, {max.mdd,10:N2}%");
@@ -288,54 +304,23 @@ namespace Universe.Coin.Upbit.App
             return max;
         }
 
-        FindRes findK(CandleModel[] models, StringBuilder? sb = null)
-            => findK(models, 0, models.Length, sb);
-
-        FindRes findK(CandleModel[] models, int offset, int count, StringBuilder? sb = null)
-        {
-            if (models.Length == 0) return (0m, 0m, 0m);
-            else
-            {
-                var list = new FindList();// (CandleUnit unit, decimal k, decimal rate, decimal mdd)>();
-                for (decimal k = 0.1m; k <= 2m; k += 0.1m)
-                {
-                    var (rate, mdd) = backTest(models, k, offset, count);
-                    list.Add((k, rate, mdd));
-                    sb?.AppendLine($"{k,6:F2}: {(rate - 1) * 100,10:F2}%, {mdd,10:F2}%");
-                }
-                var maxRate = list.Max(x => x.rate);
-                var max = list.First(x => x.rate == maxRate);
-                return max;
-            }
-        }
-
-        static (decimal k, decimal rate, decimal mdd) cast(FindRes res) => res;
-
         #endregion
 
 
         #region ---- BackTest ----
 
-        void runBackTest(Client uc, int count, decimal k, CandleUnit unit = CandleUnit.U15)
+        void runBackTest(Client uc, CandleUnit unit, int count, decimal k)
         {
             var sb = new StringBuilder();
             sb.AppendLine($"-------- [ Backtest: {unit}, k={k:F1}, ma={(_set.ApplyMovingAvg ? _set.MovingAvgSize : 1)} ]--------");
 
-            var models = load(unit);
-            if (models.Length == 0)
-            {
-                models = uc.ApiCandle<CandleMinute>(count: count, unit: unit).ToModels();
-                save(models, unit);
-            }
+            var models = prepareModels(uc, unit, count);
 
-            var (finalRate, mdd) = backTest(models, k, 0, count);
+            var (numTrades, finalRate, mdd) = IBackTest.backTest(models, k, 0, count, _set.ApplyMovingAvg);
 
             if (_set.PrintCandle)
             {
-                var tradeModels = models.Take(count).Where(x => x.Rate != 1m);
-                var numTrades = tradeModels.Count();
-                sb.Append($"{tradeModels.Print(0, count)}")
-                    .AppendLine("------------------------------------------------")
+                sb.AppendLine("------------------------------------------------")
                     .Append($"Trades= {numTrades}/{count},")
                     .AppendLine($" Profit Rate= {(finalRate - 1) * 100:F2}%, MDD= {mdd:F2}%")
                     .AppendLine("------------------------------------------------");
@@ -344,22 +329,22 @@ namespace Universe.Coin.Upbit.App
             //File.WriteAllText($"backtest_{unit}_{k}.txt", res);
         }
 
-        (decimal rate, decimal mdd) backTest(CandleModel[] models, decimal k)
-            => backTest(models, k, 0, models.Length);
-        (decimal rate, decimal mdd) backTest(CandleModel[] models, decimal k, int offset, int count)
-        {
-            if (!_set.ApplyMovingAvg) SimpleTL.Default.CalcProfitRate(models, k, offset, count);
-            else MovingAvgTL.Default.CalcProfitRate(models, k, offset, count); ;
-
-            var rate = ITradeLogic.CalcCumRate(models, offset, count);
-            var mdd = ITradeLogic.CalcDrawDown(models, offset, count);
-            return (rate, mdd);
-        }
 
         #endregion
 
 
         #region ---- Save/Load ----
+
+        CandleModel[] prepareModels(Client uc, CandleUnit unit, int count)
+        {
+            var models = load(unit);
+            if (models.Length == 0)
+            {
+                models = uc.ApiCandle<CandleMinute>(count: count, unit: unit).ToModels();
+                save(models, unit);
+            }
+            return models;
+        }
 
         JsonSerializerOptions _jsonOpt;
         const string _jsonOptionFile = "api_json_option.json";

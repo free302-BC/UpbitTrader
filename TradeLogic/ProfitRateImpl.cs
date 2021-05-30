@@ -8,7 +8,7 @@ using Universe.Coin.TradeLogic.Model;
 
 namespace Universe.Coin.TradeLogic
 {
-    public class SimpleTL : ITradeLogic
+    public class SimplePR : IModelCalc
     {
         public void CalcProfitRate(CandleModel[] models, decimal k)
             => CalcProfitRate(models, k, 0, models.Length);
@@ -28,14 +28,14 @@ namespace Universe.Coin.TradeLogic
                 : 1.0000m;
         }
 
-        public static SimpleTL Default = new();
+        public static SimplePR Default = new();
 
     }//class
 
-    public class MovingAvgTL : ITradeLogic
+    public class MovingAvgPR : IModelCalc
     {
         readonly int _maSize;
-        public MovingAvgTL(int maSize)
+        public MovingAvgPR(int maSize)
         {
             _maSize = maSize;
         }
@@ -44,7 +44,7 @@ namespace Universe.Coin.TradeLogic
 
         public void CalcProfitRate(CandleModel[] models, decimal k, int offset, int count)
         {
-            ITradeLogic.CalcMovingAvg(models, _maSize);
+            IModelCalc.CalcMovingAvg(models, _maSize);
 
             calcProfitRate(models[offset], offset > 0 ? models[offset - 1] : CandleModel.Empty, k);
             for (int i = offset + 1; i < offset + count && i < models.Length; i++)
@@ -59,7 +59,7 @@ namespace Universe.Coin.TradeLogic
                 : 1.0m;
         }
 
-        public static MovingAvgTL Default = new(5);
+        public static MovingAvgPR Default = new(5);
 
     }//class
 

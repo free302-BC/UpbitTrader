@@ -9,6 +9,7 @@ namespace Universe.Coin.Upbit.App
 {
     public class BackTestOptions : WorkerOptions
     {
+        public decimal FactorK { get; set; }
         public bool ApplyMovingAvg { get; set; }
         public int MovingAvgSize { get; set; }
         public bool ApplyStopLoss { get; set; }

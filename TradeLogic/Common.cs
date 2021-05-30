@@ -28,35 +28,7 @@ namespace Universe.Coin.TradeLogic
         COMP, ONIT, CRV, ALGO, RSR, OXT, SUN, GXC, FIL, UNI, BASIC, INJ, PROM, VAL, PSG, JUV, FOR, BFC, LINA,
         PICA, CELO, NEAR, AUCTION, GRT, SNX
     }
-
-    ///// <summary>
-    ///// string ~ CoinId conversion
-    ///// </summary>
-    //public readonly struct CoinID
-    //{
-    //    public readonly CoinId Id;
-    //    public CoinID(CoinId cid) => Id = cid;
-    //    public static implicit operator CoinId(CoinID cid) => cid.Id;
-    //    public static implicit operator CoinID(CoinId cid) => new CoinID(cid);
-    //    public static implicit operator CoinID(string cid) => new CoinID(Enum.Parse<CoinId>(cid));
-    //    public static implicit operator string(CoinID cid) => cid.Id.ToString();
-    //    public static CoinID BTC = CoinId.BCH;
-    //}
-
-    //public class CoinId
-    //{
-    //    public string Coin;
-    //    public CoinId(string coinId) => Coin = coinId;
-    //    public static implicit operator string(CoinId id) =>id.Coin;
-    //    public static implicit operator CoinId(string id) => new CoinId(id);
-    //    public static CoinId Default = new("BTC");
-    //}
-
-    //public class ApiDic : Dictionary<ApiId, (string Path, string Method, string Comment)> { }
-    //public class CoinDic : Dictionary<CoinId, (string English, string Korean)> { }
-    //public class CurrencyDic : Dictionary<CurrencyId, HashSet<CoinId>> { }
-    //타입 호환성 부족, 속도 문제...
-
+    
     public enum TickDir
     {
         D,   //ask 매도
@@ -65,7 +37,8 @@ namespace Universe.Coin.TradeLogic
 
     public enum CandleUnit
     {
-        None = 0, U1 = 1, U3 = 3, U5 = 5, U15 = 15, U10 = 10, U30 = 30, U60 = 60, U240 = 240
+        None = 0, M1 = 1, M3 = 3, M5 = 5, M15 = 15, M10 = 10, M30 = 30, M60 = 60, M240 = 240,
+        DAY = 1440, WEEK = 10080, MONTH = 302400
     }
 
     public enum ApiId
