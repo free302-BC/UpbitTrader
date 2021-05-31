@@ -66,7 +66,7 @@ namespace Universe.Coin.Upbit.App
 
             while (_set.Hours > 0)
             {
-                if(!_doFindK)
+                if (!_doFindK)
                 {
                     _set.ApplyMovingAvg = false;
                     run_K_Units(uc);
@@ -97,12 +97,12 @@ namespace Universe.Coin.Upbit.App
             void registerHotkey(EventWaitHandle ev)
             {
                 var iw = _sp.GetRequiredService<InputWorker>();
+                iw.AddCmd(ConsoleKey.Spacebar, (m) => ev.Set());
+                iw.AddCmd(ConsoleKey.Enter, (m) => ev.Set());
                 iw.AddCmd(ConsoleKey.F1, onFuncChange);
                 iw.AddCmd(ConsoleKey.F2, m => onParamChange(m, 3, () => _set.Hours));
                 iw.AddCmd(ConsoleKey.F3, m => onParamChange(m, 0.1m, () => _set.FactorK));
                 iw.AddCmd(ConsoleKey.F4, m => onParamChange(m, 3, () => _set.MovingAvgSize));
-                iw.AddCmd(ConsoleKey.Spacebar, (m) => ev.Set());
-                iw.AddCmd(ConsoleKey.Enter, (m) => ev.Set());
 
                 void onFuncChange(ConsoleModifiers modifier)
                 {
@@ -125,7 +125,7 @@ namespace Universe.Coin.Upbit.App
                     else
                     {
                         set.setter(
-                            set.currentValue 
+                            set.currentValue
                             + (modifier.HasFlag(ConsoleModifiers.Shift) ? -dv : +dv));
                     }
                     info($"Reloaded: k={_set.FactorK}, hours={_set.Hours}, ma={_set.MovingAvgSize}");
@@ -170,7 +170,8 @@ namespace Universe.Coin.Upbit.App
             sb.AppendLine($" | {max.res.trades}/{max.count}Tr");
             sb.AppendLine("-------------------------------------------");
 
-            info(sb.ToString());
+            if (_set.PrintCandle) runBackTest(uc, max.unit, max.count, k, sb);
+            info(sb);
         }
 
 
@@ -309,23 +310,23 @@ namespace Universe.Coin.Upbit.App
 
         #region ---- BackTest ----
 
-        void runBackTest(Client uc, CandleUnit unit, int count, decimal k)
+        void runBackTest(Client uc, CandleUnit unit, int count, decimal k, StringBuilder? sb = null)
         {
-            var sb = new StringBuilder();
+            bool doPrint = sb == null;
+            sb = sb ?? new StringBuilder();
             sb.AppendLine($"-------- [ Backtest: {unit}, k={k:F1}, ma={(_set.ApplyMovingAvg ? _set.MovingAvgSize : 1)} ]--------");
 
             var models = prepareModels(uc, unit, count);
 
             var (numTrades, finalRate, mdd) = IBackTest.backTest(models, k, 0, count, _set.ApplyMovingAvg);
 
-            if (_set.PrintCandle)
-            {
-                sb.AppendLine("------------------------------------------------")
-                    .Append($"Trades= {numTrades}/{count},")
-                    .AppendLine($" Profit Rate= {(finalRate - 1) * 100:F2}%, MDD= {mdd:F2}%")
-                    .AppendLine("------------------------------------------------");
-            }
-            info(sb);
+            if (_set.PrintCandle) sb.Append(models.Where(x => x.Rate != 1m && x.Rate != 0m).Print());
+            sb.AppendLine("-------------------------------------------");
+            sb.Append($"{count,6} {unit,6}: {k,6:F2} {(finalRate - 1) * 100,7:F2}% {mdd,6:F2}%");
+            sb.AppendLine($" | {numTrades}/{count}Tr");
+            sb.AppendLine("-------------------------------------------");
+
+            if (doPrint) info(sb);
             //File.WriteAllText($"backtest_{unit}_{k}.txt", res);
         }
 
@@ -337,13 +338,13 @@ namespace Universe.Coin.Upbit.App
 
         CandleModel[] prepareModels(Client uc, CandleUnit unit, int count)
         {
-            var models = load(unit);
-            if (models.Length == 0)
+            CandleModel[] models = _set.LoadFromFile ? load(unit) : Array.Empty<CandleModel>();
+            if (models.Length < count)
             {
                 models = uc.ApiCandle<CandleMinute>(count: count, unit: unit).ToModels();
                 save(models, unit);
             }
-            return models;
+            return models!;
         }
 
         JsonSerializerOptions _jsonOpt;
@@ -395,7 +396,7 @@ namespace Universe.Coin.Upbit.App
 
         #region ---- TEST ----
 
-        
+
         void testHash()
         {
             var nvc = new NameValueCollection();

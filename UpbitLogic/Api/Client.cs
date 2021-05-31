@@ -16,12 +16,17 @@ using Universe.Utility;
 
 namespace Universe.Coin.Upbit
 {
-    public partial class Client : ClientBase
+    public partial class Client : ClientBase, IClient
     {
-        public Client(string accessKeyEnc, string secretKeyEnc, ILogger logger) : 
-            base(accessKeyEnc, secretKeyEnc, logger) { }
+        public Client(string accessKeyEnc, string secretKeyEnc, ILogger logger) :
+            base(accessKeyEnc, secretKeyEnc, logger)
+        { }
 
         public MarketInfo[] ApiMarketInfo() => InvokeApi<MarketInfo>(ApiId.MarketInfoAll);
 
+        public string ApiTest(IApiParam param)
+        {
+            return param.ToString()!;
+        }
     }//class
 }

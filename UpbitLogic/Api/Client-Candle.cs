@@ -54,12 +54,15 @@ namespace Universe.Coin.Upbit
                     res.CopyTo(result, index);
                     index += res.Length;
                     count -= res.Length;
+
+                    if(count> 0)
+                    {
+                        var to = DateTimeOffset.FromUnixTimeMilliseconds(res.Last().Timestamp).UtcDateTime;
+                        setQueryString("to", to.ToString(_utcFmt));
+                    }
                 }
                 if (count > 0)
                 {
-                    var to = DateTimeOffset.FromUnixTimeMilliseconds(res.Last().Timestamp).UtcDateTime;
-                    setQueryString("to", to.ToString(_utcFmt));
-
                     var dt = _watch.ElapsedMilliseconds - _lastCallTime_Candle;
                     if (dt < 100) Thread.Sleep((int)(100 - dt));
                     _lastCallTime_Candle = _watch.ElapsedMilliseconds;
