@@ -30,13 +30,14 @@ namespace Universe.Coin.Upbit
         public static void LogWebException(this ILogger logger, WebException ex, ApiId api)
         {
             var nl = Environment.NewLine;
-            var msg = $"{api}: uri = { ex.Response?.ResponseUri}{nl}status={ex.Status}: {ex.Message}";
+            var msg = $"api= {api}{nl}uri= { ex.Response?.ResponseUri}{nl}ex.Status={ex.Status}{nl}ex.Message= {ex.Message}";
             if (ex.Response != null)
             {
-                var buffer = new Span<byte>();
-                ex.Response.GetResponseStream().Read(buffer);
+                HttpWebResponse res = (HttpWebResponse)ex.Response;
+                Span<byte> buffer = stackalloc byte[1024];
+                res.GetResponseStream().Read(buffer);
                 var text = Encoding.ASCII.GetString(buffer);
-                msg = $"{msg}{nl}Content= {text}";
+                msg = $"{msg}{nl}res.StatusCode= {res.StatusCode}{nl}res.Content= {text}";
             }
             logger.LogError(msg);
         }

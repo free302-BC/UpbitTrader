@@ -27,7 +27,7 @@ namespace Universe.Coin.Upbit
         public TradeTick[] ApiTicks(CurrencyId currency = CurrencyId.KRW, CoinId coin = CoinId.BTC, int count = 1)
         {
             clearQueryString();
-            setQueryString("markets", currency, coin);
+            setQueryString("market", currency, coin);
             setQueryString("count", count);
             return InvokeApi<TradeTick>(ApiId.TradeTicks);
         }
