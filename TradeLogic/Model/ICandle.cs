@@ -29,45 +29,36 @@ namespace Universe.Coin.TradeLogic.Model
 
         #region ---- ICandle Type ~ ApiId Map ----
 
-        //public static ApiId GetApiId<C>() where C : ICandle
-        //{
-        //    var type = typeof(C);
-        //    if (!_typeApiDic.ContainsKey(type))
-        //        throw new Exception($"{nameof(ICandle)}.{nameof(GetApiId)}(): Can't get ApiId of <{type.Name}>");
-        //    return _typeApiDic[typeof(C)];
-        //}
-        //static Dictionary<Type, ApiId> _typeApiDic;
+        public static ApiId GetApiId(CandleUnit unit)
+        {
+            return _unitApiDic[unit];
+        }
 
         #endregion
 
 
         #region ---- Allowed ApiId, CandleUnit for ICandle Modles ----
 
-        public static void CheckParam(ApiId api)
-        {
-            if (!_apiNameDic.ContainsKey(api))
-                throw new ArgumentException($"{nameof(ICandle)}: ApiId '{api}' not allowed.");
-        }
-        public static void CheckParam<C>(ApiId api, CandleUnit unit) where C : ICandle
-        {
-            if (api == ApiId.CandleMinutes)
-            {
-                if (_units.Contains(unit)) return;
-            }
-            else
-            {
-                if (unit == CandleUnit.None) return;
-            }
-            throw new ArgumentException($"{nameof(ICandle)}: CandleUnit '{unit}' not allowed.");
-        }
+        ///// <summary>
+        ///// ApiId에 정의되지 않은 값 확인
+        ///// </summary>
+        ///// <param name="api"></param>
+        //public static void CheckParam(ApiId api)
+        //{
+        //    if (!_apiNameDic.ContainsKey(api))
+        //        throw new ArgumentException($"{nameof(ICandle)}: ApiId '{api}' not allowed.");
+        //}
+
         public static string GetApiName(ApiId api, CandleUnit unit = CandleUnit.None)
         {
-            CheckParam(api);
-            if (unit == CandleUnit.None) return _apiNameDic[api];
-            else return $"{_apiNameDic[api]}{(int)unit}";
+            if(api == ApiId.CandleMinutes) 
+                return $"{_apiNameDic[api]}{(int)unit}";
+            else 
+                return _apiNameDic[api];
         }
-        static CandleUnit[] _units;
+        //static CandleUnit[] _units;
         static Dictionary<ApiId, string> _apiNameDic;
+        static Dictionary<CandleUnit, ApiId> _unitApiDic;
 
         #endregion
 
@@ -81,15 +72,16 @@ namespace Universe.Coin.TradeLogic.Model
                 { ApiId.CandleWeeks, "Week" },
                 { ApiId.CandleMonth, "Month" },
             };
+            _unitApiDic = new Dictionary<CandleUnit, ApiId>()
+            {
+                { CandleUnit.None, ApiId.None },                
+                { CandleUnit.DAY, ApiId.CandleDays },
+                { CandleUnit.WEEK, ApiId.CandleWeeks },
+                { CandleUnit.MONTH, ApiId.CandleMonth },
+            };
+            var minutes = Enum.GetValues<CandleUnit>().Where(x => x >= CandleUnit.M1 && x < CandleUnit.DAY).ToArray();
+            foreach (var m in minutes) _unitApiDic.Add(m, ApiId.CandleMinutes);
 
-            //_typeApiDic = new()
-            //{
-            //    { typeof(CandleDay), ApiId.CandleDays },
-            //    { typeof(CandleMinute), ApiId.CandleMinutes },
-
-            //};
-
-            _units = Enum.GetValues<CandleUnit>().Where(x => x != CandleUnit.None)?.ToArray()!;
         }
 
     }//class

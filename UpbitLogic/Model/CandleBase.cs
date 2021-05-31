@@ -16,20 +16,16 @@ namespace Universe.Coin.Upbit.Model
     {
         public CandleBase()
         {
-            Market = CandleDateTimeUtc = CandleDateTimeKst = string.Empty;
+            Market = CandleDateTimeUtc = CandleDateTimeKst = string.Empty;        
+            //ApiId = ICandle.GetApiId(CandleUnit.DAY);
         }
-        public CandleBase(ApiId api) : this()
+        public CandleBase(CandleUnit unit) : this()
         {
-            ICandle.CheckParam(api);
-            ApiId = api;// ICandle.GetApiId<C>();
-        }
-        public CandleBase(ApiId apiId, CandleUnit unit) : this(apiId)
-        {
-            ICandle.CheckParam<C>(apiId, unit);
+            ApiId = ICandle.GetApiId(unit);
             CandleUnit = unit; 
         }        
 
-        public ApiId ApiId { get; }
+        public ApiId ApiId { get; protected set; }
         public virtual CandleUnit CandleUnit { get; set; }
 
         /// <summary>

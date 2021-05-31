@@ -15,6 +15,7 @@ namespace Universe.Coin.Upbit.App
     {
         static void Main(string[] args)
         {
+            //key input listener
             AddWorker<InputWorker, WorkerOptions>(
                 lifeTime: ServiceLifetime.Singleton,
                 workerFactory: sp =>
@@ -29,8 +30,8 @@ namespace Universe.Coin.Upbit.App
                     void quit(ConsoleModifiers modifiers) => sp.GetRequiredService<IHost>().StopAsync().Wait();
                 });
 
-            AddWorker<BackTestWorker, BackTestOptions>("backtest.json", BackTestWorker.GetIds());
-            //AddWorker<TraderWorker, TraderOptions>();
+            //AddWorker<BackTestWorker, BackTestOptions>("backtest.json", BackTestWorker.GetIds());
+            AddWorker<TraderWorker, TraderOptions>();
             RunHost();
         }
 

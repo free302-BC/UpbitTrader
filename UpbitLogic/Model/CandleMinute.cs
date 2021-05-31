@@ -14,16 +14,21 @@ namespace Universe.Coin.Upbit.Model
     [DataContract]
     public class CandleMinute : CandleBase<CandleMinute>
     {
-        public CandleMinute() : base(ApiId.CandleMinutes)
-        { }
-        public CandleMinute(CandleUnit unit) : base(ApiId.CandleMinutes, unit) 
-        { }
+        public CandleMinute()
+        {
+            ApiId = ApiId.CandleMinutes;
+        }
+
+        public CandleMinute(CandleUnit unit) : this()
+        {
+            //ApiId = ApiId.CandleMinutes;
+            CandleUnit = unit;
+        }
         public override CandleUnit CandleUnit
         {
             get => (CandleUnit)Unit;
             set
             {
-                ICandle.CheckParam<CandleMinute>(ApiId, value);
                 Unit = (decimal)value;
             }
         }

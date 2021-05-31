@@ -395,20 +395,7 @@ namespace Universe.Coin.Upbit.App
 
         #region ---- TEST ----
 
-        void testLimit(Client uc)
-        {
-            var list = uc.ApiCandle<CandleDay>();
-            //printResJson(list);
-            info("--------------");
-
-            for (int i = 0; i < 10; i++)
-            {
-                list = uc.ApiCandle<CandleDay>();
-                if (list.Count < 8) break;
-                info(list[0]);
-                Thread.Sleep(10);
-            }
-        }
+        
         void testHash()
         {
             var nvc = new NameValueCollection();

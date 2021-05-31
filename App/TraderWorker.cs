@@ -33,7 +33,8 @@ namespace Universe.Coin.Upbit.App
 
         protected override void work()
         {
-            var uc = new Client(_set.AccessKey, _set.SecretKey, _sp.GetRequiredService<ILogger<Client>>());
+            var logger = _sp.GetRequiredService<ILogger<Client>>();
+            var uc = new Client(_set.AccessKey, _set.SecretKey, logger);
 
             //market(uc);
             //account(uc);
@@ -43,10 +44,10 @@ namespace Universe.Coin.Upbit.App
             //orderbook(uc);
             //ticks(uc);
 
-            //run(uc);
+            //runAutoTrade(uc);
         }
 
-        void run(Client uc)
+        void runAutoTrade(Client uc)
         {
             var (next, sell, target) = restart(uc);
 
@@ -134,7 +135,7 @@ namespace Universe.Coin.Upbit.App
         }
         (DateTime next, DateTime sell, decimal target) restart(Client uc)
         {
-            var models = uc.ApiCandle<CandleDay>(count: 2).ToModels();
+            var models = uc.ApiCandle<CandleDay>(unit: CandleUnit.DAY, count: 2).ToModels();
             var start = models[1].TimeKST;
             info($"Starting new period: {start}");
             var next = start.AddDays(1);
@@ -171,13 +172,13 @@ namespace Universe.Coin.Upbit.App
         }
         void candleDay(Client uc)
         {
-            var candles = uc.ApiCandle<CandleDay>(count: 10);
+            var candles = uc.ApiCandle<CandleDay>(unit: CandleUnit.DAY, count: 30);
             var models = candles.ToModels();
             info(IViewModel.Print(models));
         }
         void candleMinutes(Client uc)
         {
-            var candles = uc.ApiCandle<CandleMinute>(count: 220, unit: CandleUnit.M1);
+            var candles = uc.ApiCandle<CandleMinute>(unit: CandleUnit.M1, count: 220);
             var models = candles.ToModels();
             info(IViewModel.Print(models));
         }
