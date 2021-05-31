@@ -39,8 +39,8 @@ namespace Universe.Coin.Upbit.App
             //market(uc);
             //account(uc);
             //ticker(uc);
-            //candleDay(uc);
-            candleMinutes(uc);
+            candleDay(uc);
+            //candleMinutes(uc);
             //orderbook(uc);
             //ticks(uc);
 

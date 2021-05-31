@@ -12,18 +12,18 @@ using Universe.Coin.TradeLogic.Model;
 namespace Universe.Coin.Upbit.Model
 {
     [DataContract]
-    public class CandleBase<C> : ICandle where C: CandleBase<C>
+    public class CandleBase : ICandle// where C: CandleBase<C>
     {
         public CandleBase()
         {
             Market = CandleDateTimeUtc = CandleDateTimeKst = string.Empty;        
-            //ApiId = ICandle.GetApiId(CandleUnit.DAY);
-        }
-        public CandleBase(CandleUnit unit) : this()
-        {
-            ApiId = ICandle.GetApiId(unit);
-            CandleUnit = unit; 
         }        
+        public CandleBase(ApiId api, CandleUnit unit) : this()
+        {
+            //ICandle.CheckParam(unit);
+            ApiId = api;
+            CandleUnit = unit;
+        }
 
         public ApiId ApiId { get; protected set; }
         public virtual CandleUnit CandleUnit { get; set; }

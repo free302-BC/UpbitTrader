@@ -6,13 +6,16 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
+using Universe.Coin.TradeLogic;
 
 namespace Universe.Coin.Upbit.Model
 {
     [DataContract]
-    public class CandleDay : CandleBase<CandleDay>
+    public class CandleDay : CandleBase//<CandleDay>
     {
-        public CandleDay() { }
+        public CandleDay() : base(ApiId.CandleDays, CandleUnit.DAY)
+        { 
+        }
 
         /// <summary>
         /// 전일 종가 (UTC 0시 기준)

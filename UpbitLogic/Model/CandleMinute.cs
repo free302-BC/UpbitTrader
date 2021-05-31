@@ -12,17 +12,13 @@ using Universe.Coin.TradeLogic.Model;
 namespace Universe.Coin.Upbit.Model
 {
     [DataContract]
-    public class CandleMinute : CandleBase<CandleMinute>
+    public class CandleMinute : CandleBase//<CandleMinute>
     {
-        public CandleMinute()
+        public CandleMinute() : base(ApiId.CandleMinutes, CandleUnit.M1)
         {
-            ApiId = ApiId.CandleMinutes;
         }
-
-        public CandleMinute(CandleUnit unit) : this()
+        public CandleMinute(CandleUnit unit) : base(ApiId.CandleMinutes, unit)
         {
-            //ApiId = ApiId.CandleMinutes;
-            CandleUnit = unit;
         }
         public override CandleUnit CandleUnit
         {

@@ -29,25 +29,15 @@ namespace Universe.Coin.TradeLogic.Model
 
         #region ---- ICandle Type ~ ApiId Map ----
 
+        /// <summary>
+        /// TODO: CandleUnit에 정의되지 않은 값일 경우(타 거래소)?
+        /// </summary>
+        /// <param name="unit"></param>
+        /// <returns></returns>
         public static ApiId GetApiId(CandleUnit unit)
         {
             return _unitApiDic[unit];
         }
-
-        #endregion
-
-
-        #region ---- Allowed ApiId, CandleUnit for ICandle Modles ----
-
-        ///// <summary>
-        ///// ApiId에 정의되지 않은 값 확인
-        ///// </summary>
-        ///// <param name="api"></param>
-        //public static void CheckParam(ApiId api)
-        //{
-        //    if (!_apiNameDic.ContainsKey(api))
-        //        throw new ArgumentException($"{nameof(ICandle)}: ApiId '{api}' not allowed.");
-        //}
 
         public static string GetApiName(ApiId api, CandleUnit unit = CandleUnit.None)
         {
@@ -56,7 +46,6 @@ namespace Universe.Coin.TradeLogic.Model
             else 
                 return _apiNameDic[api];
         }
-        //static CandleUnit[] _units;
         static Dictionary<ApiId, string> _apiNameDic;
         static Dictionary<CandleUnit, ApiId> _unitApiDic;
 
@@ -74,7 +63,7 @@ namespace Universe.Coin.TradeLogic.Model
             };
             _unitApiDic = new Dictionary<CandleUnit, ApiId>()
             {
-                { CandleUnit.None, ApiId.None },                
+                //{ CandleUnit.None, ApiId.None },                
                 { CandleUnit.DAY, ApiId.CandleDays },
                 { CandleUnit.WEEK, ApiId.CandleWeeks },
                 { CandleUnit.MONTH, ApiId.CandleMonth },
