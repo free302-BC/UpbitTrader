@@ -76,10 +76,10 @@ namespace Universe.AppBase
                 info($"<{Id}> StartAsync()...");
                 work();
             }, cancellationToken)
-            .ContinueWith(t => info($"<{Id}> done."))
             .ContinueWith(
-                t => log($"{nameof(WorkerBase<W, S>)}.{nameof(StartAsync)}():", t.Exception), 
-                TaskContinuationOptions.OnlyOnFaulted);
+                t => log($"{nameof(WorkerBase<W, S>)}.{nameof(StartAsync)}():", t.Exception),
+                TaskContinuationOptions.OnlyOnFaulted)
+            .ContinueWith(t => info($"<{Id}> done."));
         }
         public Task StopAsync(CancellationToken cancellationToken)
         {

@@ -13,6 +13,7 @@ using Universe.AppBase;
 using Universe.Coin.TradeLogic;
 using Universe.Coin.TradeLogic.Model;
 using Universe.Coin.Upbit;
+using Universe.Coin.Upbit.App;
 using Universe.Coin.Upbit.Model;
 using Xunit;
 using Xunit.Abstractions;
@@ -28,6 +29,7 @@ namespace UnitTester
 
         public Worker()
         {
+            _logger = null!;
             _client = new Client(_accessKey, _secretKey, _logger);
         }
 
@@ -71,8 +73,14 @@ namespace UnitTester
                 var models = _client.ApiCandle<CandleMinute>(count: 10000, unit: CandleUnit.M1).ToModels();
                 info($"Δt= {w.ElapsedMilliseconds,6}ms: {models[0]}");
 
+                var param = new BackTestOptions() {
+                    ApplyMovingAvg = true,
+                    WindowSize = 15,
+                    WindowFunction = WindowFunction.Identical
+                };
+                var mc = new ModelCalc(param);
                 w.Restart();
-                IModelCalc.CalcMovingAvg(models, 15);
+                mc.CalcMovingAvg(models);
                 info($"Δt= {w.ElapsedMilliseconds,6}ms: {models[0]}");
             }
 

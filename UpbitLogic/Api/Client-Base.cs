@@ -52,6 +52,7 @@ namespace Universe.Coin.Upbit
             catch (WebException ex)
             {
                 _logger.LogWebException(ex, apiId);
+                if (apiId == ApiId.CandleMinutes) throw;
                 return Array.Empty<T>();
             }
         }

@@ -8,17 +8,17 @@ using Universe.Coin.TradeLogic;
 
 namespace Universe.Coin.Upbit.App
 {
-    public class BackTestOptions : WorkerOptions
+    public class BackTestOptions : WorkerOptions, ICalcParam
     {
         public bool DoFindK { get; set; }
         public decimal Hours { get; set; }
-        public decimal FactorK { get; set; }
-        public bool ApplyMovingAvg { get; set; }
-        public int MovingAvgSize { get; set; }
-        public WindowFunction WindowFunction { get; set; }
-
         public bool LoadFromFile { get; set; }
         public bool PrintCandle { get; set; }
+
+        public decimal FactorK { get; set; }
+        public bool ApplyMovingAvg { get; set; }
+        public int WindowSize { get; set; }
+        public WindowFunction WindowFunction { get; set; }
         public bool ApplyStopLoss { get; set; }
 
         public override void Reload(IWorkerOptions source)
@@ -32,7 +32,7 @@ namespace Universe.Coin.Upbit.App
             Hours = src.Hours;
             FactorK = src.FactorK;
             ApplyMovingAvg = src.ApplyMovingAvg;
-            MovingAvgSize = src.MovingAvgSize;
+            WindowSize = src.WindowSize;
             WindowFunction = src.WindowFunction;
 
             LoadFromFile = src.LoadFromFile;

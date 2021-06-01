@@ -8,16 +8,22 @@ using Universe.Coin.TradeLogic.Model;
 
 namespace Universe.Coin.TradeLogic
 {
-    public class SimplePR : IModelCalc
+    public class SimplePR : CalculatorBase, IProfitRate
     {
-        public void CalcProfitRate(CandleModel[] models, decimal k)
-            => CalcProfitRate(models, k, 0, models.Length);
-
-        public void CalcProfitRate(CandleModel[] models, decimal k, int offset, int count)
+        public SimplePR(ICalcParam param) : base(param)
         {
-            calcProfitRate(models[offset], offset > 0 ? models[offset - 1] : CandleModel.Empty, k);
+        }
+        public void CalcProfitRate(CandleModel[] models)
+            => CalcProfitRate(models, 0, models.Length);
+
+        public void CalcProfitRate(CandleModel[] models, int offset, int count)
+        {
+            calcProfitRate(models[offset], offset > 0 
+                ? models[offset - 1] 
+                : CandleModel.Empty, _param.FactorK);
+
             for (int i = offset + 1; i < offset + count && i < models.Length; i++)
-                calcProfitRate(models[i], models[i - 1], k);
+                calcProfitRate(models[i], models[i - 1], _param.FactorK);
         }
 
         void calcProfitRate(CandleModel model, CandleModel prev, decimal k)
@@ -28,27 +34,23 @@ namespace Universe.Coin.TradeLogic
                 : 1.0000m;
         }
 
-        public static SimplePR Default = new();
-
     }//class
 
-    public class MovingAvgPR : IModelCalc
+    public class MovingAvgPR :  CalculatorBase, IProfitRate
     {
-        readonly int _maSize;
-        public MovingAvgPR(int maSize)
+        public MovingAvgPR(ICalcParam param) : base(param)
         {
-            _maSize = maSize;
         }
-        public void CalcProfitRate(CandleModel[] models, decimal k) 
-            => CalcProfitRate(models, k, 0, models.Length);
+        public void CalcProfitRate(CandleModel[] models) 
+            => CalcProfitRate(models, 0, models.Length);
 
-        public void CalcProfitRate(CandleModel[] models, decimal k, int offset, int count)
+        public void CalcProfitRate(CandleModel[] models, int offset, int count)
         {
-            IModelCalc.CalcMovingAvg(models, _maSize);
-
-            calcProfitRate(models[offset], offset > 0 ? models[offset - 1] : CandleModel.Empty, k);
+            calcProfitRate(models[offset], offset > 0 
+                ? models[offset - 1] 
+                : CandleModel.Empty, _param.FactorK);
             for (int i = offset + 1; i < offset + count && i < models.Length; i++)
-                calcProfitRate(models[i], models[i - 1], k);
+                calcProfitRate(models[i], models[i - 1], _param.FactorK);
         }
 
         static void calcProfitRate(CandleModel model, CandleModel prev, decimal k)
@@ -58,8 +60,6 @@ namespace Universe.Coin.TradeLogic
                 ? Math.Round(model.Closing / model.Target - CandleModel.FeeRate, 4)
                 : 1.0m;
         }
-
-        public static MovingAvgPR Default = new(5);
 
     }//class
 

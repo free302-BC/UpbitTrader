@@ -67,9 +67,9 @@ namespace Universe.Coin.TradeLogic
         public static implicit operator KeyPair((string access, string secret) key) => new KeyPair(key.access, key.secret);
     }
 
-    public enum WindowFunction
+    public enum WindowFunction : int
     {
-        Flat, Linear, Gaussian
+        Identical, Linear, Gaussian
     }
 
 }

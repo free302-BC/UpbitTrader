@@ -23,8 +23,17 @@ namespace Universe.Coin.Upbit
     public partial class Client : ClientBase
     {
         const string _utcFmt = "yyyy-MM-ddTHH:mm:ssZ";
-        static long _lastCallTime_Candle = 0;
-        static readonly Stopwatch _watch = Stopwatch.StartNew();
+        static long _lastCallTime;
+        static readonly Stopwatch _watch;
+
+        //-------------------- TEST ------------------------------
+        public static List<(CandleUnit, long, long)> CallTimes = new();
+        static Client()
+        {
+            _watch =  Stopwatch.StartNew();
+            _lastCallTime = 0;
+        }
+        //--------------------------------------------------------
 
         public C[] ApiCandle<C>(
             CurrencyId currency = CurrencyId.KRW,
@@ -48,24 +57,42 @@ namespace Universe.Coin.Upbit
             {
                 setQueryString("count", count.ToString());
 
-                var res = InvokeApi<C>(api, postPath);
-                if (res.Length > 0)
-                {
-                    res.CopyTo(result, index);
-                    index += res.Length;
-                    count -= res.Length;
+                try
+                {                    
+                    var res = InvokeApi<C>(api, postPath);
 
-                    if(count> 0)
+                    if (res.Length > 0)
                     {
-                        var to = DateTimeOffset.FromUnixTimeMilliseconds(res.Last().Timestamp).UtcDateTime;
-                        setQueryString("to", to.ToString(_utcFmt));
+                        res.CopyTo(result, index);
+                        index += res.Length;
+                        count -= res.Length;
+
+                        if (count > 0)
+                        {
+                            var to = DateTimeOffset.FromUnixTimeMilliseconds(res.Last().Timestamp).UtcDateTime;
+                            setQueryString("to", to.ToString(_utcFmt));
+                        }
+                    }
+                    //if (count > 0)
+                    {
+                        var dt = _watch.ElapsedMilliseconds - _lastCallTime;
+                        CallTimes.Add((unit, _watch.ElapsedMilliseconds, dt));
+                        //if (dt < 100 && _lastCallTime != 0)
+                        //    throw new Exception($"dt<100: {unit} dt={dt} @{_watch.ElapsedMilliseconds}");
+
+                        if (dt < 100)
+                        {
+                            CallTimes.Add((CandleUnit.DAY, _watch.ElapsedMilliseconds, - 100 + dt));
+                            Thread.Sleep((int)(100 - dt));
+                        }
+                        _lastCallTime = _watch.ElapsedMilliseconds;
                     }
                 }
-                if (count > 0)
+                catch (Exception ex)
                 {
-                    var dt = _watch.ElapsedMilliseconds - _lastCallTime_Candle;
-                    if (dt < 100) Thread.Sleep((int)(100 - dt));
-                    _lastCallTime_Candle = _watch.ElapsedMilliseconds;
+                    CallTimes.Add((CandleUnit.None, _watch.ElapsedMilliseconds, _watch.ElapsedMilliseconds - _lastCallTime));
+                    ex.Data.Add("ms", CallTimes);
+                    throw;
                 }
             }
 

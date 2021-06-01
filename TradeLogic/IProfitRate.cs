@@ -7,18 +7,21 @@ using Universe.Coin.TradeLogic.Model;
 
 namespace Universe.Coin.TradeLogic
 {
-    public interface IProfitRate
+    public interface IProfitRate : ICalculator
     {
-        void CalcProfitRate(CandleModel[] models, decimal k);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="models"></param>
+        void CalcProfitRate(CandleModel[] models);
 
         /// <summary>
         /// models[offset..offset+count]
         /// </summary>
         /// <param name="models"></param>
-        /// <param name="k"></param>
         /// <param name="offset"></param>
         /// <param name="count"></param>
-        void CalcProfitRate(CandleModel[] models, decimal k, int offset, int count);
+        void CalcProfitRate(CandleModel[] models, int offset, int count);
 
 
     }

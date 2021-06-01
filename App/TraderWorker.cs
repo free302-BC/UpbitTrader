@@ -132,20 +132,20 @@ namespace Universe.Coin.Upbit.App
                     (next, sell, target) = restart(uc);
                 }
             }//while
-        }
-        (DateTime next, DateTime sell, decimal target) restart(Client uc)
-        {
-            var models = uc.ApiCandle<CandleDay>(unit: CandleUnit.DAY, count: 2).ToModels();
-            var start = models[1].TimeKST;
-            info($"Starting new period: {start}");
-            var next = start.AddDays(1);
-            var sell = next.AddSeconds(-60);
 
-            SimplePR.Default.CalcProfitRate(models, 0.5m);
-            var target = models[1].Target;
+            (DateTime next, DateTime sell, decimal target) restart(Client uc)
+            {
+                var models = uc.ApiCandle<CandleDay>(unit: CandleUnit.DAY, count: 2).ToModels();
+                var start = models[1].TimeKST;
+                info($"Starting new period: {start}");
 
-            return (next, sell, target);
-        }
+                var next = start.AddDays(1);
+                var sell = next.AddSeconds(-60);
+                var target = models[1].Opening + models[0].Delta;
+
+                return (next, sell, target);
+            }
+        }        
 
         void market(Client uc)
         {

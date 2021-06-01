@@ -9,10 +9,10 @@ namespace Universe.Coin.TradeLogic
 {
     using FindList = List<(int trades, decimal k, decimal rate, decimal mdd)>;
 
-    public interface IFindK
+    public interface IFindK : ICalculator
     {
         static (int trades, decimal k, decimal rate, decimal mdd) 
-            findK(CandleModel[] models, int offset, int count, bool applyMovingAvg, StringBuilder? sb = null)
+            FindK(CandleModel[] models, int offset, int count, ICalcParam param, StringBuilder? sb = null)
         {
             if (models.Length == 0) return (0, 0m, 0m, 0m);
             else
@@ -20,7 +20,7 @@ namespace Universe.Coin.TradeLogic
                 var list = new FindList();
                 for (decimal k = 0.1m; k <= 2m; k += 0.1m)
                 {
-                    var (trades, rate, mdd) = IBackTest.backTest(models, k, offset, count, applyMovingAvg);
+                    var (trades, rate, mdd) = IBackTest.BackTest(models, offset, count, param);
                     list.Add((trades, k, rate, mdd));
                     sb?.AppendLine($"{k,6:F2}: {(rate - 1) * 100,10:F2}%, {mdd,10:F2}%");
                 }

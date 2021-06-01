@@ -21,6 +21,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\AppBase\AppBase.csproj" />
+    <ProjectReference Include="..\App\App.csproj" />
     <ProjectReference Include="..\TradeLogic\TradeLogic.csproj" />
     <ProjectReference Include="..\UpbitLogic\UpbitLogic.csproj" />
   </ItemGroup>

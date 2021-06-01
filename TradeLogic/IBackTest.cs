@@ -7,18 +7,21 @@ using Universe.Coin.TradeLogic.Model;
 
 namespace Universe.Coin.TradeLogic
 {
-    public interface IBackTest
+    public interface IBackTest : ICalculator
     {
         static (int trades, decimal rate, decimal mdd) 
-            backTest(CandleModel[] models, decimal k, int offset, int count, bool applyMovingAvg)
+            BackTest(CandleModel[] models,  int offset, int count, ICalcParam param)
         {
-            if (!applyMovingAvg) SimplePR.Default.CalcProfitRate(models, k, offset, count);
-            else MovingAvgPR.Default.CalcProfitRate(models, k, offset, count);
+            var mc = new ModelCalc(param);
+            if (param.ApplyMovingAvg) mc.CalcMovingAvg(models, offset, count);
 
-            var trades = models.Take(count).Count(x => x.Rate != 1m);
+            IProfitRate pr = param.ApplyMovingAvg ? new MovingAvgPR(param) : new SimplePR(param);
+            pr.CalcProfitRate(models, offset, count);
 
-            var rate = IModelCalc.CalcCumRate(models, offset, count);
-            var mdd = IModelCalc.CalcDrawDown(models, offset, count);
+            var trades = models.Take(count).Count(x => x.Rate != 1m && x.Rate != 0m);
+
+            var rate = mc.CalcCumRate(models, offset, count);
+            var mdd = mc.CalcDrawDown(models, offset, count);
             return (trades, rate, mdd);
         }
     }

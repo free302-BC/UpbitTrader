@@ -64,30 +64,47 @@ namespace Universe.Coin.Upbit.App
             var uc = new Client(_set.AccessKey, _set.SecretKey, logger);
             registerHotkey(_ev);
 
-            while (_set.Hours > 0)
+            while (true)
             {
-                if (!_doFindK)
+                try
                 {
-                    _set.ApplyMovingAvg = false;
-                    run_K_Units(uc);
-                    _set.ApplyMovingAvg = true;
-                    run_K_Units(uc);
-                }
-                else
-                {
-                    _set.ApplyMovingAvg = false;
-                    run_Units_FindK(uc);
-                    _set.ApplyMovingAvg = true;
-                    run_Units_FindK(uc);
-                }
+                    if (!_doFindK)
+                    {
+                        //_set.WindowFunction = WindowFunction.Linear;
+                        _set.ApplyMovingAvg = false;
+                        run_K_Units(uc);
+                        _set.ApplyMovingAvg = true;
+                        run_K_Units(uc);
+                    }
+                    else
+                    {
+                        _set.ApplyMovingAvg = false;
+                        run_Units_FindK(uc);
+                        _set.ApplyMovingAvg = true;
+                        run_Units_FindK(uc);
+                    }
 
-                if (_repeat)
-                {
-                    info($"<{Id}> Sleeping 3000...");
-                    Thread.Sleep(3000);
+                    if (_repeat)
+                    {
+                        info($"<{Id}> Sleeping 3000...");
+                        Thread.Sleep(3000);
+                    }
+                    else
+                    {
+                        info($"<{Id}> Waiting...");
+                        _ev.Reset();
+                        _ev.WaitOne();
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
+                    var sb = new StringBuilder();
+                    sb.AppendLine($"Message: {ex.Message}");
+                    var times = Client.CallTimes;
+                    foreach(var time in Client.CallTimes) sb.AppendLine(time.ToString());
+                    //foreach (var k in ex.Data.Keys) sb.AppendLine($"{k}= {ex.Data[k]}");
+                    log(sb);
+
                     info($"<{Id}> Waiting...");
                     _ev.Reset();
                     _ev.WaitOne();
@@ -99,17 +116,18 @@ namespace Universe.Coin.Upbit.App
                 var iw = _sp.GetRequiredService<InputWorker>();
                 iw.AddCmd(ConsoleKey.Spacebar, (m) => ev.Set());
                 iw.AddCmd(ConsoleKey.Enter, (m) => ev.Set());
-                iw.AddCmd(ConsoleKey.F1, onFuncChange);
-                iw.AddCmd(ConsoleKey.F2, m => onParamChange(m, 3, () => _set.Hours));
-                iw.AddCmd(ConsoleKey.F3, m => onParamChange(m, 0.1m, () => _set.FactorK));
-                iw.AddCmd(ConsoleKey.F4, m => onParamChange(m, 3, () => _set.MovingAvgSize));
-
-                void onFuncChange(ConsoleModifiers modifier)
+                iw.AddCmd(ConsoleKey.F1, onChangeTest);
+                iw.AddCmd(ConsoleKey.F2, m => onChangeNumericParam(m, 3, () => _set.Hours));
+                iw.AddCmd(ConsoleKey.F3, m => onChangeNumericParam(m, 0.1m, () => _set.FactorK));
+                iw.AddCmd(ConsoleKey.F4, m => onChangeNumericParam(m, 3, () => _set.WindowSize));
+                iw.AddCmd(ConsoleKey.F4, onToggleWF);
+                
+                void onChangeTest(ConsoleModifiers modifier)
                 {
                     _doFindK = !_doFindK;
                     _ev.Set();
                 }
-                void onParamChange<P>(ConsoleModifiers modifier, P delta, Expression<Func<P>> selector)
+                void onChangeNumericParam<P>(ConsoleModifiers modifier, P delta, Expression<Func<P>> selector)
                 {
                     var set = selector.ToDelegate();
                     dynamic dv = delta!;
@@ -128,18 +146,23 @@ namespace Universe.Coin.Upbit.App
                             set.currentValue
                             + (modifier.HasFlag(ConsoleModifiers.Shift) ? -dv : +dv));
                     }
-                    info($"Reloaded: k={_set.FactorK}, hours={_set.Hours}, ma={_set.MovingAvgSize}");
+                    info($"Reloaded: k={_set.FactorK}, hours={_set.Hours}, ma={_set.WindowSize}");
                     ev.Set();
+                }
+                void onToggleWF(ConsoleModifiers modifier)
+                {
+                    var delta = modifier.HasFlag(ConsoleModifiers.Shift) ? -1 : +1;
+                    _set.WindowFunction = (WindowFunction)(((int)_set.WindowFunction + delta) % 3);
+                    _ev.Set();
                 }
             }
         }
 
 
         /// <summary>
-        /// 
+        /// 단일 k에 대하여 각 CandleUnit별로 backtest 수행
         /// </summary>
         /// <param name="uc"></param>
-        /// <param name="k"></param>
         void run_K_Units(Client uc)
         {
             var units = new[]
@@ -151,14 +174,16 @@ namespace Universe.Coin.Upbit.App
 
             info($"Entering {nameof(run_K_Units)}()...");
             sb.Clear();
-            sb.AppendLine($"-----------[ {(int)(hours / 24)}d {hours % 24}h : k={k:F1} ma={(_set.ApplyMovingAvg ? _set.MovingAvgSize : 1)} ]------------");
+            sb.AppendLine(
+                $"-----------[ {(int)(hours / 24)}d {hours % 24}h : " +
+                $"k={k:F1} ma={_set.WindowFunction} {(_set.ApplyMovingAvg ? _set.WindowSize : 1)} ]------------");
 
             foreach (var unit in units)
             {
                 var count = (int)(hours * 60 / (int)unit);
                 var models = prepareModels(uc, unit, count);
 
-                var x = IBackTest.backTest(models, k, 0, count, _set.ApplyMovingAvg);
+                var x = IBackTest.BackTest(models, 0, count, _set);
                 results.Add((unit, count, x));
                 sb.AppendLine($"{count,6} {unit,6}: {k,6:F2} {x.rate,8:F4} {x.mdd,6:F2}%");
             }
@@ -170,7 +195,7 @@ namespace Universe.Coin.Upbit.App
             sb.AppendLine($" | {max.res.trades}/{max.count}Tr");
             sb.AppendLine("-------------------------------------------");
 
-            if (_set.PrintCandle) runBackTest(uc, max.unit, max.count, k, sb);
+            if (_set.PrintCandle) runBackTest(uc, max.unit, max.count, sb);
             info(sb);
         }
 
@@ -190,7 +215,7 @@ namespace Universe.Coin.Upbit.App
 
             info($"Entering {nameof(run_Units_FindK)}()...");
             sb.Clear();
-            sb.AppendLine($"-----------[ {(int)(hours / 24)}d {hours % 24}h : ma={(_set.ApplyMovingAvg ? _set.MovingAvgSize : 1)} ]------------");
+            sb.AppendLine($"-----------[ {(int)(hours / 24)}d {hours % 24}h : ma={(_set.ApplyMovingAvg ? _set.WindowSize : 1)} ]------------");
 
             foreach (var unit in units)
             {
@@ -202,7 +227,7 @@ namespace Universe.Coin.Upbit.App
                     save(models, unit);
                 }
 
-                var x = IFindK.findK(models, 0, count, _set.ApplyMovingAvg);
+                var x = IFindK.FindK(models, 0, count, _set);
                 results.Add((unit, count, x));
                 sb.AppendLine($"{count,6} {unit,6}: {x.k,6:F2} {x.rate,8:F4} {x.mdd,6:F2}%");
             }
@@ -252,18 +277,17 @@ namespace Universe.Coin.Upbit.App
                 for (int i = 0; i < numTest; i++)
                 {
                     //var currents = new ArraySegment<CandleModel>(models, count * i, count);
-                    var x = IFindK.findK(models, count * i, count, _set.ApplyMovingAvg);
+                    var x = IFindK.FindK(models, count * i, count, _set);
                     results.Add(x);
                     //sb.Append($"{(x.rate - 1) * 100,6:N2} ");
                 }
                 kDic.Add(unit, results);
 
                 //sb.AppendLine("-------------------------------------------");
-                var seed = BigInteger.One;
-                var cumRate0 = results.Aggregate(1m, (p, x) => p * x.rate);
-                var cumRateInteger = results.Aggregate(seed, (p, x) => p * (int)(10000 * x.rate));
-                var cumRate = cumRateInteger / BigInteger.Pow(10000, results.Count - 1) - 10000;
-
+                // 누적 구하기 ~ 중복 문제 주의
+                //var cumRate0 = results.Aggregate(1m, (p, x) => p * x.rate);//decimal overflow error ~ 10^40 order
+                var cumRateInteger = results.Aggregate(BigInteger.One, (p, x) => p * (int)(10000 * x.rate));
+                var cumRate = cumRateInteger / BigInteger.Pow(10000, results.Count - 1) - 10000;// %% := % * 100 (%를 정수로 표현)
                 sb.AppendLine($"| {cumRate,6}%%");
                 //sb.AppendLine("-------------------------------------------");
                 summary.Add((unit, cumRate));
@@ -297,7 +321,7 @@ namespace Universe.Coin.Upbit.App
 
             var models = prepareModels(uc, unit, count);
 
-            var max = IFindK.findK(models, 0, count, _set.ApplyMovingAvg, sb);
+            var max = IFindK.FindK(models, 0, count, _set, sb);
             max.rate = Math.Round((max.rate - 1) * 100, 2);
             sb.AppendLine("---------------------------------------------------");
             sb.AppendLine($"{max.k,6:N2}: {max.rate,10:N2}%, {max.mdd,10:N2}%");
@@ -310,15 +334,17 @@ namespace Universe.Coin.Upbit.App
 
         #region ---- BackTest ----
 
-        void runBackTest(Client uc, CandleUnit unit, int count, decimal k, StringBuilder? sb = null)
+        void runBackTest(Client uc, CandleUnit unit, int count, StringBuilder? sb = null)
         {
             bool doPrint = sb == null;
             sb = sb ?? new StringBuilder();
-            sb.AppendLine($"-------- [ Backtest: {unit}, k={k:F1}, ma={(_set.ApplyMovingAvg ? _set.MovingAvgSize : 1)} ]--------");
+
+            var k = _set.FactorK;
+            sb.AppendLine($"-------- [ Backtest: {unit}, k={k:F1}, ma={(_set.ApplyMovingAvg ? _set.WindowSize : 1)} ]--------");
 
             var models = prepareModels(uc, unit, count);
 
-            var (numTrades, finalRate, mdd) = IBackTest.backTest(models, k, 0, count, _set.ApplyMovingAvg);
+            var (numTrades, finalRate, mdd) = IBackTest.BackTest(models, 0, count, _set);
 
             if (_set.PrintCandle) sb.Append(models.Where(x => x.Rate != 1m && x.Rate != 0m).Print());
             sb.AppendLine("-------------------------------------------");
