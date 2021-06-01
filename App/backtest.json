@@ -8,6 +8,7 @@
       "FactorK": 0.8,
       "ApplyMovingAvg": true,
       "MovingAvgSize": 5,
+      "WindowFunction": 1,
       "PrintCandle": true,
       "LoadFromFile": false,
 

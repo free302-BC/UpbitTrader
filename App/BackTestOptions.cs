@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Universe.AppBase;
+using Universe.Coin.TradeLogic;
 
 namespace Universe.Coin.Upbit.App
 {
@@ -14,7 +15,7 @@ namespace Universe.Coin.Upbit.App
         public decimal FactorK { get; set; }
         public bool ApplyMovingAvg { get; set; }
         public int MovingAvgSize { get; set; }
-
+        public WindowFunction WindowFunction { get; set; }
 
         public bool LoadFromFile { get; set; }
         public bool PrintCandle { get; set; }
@@ -32,6 +33,8 @@ namespace Universe.Coin.Upbit.App
             FactorK = src.FactorK;
             ApplyMovingAvg = src.ApplyMovingAvg;
             MovingAvgSize = src.MovingAvgSize;
+            WindowFunction = src.WindowFunction;
+
             LoadFromFile = src.LoadFromFile;
             PrintCandle = src.PrintCandle;
             ApplyStopLoss = src.ApplyStopLoss;
