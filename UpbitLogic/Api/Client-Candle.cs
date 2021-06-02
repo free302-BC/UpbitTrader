@@ -28,10 +28,12 @@ namespace Universe.Coin.Upbit
 
         //-------------------- TEST ------------------------------
         public static List<(CandleUnit, long, long)> CallTimes = new();
+        static readonly TimeCounter _timeCounter;
         static Client()
         {
             _watch =  Stopwatch.StartNew();
             _lastCallTime = 0;
+            _timeCounter = new(1000, 10);
         }
         //--------------------------------------------------------
 
@@ -58,7 +60,8 @@ namespace Universe.Coin.Upbit
                 setQueryString("count", count.ToString());
 
                 try
-                {                    
+                {
+                    _timeCounter.Add();
                     var res = InvokeApi<C>(api, postPath);
 
                     if (res.Length > 0)
@@ -80,19 +83,26 @@ namespace Universe.Coin.Upbit
                         //if (dt < 100 && _lastCallTime != 0)
                         //    throw new Exception($"dt<100: {unit} dt={dt} @{_watch.ElapsedMilliseconds}");
 
-                        if (dt < 100)
-                        {
-                            CallTimes.Add((CandleUnit.DAY, _watch.ElapsedMilliseconds, - 100 + dt));
-                            Thread.Sleep((int)(100 - dt));
-                        }
+                        //if (dt < 100)
+                        //{
+                        //    CallTimes.Add((CandleUnit.DAY, _watch.ElapsedMilliseconds, - 100 + dt));
+                        //    Thread.Sleep((int)(100 - dt));
+                        //}
                         _lastCallTime = _watch.ElapsedMilliseconds;
                     }
                 }
                 catch (Exception ex)
                 {
                     CallTimes.Add((CandleUnit.None, _watch.ElapsedMilliseconds, _watch.ElapsedMilliseconds - _lastCallTime));
-                    ex.Data.Add("ms", CallTimes);
-                    throw;
+
+                    var sb = new StringBuilder();
+                    sb.AppendLine("----------------------------------------------");
+                    sb.AppendLine($"Time: {DateTime.Now:yyMMdd.HHmmss.fff}");
+                    sb.AppendLine($"Message: {ex.Message}");
+                    sb.AppendLine("----------------------------------------------");
+                    foreach (var time in CallTimes) sb.AppendLine(time.ToString());
+                    _timeCounter.Dump(sb);
+                    File.AppendAllText("candle_time_counter.txt", sb.ToString());
                 }
             }
 

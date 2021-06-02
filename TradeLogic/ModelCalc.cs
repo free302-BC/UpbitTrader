@@ -124,8 +124,6 @@ namespace Universe.Coin.TradeLogic
             }
         }
 
-
-
         public decimal CalcCumRate(CandleModel[] models) => CalcCumRate(models, 0, models.Length);
         public decimal CalcCumRate(CandleModel[] models, int offset, int count)
         {
@@ -137,7 +135,6 @@ namespace Universe.Coin.TradeLogic
             var rate = models.Skip(offset).Take(count).Aggregate(1m, (cr, m) => m.CumRate = Math.Round(cr *= m.Rate, 4));
             return Math.Round(rate, 4);
         }
-
 
         public decimal CalcDrawDown(CandleModel[] models) => CalcDrawDown(models, 0, models.Length);
         public decimal CalcDrawDown(CandleModel[] models, int offset, int count)

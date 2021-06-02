@@ -63,15 +63,15 @@ namespace UnitTester
 
             protected override void work()
             {
-                speedTest();
+                MovingAvg_Speed_Test();
                 _sp.GetRequiredService<IHost>().StopAsync().Wait();
             }
             
-            void speedTest()
+            void MovingAvg_Speed_Test()
             {
                 var w = Stopwatch.StartNew();
-                var models = _client.ApiCandle<CandleMinute>(count: 10000, unit: CandleUnit.M1).ToModels();
-                info($"Δt= {w.ElapsedMilliseconds,6}ms: {models[0]}");
+                var models = _client.ApiCandle<CandleMinute>(count: 100000, unit: CandleUnit.M1).ToModels();
+                info($"Load Models: Δt= {w.ElapsedMilliseconds,6}ms", $"{models[0]}");
 
                 var param = new BackTestOptions() {
                     ApplyMovingAvg = true,
@@ -81,7 +81,17 @@ namespace UnitTester
                 var mc = new ModelCalc(param);
                 w.Restart();
                 mc.CalcMovingAvg(models);
-                info($"Δt= {w.ElapsedMilliseconds,6}ms: {models[0]}");
+                info($"{param.WindowFunction}: Δt= {w.ElapsedMilliseconds,6}ms",$"{models[0]}");
+
+                param.WindowFunction = WindowFunction.Linear;
+                w.Restart();
+                mc.CalcMovingAvg(models);
+                info($"{param.WindowFunction}: Δt= {w.ElapsedMilliseconds,6}ms", $"{models[0]}");
+
+                param.WindowFunction = WindowFunction.Gaussian;
+                w.Restart();
+                mc.CalcMovingAvg(models);
+                info($"{param.WindowFunction}: Δt= {w.ElapsedMilliseconds,6}ms", $"{models[0]}");
             }
 
         }

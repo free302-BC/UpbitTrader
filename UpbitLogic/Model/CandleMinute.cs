@@ -23,10 +23,7 @@ namespace Universe.Coin.Upbit.Model
         public override CandleUnit CandleUnit
         {
             get => (CandleUnit)Unit;
-            set
-            {
-                Unit = (decimal)value;
-            }
+            set => Unit = (decimal)value;
         }
 
         /// <summary>

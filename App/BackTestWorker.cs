@@ -66,45 +66,29 @@ namespace Universe.Coin.Upbit.App
 
             while (true)
             {
-                try
+                if (!_doFindK)
                 {
-                    if (!_doFindK)
-                    {
-                        //_set.WindowFunction = WindowFunction.Linear;
-                        _set.ApplyMovingAvg = false;
-                        run_K_Units(uc);
-                        _set.ApplyMovingAvg = true;
-                        run_K_Units(uc);
-                    }
-                    else
-                    {
-                        _set.ApplyMovingAvg = false;
-                        run_Units_FindK(uc);
-                        _set.ApplyMovingAvg = true;
-                        run_Units_FindK(uc);
-                    }
-
-                    if (_repeat)
-                    {
-                        info($"<{Id}> Sleeping 3000...");
-                        Thread.Sleep(3000);
-                    }
-                    else
-                    {
-                        info($"<{Id}> Waiting...");
-                        _ev.Reset();
-                        _ev.WaitOne();
-                    }
+                    //_set.WindowFunction = WindowFunction.Linear;
+                    _set.ApplyMovingAvg = false;
+                    run_K_Units(uc);
+                    _set.ApplyMovingAvg = true;
+                    run_K_Units(uc);
                 }
-                catch (Exception ex)
+                else
                 {
-                    var sb = new StringBuilder();
-                    sb.AppendLine($"Message: {ex.Message}");
-                    var times = Client.CallTimes;
-                    foreach(var time in Client.CallTimes) sb.AppendLine(time.ToString());
-                    //foreach (var k in ex.Data.Keys) sb.AppendLine($"{k}= {ex.Data[k]}");
-                    log(sb);
+                    _set.ApplyMovingAvg = false;
+                    run_Units_FindK(uc);
+                    _set.ApplyMovingAvg = true;
+                    run_Units_FindK(uc);
+                }
 
+                if (_repeat)
+                {
+                    info($"<{Id}> Sleeping 3000...");
+                    Thread.Sleep(3000);
+                }
+                else
+                {
                     info($"<{Id}> Waiting...");
                     _ev.Reset();
                     _ev.WaitOne();
@@ -120,7 +104,7 @@ namespace Universe.Coin.Upbit.App
                 iw.AddCmd(ConsoleKey.F2, m => onChangeNumericParam(m, 3, () => _set.Hours));
                 iw.AddCmd(ConsoleKey.F3, m => onChangeNumericParam(m, 0.1m, () => _set.FactorK));
                 iw.AddCmd(ConsoleKey.F4, m => onChangeNumericParam(m, 3, () => _set.WindowSize));
-                iw.AddCmd(ConsoleKey.F4, onToggleWF);
+                iw.AddCmd(ConsoleKey.F5, onToggleWF);
                 
                 void onChangeTest(ConsoleModifiers modifier)
                 {
@@ -171,12 +155,10 @@ namespace Universe.Coin.Upbit.App
             var sb = new StringBuilder();
             var hours = _set.Hours;
             var k = _set.FactorK;
+            var ma = (_set.WindowFunction, _set.ApplyMovingAvg ? _set.WindowSize : 1);
 
             info($"Entering {nameof(run_K_Units)}()...");
-            sb.Clear();
-            sb.AppendLine(
-                $"-----------[ {(int)(hours / 24)}d {hours % 24}h : " +
-                $"k={k:F1} ma={_set.WindowFunction} {(_set.ApplyMovingAvg ? _set.WindowSize : 1)} ]------------");
+            sb.AppendLine($"-----------[ {(int)(hours / 24)}d {hours % 24}h : k={k:F1} ma={ma} ]------------");
 
             foreach (var unit in units)
             {
@@ -212,20 +194,15 @@ namespace Universe.Coin.Upbit.App
             var results = new FindList2();
             var sb = new StringBuilder();
             var hours = _set.Hours;
+            var ma = (_set.WindowFunction, _set.ApplyMovingAvg ? _set.WindowSize : 1);
 
             info($"Entering {nameof(run_Units_FindK)}()...");
-            sb.Clear();
-            sb.AppendLine($"-----------[ {(int)(hours / 24)}d {hours % 24}h : ma={(_set.ApplyMovingAvg ? _set.WindowSize : 1)} ]------------");
+            sb.AppendLine($"-----------[ {(int)(hours / 24)}d {hours % 24}h : ma={ma} ]------------");
 
             foreach (var unit in units)
             {
                 var count = (int)(hours * 60 / (int)unit);
-                var models = load(unit);
-                if (models.Length == 0)
-                {
-                    models = uc.ApiCandle<CandleMinute>(count: count, unit: unit).ToModels();
-                    save(models, unit);
-                }
+                var models = prepareModels(uc, unit, count);
 
                 var x = IFindK.FindK(models, 0, count, _set);
                 results.Add((unit, count, x));
@@ -238,10 +215,9 @@ namespace Universe.Coin.Upbit.App
             sb.Append($"{max.count,6} {max.unit,6}: {max.res.k,6:F2} {(max.res.rate - 1) * 100,6:F2}%, {max.res.mdd,6:F2}%");
             sb.AppendLine($" | {max.res.trades}/{max.count}Tr");
             sb.AppendLine("-------------------------------------------");
-            info(sb.ToString());
 
-            //
-            //runBackTest(uc, max.unit, max.count, max.res.k);
+            if (_set.PrintCandle) runBackTest(uc, max.unit, max.count, sb);
+            info(sb.ToString());
         }
 
 
