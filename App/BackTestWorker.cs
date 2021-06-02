@@ -55,7 +55,6 @@ namespace Universe.Coin.Upbit.App
         static (int trades, decimal k, decimal rate, decimal mdd) cast(FindRes res) => res;
         static (int trades, decimal rate, decimal mdd) cast(BtRes res) => res;
 
-        volatile bool _repeat = false;
         volatile bool _doFindK = false;
         readonly ManualResetEvent _ev;
         protected override void work()
@@ -67,33 +66,13 @@ namespace Universe.Coin.Upbit.App
             while (true)
             {
                 if (!_doFindK)
-                {
-                    var wf = _set.WindowFunction;
-                    _set.WindowFunction = WindowFunction.None;
                     run_Units_K(uc);
-                    _set.WindowFunction = wf;
-                    run_Units_K(uc);
-                }
                 else
-                {
-                    var wf = _set.WindowFunction;
-                    _set.WindowFunction = WindowFunction.None;
                     run_Units_FindK(uc);
-                    _set.WindowFunction = wf;
-                    run_Units_FindK(uc);
-                }
 
-                if (_repeat)
-                {
-                    info($"<{Id}> Sleeping 3000...");
-                    Thread.Sleep(3000);
-                }
-                else
-                {
-                    info($"<{Id}> Waiting...");
-                    _ev.Reset();
-                    _ev.WaitOne();
-                }
+                info($"<{Id}> Waiting...");
+                _ev.Reset();
+                _ev.WaitOne();
             }
 
             void registerHotkey(EventWaitHandle ev)
@@ -106,7 +85,7 @@ namespace Universe.Coin.Upbit.App
                 iw.AddCmd(ConsoleKey.F3, m => onChangeNumericParam(m, 0.1m, () => _set.FactorK));
                 iw.AddCmd(ConsoleKey.F4, m => onChangeNumericParam(m, 3, () => _set.WindowSize));
                 iw.AddCmd(ConsoleKey.F5, onToggleWF);
-                
+
                 void onChangeTest(ConsoleModifiers modifier)
                 {
                     _doFindK = !_doFindK;
@@ -137,7 +116,8 @@ namespace Universe.Coin.Upbit.App
                 void onToggleWF(ConsoleModifiers modifier)
                 {
                     var delta = modifier.HasFlag(ConsoleModifiers.Shift) ? -1 : +1;
-                    _set.WindowFunction = (WindowFunction)(((int)_set.WindowFunction + delta) % 3);
+                    _set.WindowFunction
+                        = (WindowFunction)(((int)_set.WindowFunction + delta) % (int)(1 + WindowFunction.Gaussian));
                     _ev.Set();
                 }
             }
