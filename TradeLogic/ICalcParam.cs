@@ -8,14 +8,16 @@ namespace Universe.Coin.TradeLogic
 {
     public interface ICalcParam
     {
+        public decimal FactorK { get; set; }
 
-        public decimal FactorK { get;  }
+        public int WindowSize { get; set; }
 
-        public bool ApplyMovingAvg { get;  }
-        public int WindowSize { get;  }
-        public WindowFunction WindowFunction { get;  }
+        public WindowFunction WindowFunction { get; set; }
 
-        public bool ApplyStopLoss { get;  }
+        public bool ApplyStopLoss { get; set; }
+
+        public ICalcParam Clone();
+        
 
     }//interface
 }

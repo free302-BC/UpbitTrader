@@ -16,7 +16,7 @@ namespace Universe.Coin.Upbit.App
         public bool PrintCandle { get; set; }
 
         public decimal FactorK { get; set; }
-        public bool ApplyMovingAvg { get; set; }
+        //public bool ApplyMovingAvg { get; set; }
         public int WindowSize { get; set; }
         public WindowFunction WindowFunction { get; set; }
         public bool ApplyStopLoss { get; set; }
@@ -31,7 +31,6 @@ namespace Universe.Coin.Upbit.App
             DoFindK = src.DoFindK;
             Hours = src.Hours;
             FactorK = src.FactorK;
-            ApplyMovingAvg = src.ApplyMovingAvg;
             WindowSize = src.WindowSize;
             WindowFunction = src.WindowFunction;
 
@@ -39,6 +38,8 @@ namespace Universe.Coin.Upbit.App
             PrintCandle = src.PrintCandle;
             ApplyStopLoss = src.ApplyStopLoss;
         }
+
+        public ICalcParam Clone() => (BackTestOptions)MemberwiseClone();
 
     }
 }

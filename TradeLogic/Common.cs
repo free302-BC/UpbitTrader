@@ -69,7 +69,7 @@ namespace Universe.Coin.TradeLogic
 
     public enum WindowFunction : int
     {
-        Identical, Linear, Gaussian
+        None, Identical, Linear, Gaussian
     }
 
 }

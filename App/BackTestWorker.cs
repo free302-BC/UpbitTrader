@@ -68,17 +68,18 @@ namespace Universe.Coin.Upbit.App
             {
                 if (!_doFindK)
                 {
-                    //_set.WindowFunction = WindowFunction.Linear;
-                    _set.ApplyMovingAvg = false;
-                    run_K_Units(uc);
-                    _set.ApplyMovingAvg = true;
-                    run_K_Units(uc);
+                    var wf = _set.WindowFunction;
+                    _set.WindowFunction = WindowFunction.None;
+                    run_Units_K(uc);
+                    _set.WindowFunction = wf;
+                    run_Units_K(uc);
                 }
                 else
                 {
-                    _set.ApplyMovingAvg = false;
+                    var wf = _set.WindowFunction;
+                    _set.WindowFunction = WindowFunction.None;
                     run_Units_FindK(uc);
-                    _set.ApplyMovingAvg = true;
+                    _set.WindowFunction = wf;
                     run_Units_FindK(uc);
                 }
 
@@ -147,7 +148,7 @@ namespace Universe.Coin.Upbit.App
         /// 단일 k에 대하여 각 CandleUnit별로 backtest 수행
         /// </summary>
         /// <param name="uc"></param>
-        void run_K_Units(Client uc)
+        void run_Units_K(Client uc)
         {
             var units = new[]
             { CandleUnit.M240, CandleUnit.M60, CandleUnit.M30, CandleUnit.M15, CandleUnit.M10, CandleUnit.M3, CandleUnit.M1 };
@@ -155,9 +156,9 @@ namespace Universe.Coin.Upbit.App
             var sb = new StringBuilder();
             var hours = _set.Hours;
             var k = _set.FactorK;
-            var ma = (_set.WindowFunction, _set.ApplyMovingAvg ? _set.WindowSize : 1);
+            var ma = (_set.WindowFunction, _set.WindowSize);
 
-            info($"Entering {nameof(run_K_Units)}()...");
+            info($"Entering {nameof(run_Units_K)}()...");
             sb.AppendLine($"-----------[ {(int)(hours / 24)}d {hours % 24}h : k={k:F1} ma={ma} ]------------");
 
             foreach (var unit in units)
@@ -194,7 +195,7 @@ namespace Universe.Coin.Upbit.App
             var results = new FindList2();
             var sb = new StringBuilder();
             var hours = _set.Hours;
-            var ma = (_set.WindowFunction, _set.ApplyMovingAvg ? _set.WindowSize : 1);
+            var ma = (_set.WindowFunction, _set.WindowSize);
 
             info($"Entering {nameof(run_Units_FindK)}()...");
             sb.AppendLine($"-----------[ {(int)(hours / 24)}d {hours % 24}h : ma={ma} ]------------");
@@ -287,41 +288,19 @@ namespace Universe.Coin.Upbit.App
         }
 
 
-
-        #region ---- Find K ----
-
-        FindRes runFindK(Client uc, CandleUnit unit, int count)
-        {
-            var sb = new StringBuilder();
-            sb.AppendLine($"--- Finding K: {count} {unit} ----");
-
-            var models = prepareModels(uc, unit, count);
-
-            var max = IFindK.FindK(models, 0, count, _set, sb);
-            max.rate = Math.Round((max.rate - 1) * 100, 2);
-            sb.AppendLine("---------------------------------------------------");
-            sb.AppendLine($"{max.k,6:N2}: {max.rate,10:N2}%, {max.mdd,10:N2}%");
-            info(sb);
-            return max;
-        }
-
-        #endregion
-
-
         #region ---- BackTest ----
 
         void runBackTest(Client uc, CandleUnit unit, int count, StringBuilder? sb = null)
         {
+            var models = prepareModels(uc, unit, count);
+            var (numTrades, finalRate, mdd) = IBackTest.BackTest(models, 0, count, _set);
+
             bool doPrint = sb == null;
             sb = sb ?? new StringBuilder();
 
             var k = _set.FactorK;
-            sb.AppendLine($"-------- [ Backtest: {unit}, k={k:F1}, ma={(_set.ApplyMovingAvg ? _set.WindowSize : 1)} ]--------");
-
-            var models = prepareModels(uc, unit, count);
-
-            var (numTrades, finalRate, mdd) = IBackTest.BackTest(models, 0, count, _set);
-
+            var ma = (_set.WindowFunction, _set.WindowSize);
+            sb.AppendLine($"-------- [ Backtest: {unit}, k={k:F1}, ma={ma} ]--------");
             if (_set.PrintCandle) sb.Append(models.Where(x => x.Rate != 1m && x.Rate != 0m).Print());
             sb.AppendLine("-------------------------------------------");
             sb.Append($"{count,6} {unit,6}: {k,6:F2} {(finalRate - 1) * 100,7:F2}% {mdd,6:F2}%");

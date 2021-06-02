@@ -74,7 +74,7 @@ namespace UnitTester
                 info($"Load Models: Δt= {w.ElapsedMilliseconds,6}ms", $"{models[0]}");
 
                 var param = new BackTestOptions() {
-                    ApplyMovingAvg = true,
+                    //ApplyMovingAvg = true,
                     WindowSize = 15,
                     WindowFunction = WindowFunction.Identical
                 };
