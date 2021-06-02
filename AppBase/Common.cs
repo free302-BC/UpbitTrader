@@ -8,10 +8,5 @@ using System.Threading.Tasks;
 
 namespace Universe.AppBase
 {
-    public interface IOperator<P>
-    {
-        
-    }
-
-
+    
 }

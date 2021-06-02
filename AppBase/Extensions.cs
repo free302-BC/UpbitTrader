@@ -13,21 +13,21 @@ namespace Universe.AppBase
     public static class Extensions
     {
         /// <summary>
-        /// 멤버의 현재값과 setter 'Action'을 리턴
+        /// 멤버의 getter 'Func'과 setter 'Action'을 리턴
         /// </summary>
         /// <typeparam name="P">멤버의 데이터 타입</typeparam>
         /// <param name="selector">instance를 포함한 member access func</param>
         /// <returns></returns>
-        public static (P currentValue, Action<P> setter)
+        public static (Func<P> getter, Action<P> setter)
             ToDelegate<P>(this Expression<Func<P>> selector)//P=Property
         {
             //selector.Body := member access expression
-            var v0 = selector.Compile()();//현재값
+            //var v0 = selector.Compile()();//현재값
             var paramMember = Expression.Parameter(selector.Body.Type);//== P
             var assignExp = Expression.Lambda<Action<P>>(Expression.Assign(selector.Body, paramMember), paramMember);
             var setter = assignExp.Compile();
 
-            return (v0, setter);
+            return (selector.Compile(), setter);
         }
 
         /// <summary>

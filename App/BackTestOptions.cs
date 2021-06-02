@@ -38,8 +38,10 @@ namespace Universe.Coin.Upbit.App
             PrintCandle = src.PrintCandle;
             ApplyStopLoss = src.ApplyStopLoss;
         }
-
+        
         public ICalcParam Clone() => (BackTestOptions)MemberwiseClone();
+
+
 
     }
 }

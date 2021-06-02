@@ -1,9 +1,10 @@
 --------- [ 미완료 ] ---------
-+ sim params: unit, k, ma
 
-+ macd 구현
++ macd 구현 
+ - macd --> k 관계? 
 
-+ 알고리즘: 매 거래마다 K 변경 ~ MA 반영?
++ 알고리즘: 
+ - 매 거래마다 K 변경 ~ MA 반영?
 
 + 체결: 실시간 or 모두 받기 ~ 웹소켓? https://wikidocs.net/21892
 

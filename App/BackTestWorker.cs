@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Net;
 using System.Web;
 using System.Text;
@@ -55,7 +56,6 @@ namespace Universe.Coin.Upbit.App
         static (int trades, decimal k, decimal rate, decimal mdd) cast(FindRes res) => res;
         static (int trades, decimal rate, decimal mdd) cast(BtRes res) => res;
 
-        volatile bool _doFindK = false;
         readonly ManualResetEvent _ev;
         protected override void work()
         {
@@ -65,7 +65,7 @@ namespace Universe.Coin.Upbit.App
 
             while (true)
             {
-                if (!_doFindK)
+                if (!_set.DoFindK)
                     run_Units_K(uc);
                 else
                     run_Units_FindK(uc);
@@ -88,14 +88,15 @@ namespace Universe.Coin.Upbit.App
 
                 void onChangeTest(ConsoleModifiers modifier)
                 {
-                    _doFindK = !_doFindK;
-                    _ev.Set();
+                    _set.DoFindK = !_set.DoFindK;
+                    info($"DoFindK: {_set.DoFindK}");
+                    //_ev.Set();
                 }
                 void onChangeNumericParam<P>(ConsoleModifiers modifier, P delta, Expression<Func<P>> selector)
                 {
                     var set = selector.ToDelegate();
                     dynamic dv = delta!;
-                    dynamic v0 = set.currentValue!;
+                    dynamic v0 = set.getter()!;
 
                     if (modifier.HasFlag(ConsoleModifiers.Control))
                     {
@@ -106,19 +107,18 @@ namespace Universe.Coin.Upbit.App
                     }
                     else
                     {
-                        set.setter(
-                            set.currentValue
-                            + (modifier.HasFlag(ConsoleModifiers.Shift) ? -dv : +dv));
+                        set.setter(v0 + (modifier.HasFlag(ConsoleModifiers.Shift) ? -dv : +dv));
                     }
-                    info($"Reloaded: k={_set.FactorK}, hours={_set.Hours}, ma={_set.WindowSize}");
-                    ev.Set();
+                    info($"{((MemberExpression)selector.Body).Member.Name}: {set.getter()}");
+                    //ev.Set();
                 }
                 void onToggleWF(ConsoleModifiers modifier)
                 {
                     var delta = modifier.HasFlag(ConsoleModifiers.Shift) ? -1 : +1;
                     _set.WindowFunction
                         = (WindowFunction)(((int)_set.WindowFunction + delta) % (int)(1 + WindowFunction.Gaussian));
-                    _ev.Set();
+                    info($"WindowFunction: {_set.WindowFunction}");
+                    //_ev.Set();
                 }
             }
         }
