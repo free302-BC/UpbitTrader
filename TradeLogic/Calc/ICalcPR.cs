@@ -5,9 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Universe.Coin.TradeLogic.Model;
 
-namespace Universe.Coin.TradeLogic
+namespace Universe.Coin.TradeLogic.Calc
 {
-    public interface IProfitRate : ICalculator
+    public interface ICalcPR : ICalc
     {
         /// <summary>
         /// 

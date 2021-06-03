@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Universe.AppBase;
 using Universe.Coin.TradeLogic;
+using Universe.Coin.TradeLogic.Calc;
 
 namespace Universe.Coin.Upbit.App
 {

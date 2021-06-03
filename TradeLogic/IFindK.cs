@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Universe.Coin.TradeLogic.Calc;
 using Universe.Coin.TradeLogic.Model;
 
 namespace Universe.Coin.TradeLogic
 {
     using FindList = List<(int trades, decimal k, decimal rate, decimal mdd)>;
 
-    public interface IFindK : ICalculator
+    public interface IFindK
     {
         static (int trades, decimal k, decimal rate, decimal mdd) 
             FindK(CandleModel[] models, int offset, int count, ICalcParam param, StringBuilder? sb = null)

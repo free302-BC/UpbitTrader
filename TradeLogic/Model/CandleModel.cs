@@ -15,7 +15,7 @@ namespace Universe.Coin.TradeLogic.Model
         public decimal Opening, High, Low, Closing, Delta;
 
         //계산용
-        public decimal MovingAvg, Target, Rate, CumRate, DrawDown;
+        public decimal MovingAvg, MacdOsc, Target, Rate, CumRate, DrawDown;
         public const decimal FeeRate = 0.0005m * 2m;
         public static readonly CandleModel Empty = new() { Delta = 99999m };
 
@@ -33,14 +33,16 @@ namespace Universe.Coin.TradeLogic.Model
             Closing = Math.Round(candle.TradePrice / 10000.0m, 1);
             Delta = High - Low;
             return this;
-        }        
+        }
         public override string ToString()
-            => $"{TimeKST:yyMMdd.HHmm} {ICandle.GetApiName(ApiId, Unit),8} {Opening,8:F1} {Target,8:F1} {High,8:F1} {Closing,8:F1} {Rate,8:F4} {CumRate,8:F4} {DrawDown,8:F2}";
+            => $"{TimeKST:yyMMdd.HHmm} {ICandle.GetApiName(ApiId, Unit),8} {Opening,8:F1} {MacdOsc,4:F2}"
+            + $" {Target,8:F1} {High,8:F1} {Closing,8:F1} {Rate,8:F4} {CumRate,8:F4} {DrawDown,8:F2}";
 
         static readonly (string, int)[] _names =
         {
             (nameof(TimeKST), 11),
-            (nameof(ApiId), 8),
+            (nameof(ApiId),    8),
+            (nameof(MacdOsc),  4),
             (nameof(Opening),  8),
             (nameof(Target),   8),
             (nameof(High),     8),

@@ -1,17 +1,84 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using Universe.Coin.TradeLogic.Model;
 
-namespace Universe.Coin.TradeLogic
+namespace Universe.Coin.TradeLogic.Calc
 {
-    public class ModelCalc : CalculatorBase, IModelCalc
+    /// <summary>
+    /// IViewModel에 대한 모든 계산 interface의 기본
+    /// </summary>
+    public partial interface ICalc
     {
-        public ModelCalc(ICalcParam param) : base(param)
+        /// <summary>
+        /// 가변 Window Size 기법으로 Moving Average 구함
+        /// 데이터 갯수가 부족할 경우 ~ 그 갯수==Window Size
+        /// </summary>
+        /// <param name="values"></param>
+        /// <param name="offset"></param>
+        /// <param name="count"></param>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        static decimal[] CalcMovingAvg(
+            decimal[] values, int offset, int count, int windowSize, WindowFunction windowFunction)
         {
+            var winFuncs = _winFuncs[windowFunction];
+
+            //TODO: offset ~ offset 이전 데이터 계산포함?
+            var ma = new decimal[values.Length];
+            for (int i = offset; i < count; i++)//i ~ models index
+            {
+                int size = Math.Min(i + 1 + offset, windowSize);//i ~ models index
+                var weights = winFuncs[size];
+                var sum = 0m;
+                var j0 = i - (size - 1);//start index of MA data
+                for (int j = 0; j < size; j++) sum += weights[j] * values[j0 + j];
+                ma[i] = sum / size;
+            }
+            return ma;
         }
+
+        /// <summary>
+        /// models의 모든 원소에 대해 getter, setter를 반복호출 ~ 속도 문제?
+        /// </summary>
+        /// <typeparam name="VM"></typeparam>
+        /// <param name="models"></param>
+        /// <param name="offset"></param>
+        /// <param name="count"></param>
+        /// <param name="param"></param>
+        /// <param name="getter"></param>
+        /// <param name="setter"></param>
+        static void CalcMovingAvg<VM>(VM[] models, int offset, int count, ICalcParam param,
+            Func<VM, decimal> getter, Action<VM, decimal> setter)
+            where VM: IViewModel
+        {
+            var values = models.Select(v => getter(v)).ToArray();
+            var avgs =  CalcMovingAvg(values, offset, count, param.WindowSize, param.WindowFunction);
+            for (int i = 0; i < avgs.Length; i++) setter(models[i], avgs[i]);
+        }
+
+
+        #region ---- TEST ----
+
+        public static void TestMovingAvg()
+        {
+            var ma = CalcMovingAvg(_src, 0, _src.Length, 5, WindowFunction.Linear);
+            save(_src, ma, "moving_average.txt");
+
+            static void save(decimal[] values, decimal[] ma, string fileName)
+            {
+                var sb = new StringBuilder();
+                //sb.AppendLine($"{"Value"}\t{"MV"}\t{"Δ"}");
+                for (int i = 0; i < ma.Length; i++)
+                    sb.AppendLine($"{values[i]:F2}\t{ma[i],6:F2}\t{values[i] - ma[i],6:F2}");
+                File.WriteAllText(fileName, sb.ToString());
+            }
+        }
+        #endregion
 
 
         #region ---- Build Window Function ----
@@ -19,7 +86,7 @@ namespace Universe.Coin.TradeLogic
         const int _maxWindowSize = 100;
         static Dictionary<WindowFunction, decimal[][]> _winFuncs;
 
-        static ModelCalc()
+        static ICalc()
         {
             _winFuncs = new();
             var len = _maxWindowSize + 1;
@@ -93,78 +160,11 @@ namespace Universe.Coin.TradeLogic
             var exp = coef * Math.Exp(-2.0 * (x - windowSize) / windowSize * (x - windowSize) / windowSize);
             return (decimal)(0.7978845608028654 / windowSize * exp);
         }
+        
         #endregion
 
 
-        /// <summary>
-        /// 가변 Window Size 기법으로 Moving Average 구함
-        /// 데이터 갯수가 부족할 경우 ~ 그 갯수==Window Size
-        /// </summary>
-        /// <param name="models"></param>
-        /// <param name="windowSize"></param>
-        /// <param name="winFunc"></param>
-        public void CalcMovingAvg(CandleModel[] models)
-        {
-            CalcMovingAvg(models, 0, models.Length);
-        }
-        public void CalcMovingAvg(CandleModel[] models, int offset, int count)
-        {
-            var windowSize = _param.WindowSize;
-            var windowFunc = _winFuncs[_param.WindowFunction];
-
-            for (int i = offset; i < count; i++)//i ~ models index
-            {
-                int size = Math.Min(i + 1, windowSize);//i ~ models index
-                var weights = windowFunc[size];
-                var sum = 0m;
-                var j0 = i - (size - 1);//start index of MA data
-                for (int j = 0; j < size; j++) sum += weights[j] * models[j0 + j].Closing;
-
-                models[i].MovingAvg = sum / size;
-            }
-        }
-
-        public decimal CalcCumRate(CandleModel[] models) => CalcCumRate(models, 0, models.Length);
-        public decimal CalcCumRate(CandleModel[] models, int offset, int count)
-        {
-            //-------------------------------------------------------------------------
-            // TODO: 호출자가 이 결과를 모아 누적계산시: seed는 중복 계산된다.
-            //var seed = offset > 0 ? models[offset - 1].CumRate : 1m;
-            //-------------------------------------------------------------------------
-
-            var rate = models.Skip(offset).Take(count).Aggregate(1m, (cr, m) => m.CumRate = Math.Round(cr *= m.Rate, 4));
-            return Math.Round(rate, 4);
-        }
-
-        public decimal CalcDrawDown(CandleModel[] models) => CalcDrawDown(models, 0, models.Length);
-        public decimal CalcDrawDown(CandleModel[] models, int offset, int count)
-        {
-            //-------------------------------------------------------------------------
-            //TODO: max 구하기? 현재영역 or 전체
-            // 현재영역의 mdd는 의미가 없음 ~ 전체 구간에서 다시 구해야 함.
-            //-------------------------------------------------------------------------
-
-            var max = decimal.MinValue;
-            var sub = models.Skip(offset).Take(count);
-            foreach (var m in sub)
-            {
-                max = max > m.CumRate ? max : m.CumRate;
-                m.DrawDown = max > m.CumRate ? Math.Round(100 * (max - m.CumRate) / max, 2) : 0m;
-            }
-
-            return sub.Count() > 0 ? sub.Max(m => m.DrawDown) : 0m;
-        }
-
-
-        //void calcRate_StopLoss(CandleModel prev, decimal k)
-        //{
-        //    Target = Math.Round(Opening + prev.Delta * k, 2);
-
-        //    var sellPrice = Target * 0.99m > Low ? Math.Max(Target * 0.985m, Low) : Closing;
-        //    //하락후 회복시 미반영
-
-        //    Rate = (High > Target) ? Math.Round(sellPrice / Target - FeeRate, 4) : 1.0m;
-        //}
 
     }
+
 }

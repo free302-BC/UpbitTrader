@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 using Microsoft.Data.Analysis;
 using Universe.Coin.TradeLogic.Model;
 
-namespace Universe.Coin.TradeLogic
+namespace Universe.Coin.TradeLogic.Calc
 {
-    public class SimplePR : CalculatorBase, IProfitRate
+    public class SimplePR : CalcBase, ICalcPR
     {
         public SimplePR(ICalcParam param) : base(param)
         {
@@ -36,7 +36,7 @@ namespace Universe.Coin.TradeLogic
 
     }//class
 
-    public class MovingAvgPR :  CalculatorBase, IProfitRate
+    public class MovingAvgPR :  CalcBase, ICalcPR
     {
         public MovingAvgPR(ICalcParam param) : base(param)
         {

@@ -5,10 +5,12 @@ using System.Text;
 using System.Threading.Tasks;
 using Universe.Coin.TradeLogic.Model;
 
-namespace Universe.Coin.TradeLogic
+namespace Universe.Coin.TradeLogic.Calc
 {
-    public interface IModelCalc : ICalculator
+    public interface ICalcCandle : ICalc
     {
+        void CalcMacdOsc(CandleModel[] models);
+
         void CalcMovingAvg(CandleModel[] models);
         void CalcMovingAvg(CandleModel[] models, int offset, int count);
 

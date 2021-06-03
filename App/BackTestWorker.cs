@@ -23,11 +23,10 @@ using System.Diagnostics;
 using System.Numerics;
 using System.Text.Encodings.Web;
 using System.Text.Unicode;
-using System.Linq.Expressions;
 
 namespace Universe.Coin.Upbit.App
 {
-    using FindRes = ValueTuple<int, decimal, decimal, decimal>;//(k, rate, mdd)
+    using FindRes = ValueTuple<int, decimal, decimal, decimal>;//(trades, k, rate, mdd)
     using FindList = List<(int trades, decimal k, decimal rate, decimal mdd)>;
     using FindList2 = List<(CandleUnit unit, int count, (int trades, decimal k, decimal rate, decimal mdd) res)>;
 
@@ -85,6 +84,7 @@ namespace Universe.Coin.Upbit.App
                 iw.AddCmd(ConsoleKey.F3, m => onChangeNumericParam(m, 0.1m, () => _set.FactorK));
                 iw.AddCmd(ConsoleKey.F4, m => onChangeNumericParam(m, 3, () => _set.WindowSize));
                 iw.AddCmd(ConsoleKey.F5, onToggleWF);
+                iw.AddCmd(ConsoleKey.F12, onRemoveFile);
 
                 void onChangeTest(ConsoleModifiers modifier)
                 {
@@ -118,6 +118,15 @@ namespace Universe.Coin.Upbit.App
                     _set.WindowFunction
                         = (WindowFunction)(((int)_set.WindowFunction + delta) % (int)(1 + WindowFunction.Gaussian));
                     info($"WindowFunction: {_set.WindowFunction}");
+                    //_ev.Set();
+                }
+                void onRemoveFile(ConsoleModifiers modifier)
+                {
+                    var units = new[]
+                    { CandleUnit.M240, CandleUnit.M60, CandleUnit.M30, 
+                        CandleUnit.M15, CandleUnit.M10, CandleUnit.M3, CandleUnit.M1 };
+                    foreach (var u in units) removeFile(u);
+                    info($"Cache files removed");
                     //_ev.Set();
                 }
             }
@@ -305,7 +314,7 @@ namespace Universe.Coin.Upbit.App
                 models = uc.ApiCandle<CandleMinute>(count: count, unit: unit).ToModels();
                 save(models, unit);
             }
-            return models!;
+            return models.Take(count).ToArray();
         }
 
         JsonSerializerOptions _jsonOpt;
@@ -327,6 +336,10 @@ namespace Universe.Coin.Upbit.App
                 if (models != null) return models;
             }
             return Array.Empty<CandleModel>();
+        }
+        void removeFile(CandleUnit unit)
+        {
+            File.Delete($"{unit}.json");
         }
 
         #endregion

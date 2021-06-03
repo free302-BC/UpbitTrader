@@ -6,13 +6,13 @@
 
       "Hours": 1272,
       "DoFindK": false,
-      "PrintCandle": true,
-      "LoadFromFile": false,
+      "PrintCandle": false,
+      "LoadFromFile": true,
 
       "FactorK": 0.8,
       "ApplyMovingAvg": true,
       "WindowSize": 5,
-      "WindowFunction": 1,
+      "WindowFunction": 2,
       "ApplyStopLoss": false
     }
     

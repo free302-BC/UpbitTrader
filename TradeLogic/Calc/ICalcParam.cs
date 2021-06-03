@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Universe.Coin.TradeLogic
+namespace Universe.Coin.TradeLogic.Calc
 {
     public interface ICalcParam
     {

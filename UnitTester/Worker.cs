@@ -11,6 +11,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Universe.AppBase;
 using Universe.Coin.TradeLogic;
+using Universe.Coin.TradeLogic.Calc;
 using Universe.Coin.TradeLogic.Model;
 using Universe.Coin.Upbit;
 using Universe.Coin.Upbit.App;
@@ -78,7 +79,7 @@ namespace UnitTester
                     WindowSize = 15,
                     WindowFunction = WindowFunction.Identical
                 };
-                var mc = new ModelCalc(param);
+                var mc = new CalcCandle(param);
                 w.Restart();
                 mc.CalcMovingAvg(models);
                 info($"{param.WindowFunction}: Δt= {w.ElapsedMilliseconds,6}ms",$"{models[0]}");
