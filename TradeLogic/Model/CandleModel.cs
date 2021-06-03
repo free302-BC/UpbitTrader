@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Universe.Coin.TradeLogic.Model
 {
-    public class CandleModel : IViewModel<CandleModel, ICandle>
+    public class CandleModel : ICalcModel
     {
         //입력
         public ApiId ApiId;
@@ -15,8 +15,14 @@ namespace Universe.Coin.TradeLogic.Model
         public decimal Opening, High, Low, Closing, Delta;
 
         //계산용
-        public decimal MovingAvg, MacdOsc, Target, Rate, CumRate, DrawDown;
+        //public decimal MovingAvg, MacdOsc, Target, Rate, CumRate, DrawDown;
         public const decimal FeeRate = 0.0005m * 2m;
+        public decimal MovingAvg { get; set; }
+        public decimal MacdOsc { get; set; }
+        public decimal Target { get; set; }
+        public decimal Rate { get; set; }
+        public decimal CumRate { get; set; }
+        public decimal DrawDown { get; set; }
 
         public static readonly CandleModel Empty = new() { Delta = 99999m };
 
@@ -33,19 +39,6 @@ namespace Universe.Coin.TradeLogic.Model
             Closing = Math.Round(candle.TradePrice / 10000.0m, 1);
             Delta = High - Low;
         }
-
-        //public CandleModel SetApiModel(ICandle candle)
-        //{
-        //    ApiId = candle.ApiId;
-        //    Unit = candle.CandleUnit;
-        //    TimeKST = DateTime.Parse(candle.CandleDateTimeKst);
-        //    Opening = Math.Round(candle.OpeningPrice / 10000.0m, 1);
-        //    High = Math.Round(candle.HighPrice / 10000.0m, 1);
-        //    Low = Math.Round(candle.LowPrice / 10000.0m, 1);
-        //    Closing = Math.Round(candle.TradePrice / 10000.0m, 1);
-        //    Delta = High - Low;
-        //    return this;
-        //}
         public override string ToString()
             => $"{TimeKST:yyMMdd.HHmm} {ICandle.GetApiName(ApiId, Unit),8} {Opening,8:F1} {MacdOsc,4:F2}"
             + $" {Target,8:F1} {High,8:F1} {Closing,8:F1} {Rate,8:F4} {CumRate,8:F4} {DrawDown,8:F2}";
@@ -63,6 +56,8 @@ namespace Universe.Coin.TradeLogic.Model
             (nameof(CumRate),  8),
             (nameof(DrawDown), 8)
         };
+
+        
         static CandleModel() => IViewModel.buildHeader(_names);
 
     }//class
@@ -72,7 +67,6 @@ namespace Universe.Coin.TradeLogic.Model
         public static CandleModel[] ToModels(this IEnumerable<ICandle> models)
            => models.Select(x => new CandleModel(x)).Reverse().ToArray();
         public static CandleModel ToModel(this ICandle model) => new CandleModel(model);
-
     }   
 
 

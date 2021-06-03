@@ -6,21 +6,26 @@ using System.Threading.Tasks;
 
 namespace Universe.Coin.TradeLogic.Model
 {
-    public class TradeTickModel : IViewModel<TradeTickModel, ITradeTick>
+    public class TradeTickModel : ICalcModel
     {
         //입력
         public DateTime TimeKST;
         public decimal UnitPrice, Volume, Price, Change;
         public long Serial;
-        public string Dir;
+        public string Dir = "";
 
         //계산용
+        public decimal MovingAvg { get; set; }
+        public decimal MacdOsc { get; set; }
+        public decimal Target { get; set; }
+        public decimal Rate { get; set; }
+        public decimal CumRate { get; set; }
+        public decimal DrawDown { get; set; }
 
+        public static readonly TradeTickModel Empty = new();
 
-        public TradeTickModel() { Dir = ""; }
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+        public TradeTickModel() { }
         public TradeTickModel(ITradeTick tick) => setApiModel(tick);
-#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
         void setApiModel(ITradeTick tick)
         {
@@ -52,6 +57,7 @@ namespace Universe.Coin.TradeLogic.Model
             //(nameof(Serial), 0),
         };
 
+        
     }//class
 
     public static class _TradeTickModel

@@ -44,7 +44,7 @@ namespace Universe.Coin.Upbit.App
             : base(logger, sp, set, GetNewId())
         {
             _ev = new(false);
-            onOptionsUpdate += () => _ev.Set();
+            onOptionsUpdate += () => info($"{nameof(BackTestOptions)} updated!");
 
             _jsonOpt = JsonSerializer.Deserialize<JsonSerializerOptions>(File.ReadAllText(_jsonOptionFile))!;
         }

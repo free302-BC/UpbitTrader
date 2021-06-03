@@ -11,16 +11,24 @@ namespace Universe.Coin.TradeLogic.Calc
 {
     public partial interface ICalc
     {
-        static void CalcMacdOsc<VM>(VM[] models, int offset, int count, ICalcParam param,
-            Func<VM, decimal> getter, Action<VM, decimal> setter)
-            where VM : IViewModel
+        /// <summary>
+        /// ICalcModel[]에 대한 MACD oscillator 계산
+        /// </summary>
+        /// <typeparam name="VM"></typeparam>
+        /// <param name="models"></param>
+        /// <param name="offset"></param>
+        /// <param name="count"></param>
+        /// <param name="param"></param>
+        /// <param name="getter"></param>
+        static void CalcMacdOsc<VM>(VM[] models, int offset, int count, ICalcParam param, Func<VM, decimal> getter)
+            where VM : ICalcModel
         {
             var values = models.Select(v => getter(v)).ToArray();
-            var osc = CalcMacdOsc(values, offset, count, param.MacdWindowSizes);
-            for (int i = 0; i < osc.Length; i++) setter(models[i], osc[i]);
+            var osc = calcMacdOsc(values, offset, count, param.MacdWindowSizes);
+            for (int i = 0; i < osc.Length; i++) models[i].MacdOsc = osc[i];
         }
 
-        static decimal[] CalcMacdOsc(decimal[] values, int offset, int count, int[] windowSizes)
+        private static decimal[] calcMacdOsc(decimal[] values, int offset, int count, int[] windowSizes)
         {
             return calcMacd(values, offset, count, windowSizes).osc;
         }
@@ -33,10 +41,10 @@ namespace Universe.Coin.TradeLogic.Calc
             decimal[][] avgs = new decimal[2][];
 
             for (int i = 0; i < 2; i++)
-                avgs[i] = CalcMovingAvg(models, offset, count, windowSizes[i], wf);
+                avgs[i] = calcMovingAvg(models, offset, count, windowSizes[i], wf);
 
             var macd = avgs[0].Zip(avgs[1], (x, y) => x - y).ToArray();
-            var signal = CalcMovingAvg(macd, 0, macd.Length, windowSizes[2], wf);
+            var signal = calcMovingAvg(macd, 0, macd.Length, windowSizes[2], wf);
             var osc = macd.Zip(signal, (m, s) => m - s).ToArray();
 
             return (avgs[0], avgs[1], macd, signal, osc);

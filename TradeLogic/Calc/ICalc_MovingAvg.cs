@@ -15,7 +15,7 @@ namespace Universe.Coin.TradeLogic.Calc
     public partial interface ICalc
     {
         /// <summary>
-        /// models의 모든 원소에 대해 getter, setter를 반복호출 ~ 속도 문제?
+        /// ICalcModel[]에 대한 moving average 계산
         /// </summary>
         /// <typeparam name="VM"></typeparam>
         /// <param name="models"></param>
@@ -23,14 +23,14 @@ namespace Universe.Coin.TradeLogic.Calc
         /// <param name="count"></param>
         /// <param name="param"></param>
         /// <param name="getter"></param>
-        /// <param name="setter"></param>
-        static void CalcMovingAvg<VM>(VM[] models, int offset, int count, ICalcParam param,
-            Func<VM, decimal> getter, Action<VM, decimal> setter)
-            where VM : IViewModel
+        static void CalcMovingAvg<VM>(VM[] models, int offset, int count, ICalcParam param, Func<VM, decimal> getter)
+            where VM : ICalcModel
         {
+            if (param.WindowFunction == WindowFunction.None) return;
+
             var values = models.Select(v => getter(v)).ToArray();
-            var avgs = CalcMovingAvg(values, offset, count, param.WindowSize, param.WindowFunction);
-            for (int i = 0; i < avgs.Length; i++) setter(models[i], avgs[i]);
+            var avgs = calcMovingAvg(values, offset, count, param.WindowSize, param.WindowFunction);
+            for (int i = 0; i < avgs.Length; i++) models[i].MovingAvg = avgs[i];
         }
 
         /// <summary>
@@ -42,7 +42,7 @@ namespace Universe.Coin.TradeLogic.Calc
         /// <param name="count"></param>
         /// <param name="param"></param>
         /// <returns></returns>
-        static decimal[] CalcMovingAvg(
+        private static decimal[] calcMovingAvg(
             decimal[] values, int offset, int count, int windowSize, WindowFunction windowFunction)
         {
             var winFuncs = _winFuncs[windowFunction];
@@ -56,7 +56,7 @@ namespace Universe.Coin.TradeLogic.Calc
                 var sum = 0m;
                 var j0 = i - (size - 1);//start index of MA data
                 for (int j = 0; j < size; j++) sum += weights[j] * values[j0 + j];
-                ma[i] = sum / size;
+                ma[i] = Math.Round(sum / size, 2);//TODO: 
             }
             return ma;
         }
@@ -66,7 +66,7 @@ namespace Universe.Coin.TradeLogic.Calc
 
         public static void TestMovingAvg()
         {
-            var ma = CalcMovingAvg(_src, 0, _src.Length, 5, WindowFunction.Linear);
+            var ma = calcMovingAvg(_src, 0, _src.Length, 5, WindowFunction.Linear);
             save(_src, ma, "moving_average.txt");
 
             static void save(decimal[] values, decimal[] ma, string fileName)

@@ -7,7 +7,7 @@ using Universe.Coin.TradeLogic.Model;
 
 namespace Universe.Coin.TradeLogic.Model
 {
-    public class OrderbookModel : IViewModel<OrderbookModel, IOrderbook>
+    public class OrderbookModel : IViewModel
     {
         public DateTime time;
         public decimal askUP, bidUP, deltaUP; //unit price (price per 1 coin)

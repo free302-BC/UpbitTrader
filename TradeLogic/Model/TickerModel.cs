@@ -7,7 +7,7 @@ using Universe.Coin.TradeLogic.Model;
 
 namespace Universe.Coin.TradeLogic.Model
 {
-    public class TickerModel : IViewModel<TickerModel, ITicker>
+    public class TickerModel : IViewModel
     {
         string Market, TimeKST, Change;
         decimal Opening, High, Low, Closing, Delta;

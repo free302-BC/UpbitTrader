@@ -12,10 +12,62 @@ namespace Universe.Coin.TradeLogic.Calc
     /// </summary>
     public interface ICalcCandle
     {
+        #region ---- Profit Rate ----
+
+        /// <summary>
+        /// 주어진 ICalcParam을 이용하여 Profit Rate를 계산
+        /// </summary>
+        /// <param name="models"></param>
+        /// <param name="param"></param>
+        public static void CalcProfitRate(CandleModel[] models, ICalcParam param)
+            => CalcProfitRate(models, 0, models.Length, param);
+
+        /// <summary>
+        /// 주어진 ICalcParam을 이용하여 [offset..count]구간의 Profit Rate를 계산
+        /// </summary>
+        /// <param name="models"></param>
+        /// <param name="offset"></param>
+        /// <param name="count"></param>
+        /// <param name="param"></param>
+        public static void CalcProfitRate(CandleModel[] models, int offset, int count, ICalcParam param)
+        {
+            CalcProfitRate(models[offset], offset > 0
+                ? models[offset - 1]
+                : CandleModel.Empty, param);
+
+            for (int i = offset + 1; i < offset + count && i < models.Length; i++)
+                CalcProfitRate(models[i], models[i - 1], param);
+        }
+
+        /// <summary>
+        /// 주어진 K factor에 따라 model의 Profit Rate를 계산
+        /// </summary>
+        /// <param name="model"></param>
+        /// <param name="prev"></param>
+        /// <param name="param"></param>
+        public static void CalcProfitRate(CandleModel model, CandleModel prev, ICalcParam param)
+        {
+            var k = param.FactorK;
+            model.Target = Math.Round(model.Opening + prev.Delta * k, 2);
+
+            var doTrade = param.WindowFunction == WindowFunction.None
+                ? (model.High > model.Target)
+                : (model.High > model.Target && model.Opening >= prev.MovingAvg);
+
+            model.Rate = doTrade
+                    ? Math.Round(model.Closing / model.Target - CandleModel.FeeRate, 4)
+                    : 1.0000m;
+        }
+        #endregion
+
+
+        #region ---- MACD OSC ----
         public static void CalcMacdOsc(CandleModel[] models, ICalcParam param)
         {
-            ICalc.CalcMacdOsc(models, 0, models.Length, param, m => m.Closing, (m, d) => m.MacdOsc = d);
+            ICalc.CalcMacdOsc(models, 0, models.Length, param, m => m.Closing);
         }
+        #endregion
+
 
         #region ---- Moving Average ----
 
@@ -32,41 +84,23 @@ namespace Universe.Coin.TradeLogic.Calc
         }
         public static void CalcMovingAvg(CandleModel[] models, int offset, int count, ICalcParam param)
         {
-            ICalc.CalcMovingAvg(models, offset, count, param, m => m.Closing, (m, ma) => m.MovingAvg = ma);
+            ICalc.CalcMovingAvg(models, offset, count, param, m => m.Closing);
         }
         #endregion
 
 
         #region ---- Cumulated Profit Rate & DrawDown ----
-        public static decimal CalcCumRate(CandleModel[] models) => CalcCumRate(models, 0, models.Length);
-        public static decimal CalcCumRate(CandleModel[] models, int offset, int count)
-        {
-            //-------------------------------------------------------------------------
-            // TODO: 호출자가 이 결과를 모아 누적계산시: seed는 중복 계산된다.
-            //var seed = offset > 0 ? models[offset - 1].CumRate : 1m;
-            //-------------------------------------------------------------------------
+        public static decimal CalcCumRate(CandleModel[] models) 
+            => CalcCumRate(models, 0, models.Length);
 
-            var rate = models.Skip(offset).Take(count).Aggregate(1m, (cr, m) => m.CumRate = Math.Round(cr *= m.Rate, 4));
-            return Math.Round(rate, 4);
-        }
-        public static decimal CalcDrawDown(CandleModel[] models) => CalcDrawDown(models, 0, models.Length);
-        public static decimal CalcDrawDown(CandleModel[] models, int offset, int count)
-        {
-            //-------------------------------------------------------------------------
-            //TODO: max 구하기? 현재영역 or 전체
-            // 현재영역의 mdd는 의미가 없음 ~ 전체 구간에서 다시 구해야 함.
-            //-------------------------------------------------------------------------
+        public static decimal CalcCumRate(CandleModel[] models, int offset, int count) 
+            => ICalc.CalcCumRate(models, offset, count, m => m.Rate);
 
-            var max = decimal.MinValue;
-            var sub = models.Skip(offset).Take(count);
-            foreach (var m in sub)
-            {
-                max = max > m.CumRate ? max : m.CumRate;
-                m.DrawDown = max > m.CumRate ? Math.Round(100 * (max - m.CumRate) / max, 2) : 0m;
-            }
+        public static decimal CalcDrawDown(CandleModel[] models) 
+            => CalcDrawDown(models, 0, models.Length);
+        public static decimal CalcDrawDown(CandleModel[] models, int offset, int count) 
+            => ICalc.CalcDrawDown(models, offset, count, m => m.CumRate);
 
-            return sub.Count() > 0 ? sub.Max(m => m.DrawDown) : 0m;
-        }
         #endregion
 
     }

@@ -21,7 +21,7 @@ namespace Universe.Coin.Upbit.App
         public int WindowSize { get; set; }
         public WindowFunction WindowFunction { get; set; }
         public bool ApplyStopLoss { get; set; }
-        public int[] MacdWindowSizes { get; set; }
+        public int[] MacdWindowSizes { get; set; } = new int[0];
 
         public override void Reload(IWorkerOptions source)
         {
@@ -42,8 +42,6 @@ namespace Universe.Coin.Upbit.App
         }
         
         public ICalcParam Clone() => (BackTestOptions)MemberwiseClone();
-
-
 
     }
 }

@@ -80,14 +80,7 @@ namespace Universe.Coin.Upbit
                     {
                         var dt = _watch.ElapsedMilliseconds - _lastCallTime;
                         CallTimes.Add((unit, _watch.ElapsedMilliseconds, dt));
-                        //if (dt < 100 && _lastCallTime != 0)
-                        //    throw new Exception($"dt<100: {unit} dt={dt} @{_watch.ElapsedMilliseconds}");
-
-                        //if (dt < 100)
-                        //{
-                        //    CallTimes.Add((CandleUnit.DAY, _watch.ElapsedMilliseconds, - 100 + dt));
-                        //    Thread.Sleep((int)(100 - dt));
-                        //}
+                        
                         _lastCallTime = _watch.ElapsedMilliseconds;
                     }
                 }

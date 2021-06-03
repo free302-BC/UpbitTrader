@@ -16,10 +16,7 @@ namespace Universe.Coin.TradeLogic
             if (param.WindowFunction != WindowFunction.None) 
                 ICalcCandle.CalcMovingAvg(models, offset, count, param);
 
-            ICalcPR pr = param.WindowFunction != WindowFunction.None 
-                ? new MovingAvgPR() 
-                : new SimplePR();
-            pr.CalcProfitRate(models, offset, count, param);
+            ICalcCandle.CalcProfitRate(models, offset, count, param);
             var trades = models.Take(count).Count(x => x.Rate != 1m && x.Rate != 0m);
 
             var rate = ICalcCandle.CalcCumRate(models, offset, count);

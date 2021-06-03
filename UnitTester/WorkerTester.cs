@@ -21,14 +21,14 @@ using Xunit.Abstractions;
 
 namespace UnitTester
 {
-    public class Worker : ProgramBase
+    public class WorkerTester : ProgramBase
     {
         const string _accessKey = "E5AEDC2AF2111C0DE0837B20147366A695CAC34FE4137F01E9B2751215561A82CAEBCB44ED343B28";
         const string _secretKey = "D4CFF355ED1A7D21C4B14709400E00A1DAA9C267EF360032DAC06F06134625AED9F9F256D230181F";
         readonly Client _client;
         readonly ILogger _logger;
 
-        public Worker()
+        public WorkerTester()
         {
             _logger = null!;
             _client = new Client(_accessKey, _secretKey, _logger);
@@ -61,6 +61,7 @@ namespace UnitTester
             }
 
             new void info(object message) => Debug.WriteLine($"{message}");
+            new void info(object message1, object message2) => Debug.WriteLine($"{message1}\n{message2}");
 
             protected override void work()
             {
@@ -72,7 +73,7 @@ namespace UnitTester
             {
                 var w = Stopwatch.StartNew();
                 var models = _client.ApiCandle<CandleMinute>(count: 100000, unit: CandleUnit.M1).ToModels();
-                info($"Load Models: Δt= {w.ElapsedMilliseconds,6}ms", $"{models[0]}");
+                info($"Load Models: Δt= {w.ElapsedMilliseconds}ms", $"{models[0]}");
 
                 var param = new BackTestOptions() {
                     //ApplyMovingAvg = true,
@@ -81,18 +82,24 @@ namespace UnitTester
                 };
 
                 w.Restart();
+                param.WindowFunction = WindowFunction.None;
                 ICalcCandle.CalcMovingAvg(models, param);
-                info($"{param.WindowFunction}: Δt= {w.ElapsedMilliseconds,6}ms",$"{models[0]}");
+                info($"{param.WindowFunction,20}:Δt= {w.ElapsedMilliseconds}ms", $"{models[0]}");
+
+                w.Restart();
+                param.WindowFunction = WindowFunction.Identical;
+                ICalcCandle.CalcMovingAvg(models, param);
+                info($"{param.WindowFunction,20}:Δt= {w.ElapsedMilliseconds}ms",$"{models[0]}");
 
                 param.WindowFunction = WindowFunction.Linear;
                 w.Restart();
                 ICalcCandle.CalcMovingAvg(models, param);
-                info($"{param.WindowFunction}: Δt= {w.ElapsedMilliseconds,6}ms", $"{models[0]}");
+                info($"{param.WindowFunction,20}Δt= {w.ElapsedMilliseconds}ms", $"{models[0]}");
 
                 param.WindowFunction = WindowFunction.Gaussian;
                 w.Restart();
                 ICalcCandle.CalcMovingAvg(models, param);
-                info($"{param.WindowFunction}: Δt= {w.ElapsedMilliseconds,6}ms", $"{models[0]}");
+                info($"{param.WindowFunction,20}:Δt= {w.ElapsedMilliseconds}ms", $"{models[0]}");
             }
 
         }

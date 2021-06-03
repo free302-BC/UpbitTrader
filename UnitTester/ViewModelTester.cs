@@ -18,7 +18,7 @@ namespace UnitTester
             public string Name = "A API Model";
             public override string ToString() => $"Id= {Id}\nName= {Name}";
         }
-        public class VM1 : IViewModel<VM1, AM>
+        public class VM1 : IViewModel
         {
             public int Id;
             public string Name;
