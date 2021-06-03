@@ -9,15 +9,17 @@ namespace Universe.Coin.TradeLogic.Model
 {
     public class TickerModel : IViewModel
     {
-        string Market, TimeKST, Change;
+        //입력
+        string Market, Change;
+        DateTime TimeKST;
         decimal Opening, High, Low, Closing, Delta;
-        public TickerModel() => Market = TimeKST = Change = "";
 
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-        public TickerModel(ITicker ticker) => setApiModel(ticker);
-#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+        //계산용
 
-        void setApiModel(ITicker ticker)
+
+        public TickerModel() => Market = Change = "";
+
+        public TickerModel(ITicker ticker)
         {
             Market = ticker.Market;
             TimeKST = $"{ticker.TradeDateKst}.{ticker.TradeTimeKst}";

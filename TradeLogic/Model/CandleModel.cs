@@ -56,7 +56,6 @@ namespace Universe.Coin.TradeLogic.Model
             (nameof(CumRate),  8),
             (nameof(DrawDown), 8)
         };
-
         
         static CandleModel() => IViewModel.buildHeader(_names);
 

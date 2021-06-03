@@ -16,7 +16,7 @@ namespace Universe.Coin.Upbit.Model
         public Orderbook()
         {
             Market = "";
-            OrderbookUnits = new List<IOrderbookUnit>();
+            //OrderbookUnits = new();
         }
 
         /// <summary>
@@ -51,8 +51,20 @@ namespace Universe.Coin.Upbit.Model
         /// 호가
         /// </summary>
         /// <value>호가</value>
-        [DataMember(Name = "orderbook_units", EmitDefaultValue = false)]
+        //[DataMember(Name = "orderbook_units", EmitDefaultValue = false)]
         public List<IOrderbookUnit> OrderbookUnits { get; set; }
+
+        [DataMember(Name = "orderbook_units", EmitDefaultValue = false)]
+        object[] units
+        {
+            get => OrderbookUnits?.Select(x => (OrderbookUnit)x)?.ToArray() ?? Array.Empty<object>();
+            set
+            {
+                OrderbookUnits = value
+                    .Select(v => JsonConvert.DeserializeObject<OrderbookUnit>(v.ToString()!)!)
+                    .Select(x => (IOrderbookUnit)x).ToList();
+            }
+        }
 
         const int w = 20;
         /// <summary>
