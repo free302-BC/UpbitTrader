@@ -46,8 +46,8 @@ namespace Universe.Coin.Upbit
             try
             {
                 string json = _wc.DownloadString(Helper.GetApiPath(apiId, postPath));
-                var modles = JsonConvert.DeserializeObject<T[]>(json) ?? Array.Empty<T>();
-                return modles;
+                var models = JsonConvert.DeserializeObject<T[]>(json) ?? Array.Empty<T>();
+                return models;
             }
             catch (WebException ex)
             {

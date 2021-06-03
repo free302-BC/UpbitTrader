@@ -31,8 +31,9 @@ namespace Universe.Coin.TradeLogic
     
     public enum TickDir
     {
-        D,   //ask 매도
-        U    //bid 매수
+        E,  //even
+        F,  //down, ask 매도
+        R   //rise, bid 매수
     }
 
     public enum CandleUnit

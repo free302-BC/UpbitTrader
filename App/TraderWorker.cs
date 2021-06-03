@@ -42,9 +42,9 @@ namespace Universe.Coin.Upbit.App
             //candleDay(uc);
             //candleMinutes(uc);
             //orderbook(uc);
-            //ticks(uc);
+            ticks(uc);
 
-            runAutoTrade(uc);
+            //runAutoTrade(uc);
         }
 
         void runAutoTrade(Client uc)
