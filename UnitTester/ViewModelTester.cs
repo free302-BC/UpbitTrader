@@ -23,14 +23,13 @@ namespace UnitTester
             public int Id;
             public string Name;
             public VM1() { }
-            public VM1(AM am) => SetApiModel(am);
+            public VM1(AM am) => setApiModel(am);
 
             public override string ToString() => $"{Id,10} {Name,20}";
-            public VM1 SetApiModel(AM apiModel)
+            void setApiModel(AM apiModel)
             {
                 Id = apiModel.Id;
                 Name = apiModel.Name;
-                return this;
             }
 
             static VM1() => IViewModel.buildHeader(names);

@@ -19,10 +19,10 @@ namespace Universe.Coin.TradeLogic.Model
 
         public TradeTickModel() { Dir = ""; }
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-        public TradeTickModel(ITradeTick tick) => SetApiModel(tick);
+        public TradeTickModel(ITradeTick tick) => setApiModel(tick);
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
-        public TradeTickModel SetApiModel(ITradeTick tick)
+        void setApiModel(ITradeTick tick)
         {
             TimeKST = DateTimeOffset.FromUnixTimeMilliseconds(tick.Timestamp).LocalDateTime;
             UnitPrice = tick.TradePrice / 10000m;
@@ -36,7 +36,6 @@ namespace Universe.Coin.TradeLogic.Model
             var msAtTheHour = new DateTimeOffset(TimeKST.Date).AddHours(TimeKST.Hour).ToUnixTimeMilliseconds();//
             Serial = tick.SequentialId / 1000 - msAtTheHour + (tick.SequentialId % 1000);//초당 1000개 
             //Serial = tick.SequentialId % 10000000L;
-            return this;
         }
         public override string ToString()
             => $"[{TimeKST:HHmmss.fff}] {Volume:F8} × {UnitPrice,6:F1} = {Price,7:F1}  {Dir,-6} | {Change,7:F1}";

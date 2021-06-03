@@ -35,22 +35,5 @@ namespace Universe.Coin.TradeLogic.Model
         #endregion
 
     }//ViewModel
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <typeparam name="VM"></typeparam>
-    /// <typeparam name="AM"></typeparam>
-    public interface IViewModel<VM, AM> : IViewModel
-        where VM : IViewModel<VM, AM>//, new()
-        where AM : IApiModel
-    {
-        VM SetApiModel(AM apiModel);
-
-        //public static VM ToModel(AM apiModel) => new VM().SetApiModel(apiModel);
-
-        //public static List<VM> ToModels(IEnumerable<AM> models)
-        //    => models.Select(x => new VM().SetApiModel(x)).Reverse().ToList();
-    }
-
+    
 }

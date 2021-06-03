@@ -70,4 +70,5 @@ namespace Universe.Coin.TradeLogic.Calc
         #endregion
 
     }
+
 }

@@ -14,10 +14,10 @@ namespace Universe.Coin.TradeLogic.Model
         public TickerModel() => Market = TimeKST = Change = "";
 
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-        public TickerModel(ITicker ticker) => SetApiModel(ticker);
+        public TickerModel(ITicker ticker) => setApiModel(ticker);
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
-        public TickerModel SetApiModel(ITicker ticker)
+        void setApiModel(ITicker ticker)
         {
             Market = ticker.Market;
             TimeKST = $"{ticker.TradeDateKst}.{ticker.TradeTimeKst}";
@@ -27,7 +27,6 @@ namespace Universe.Coin.TradeLogic.Model
             Closing = Math.Round(ticker.TradePrice / 10000.0m, 1);
             Delta = Math.Round(ticker.SignedChangePrice / 10000.0m, 1);
             Change = ticker.Change == "EVEN" ? "〓" : $"{(ticker.Change == "RISE" ? "▲" : "▼")}";
-            return this;
         }
 
         public override string ToString()

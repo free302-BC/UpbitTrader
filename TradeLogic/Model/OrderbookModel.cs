@@ -14,8 +14,12 @@ namespace Universe.Coin.TradeLogic.Model
         public decimal askA, bidA;//amount (number of coins)
         public decimal askP, bidP;
         public OrderbookModel() { }
-        public OrderbookModel(IOrderbook book) => SetApiModel(book);
-        public OrderbookModel SetApiModel(IOrderbook book)
+        public OrderbookModel(IOrderbook book)
+        {
+            setApiModel(book);
+        }
+
+        void setApiModel(IOrderbook book)
         {
             var order = book.OrderbookUnits[0];
             time = DateTimeOffset.FromUnixTimeMilliseconds(book.Timestamp).LocalDateTime;
@@ -29,7 +33,6 @@ namespace Universe.Coin.TradeLogic.Model
 
             askP = askA * askUP;
             bidP = bidA * bidUP;
-            return this;
         }
         public override bool Equals(object? obj)
         {
