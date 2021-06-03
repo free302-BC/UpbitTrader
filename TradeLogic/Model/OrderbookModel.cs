@@ -45,17 +45,17 @@ namespace Universe.Coin.TradeLogic.Model
         public override int GetHashCode() => Utility.HashCode.Of(askUP).And(askA).And(bidUP).And(bidA);
 
         public override string ToString()
-            => $"[{time:HHmmss.fff}] {askA:F8} × {askUP,6:F1} = {askP,7:F1}  | {deltaUP,4:F1} | {bidP,7:F1} = {bidUP,6:F1} × {bidA:F8}";
+            => $"[{time:HH:mm:ss.fff}] {askA:F8} × {askUP,6:F1} = {askP,7:F1}  | {deltaUP,5:F1} | {bidP,7:F1} = {bidUP,6:F1} × {bidA:F8}";
         static OrderbookModel() => IViewModel.buildHeader(_names);
         static readonly (string name, int wdith)[] _names =
         {
-            (nameof(time),  10),
+            (nameof(time),  12),
             (nameof(askA),  10),
             (nameof(askUP), 6),
             (nameof(askP),  7),
             (nameof(deltaUP), 3),
             (nameof(bidP), 7),
-            (nameof(bidUP), 6),
+            (nameof(bidUP), 7),
             (nameof(bidA), 10)
         };
 

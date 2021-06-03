@@ -32,16 +32,21 @@ namespace Universe.Coin.Upbit.App
 
             DoFindK = src.DoFindK;
             Hours = src.Hours;
+            LoadFromFile = src.LoadFromFile;
+            PrintCandle = src.PrintCandle;
+
             FactorK = src.FactorK;
             WindowSize = src.WindowSize;
             WindowFunction = src.WindowFunction;
-
-            LoadFromFile = src.LoadFromFile;
-            PrintCandle = src.PrintCandle;
             ApplyStopLoss = src.ApplyStopLoss;
+            MacdWindowSizes = src.MacdWindowSizes.ToArray();
         }
-        
-        public ICalcParam Clone() => (BackTestOptions)MemberwiseClone();
 
+        public ICalcParam Clone()
+        {
+            var clone = (BackTestOptions)MemberwiseClone();
+            clone.MacdWindowSizes = MacdWindowSizes.ToArray();
+            return clone;
+        }
     }
 }

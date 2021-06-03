@@ -18,6 +18,7 @@ using System.Collections.Specialized;
 using Universe.Utility;
 using Universe.Coin.TradeLogic.Model;
 using Universe.Coin.TradeLogic;
+using Universe.Coin.TradeLogic.Calc;
 
 namespace Universe.Coin.Upbit.App
 {
@@ -44,7 +45,7 @@ namespace Universe.Coin.Upbit.App
             //orderbook(uc);
             ticks(uc);
 
-            //runAutoTrade(uc);
+            runAutoTrade(uc);
         }
 
         void runAutoTrade(Client uc)
@@ -78,7 +79,7 @@ namespace Universe.Coin.Upbit.App
                     var newTicks = uc.ApiTicks(count: numTicks).ToModels().Where(x => !lastTicks.Contains(x.Serial));
                     var numNewTicks = newTicks.Count();
                     if (numNewTicks > numTicks / 5) info($"numNewTicks= <{numNewTicks}>");
-                    foreach (var tick in newTicks) report(tick, tick.Dir == "▲" ? 1 : -1);
+                    foreach (var tick in newTicks) report(tick, tick.Dir == TradeTickDir.U ? 1 : -1);
                     lastTicks.AddRange(newTicks.Select(x => x.Serial));
 
                     //check ticks buffer
@@ -190,7 +191,8 @@ namespace Universe.Coin.Upbit.App
         void ticks(Client uc)
         {
             var ticks = uc.ApiTicks(count: 10).ToModels();
-            info(IViewModel.Print((IEnumerable<IViewModel>)ticks));
+            ICalc.CalcMovingAvg(ticks, 0, ticks.Length, _set, m => m.UnitPrice);
+            info(IViewModel.Print(ticks));
         }
     }//class
 }

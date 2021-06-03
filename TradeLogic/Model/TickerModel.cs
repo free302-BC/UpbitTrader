@@ -13,7 +13,7 @@ namespace Universe.Coin.TradeLogic.Model
         string Market;
         DateTime TimeKST;
         decimal Opening, High, Low, Closing, Delta;
-        TickDir Dir;
+        TickerDir Dir;
 
         //계산용
 
@@ -32,9 +32,9 @@ namespace Universe.Coin.TradeLogic.Model
 
             Dir = ticker.Change[0] switch
             {
-                'E' => TickDir.E,
-                'R' => TickDir.R,
-                'F' => TickDir.F,
+                'E' => TickerDir.E,
+                'R' => TickerDir.R,
+                'F' => TickerDir.F,
                 _ => throw new NotImplementedException()
             };
 

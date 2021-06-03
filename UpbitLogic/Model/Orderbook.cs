@@ -16,7 +16,7 @@ namespace Universe.Coin.Upbit.Model
         public Orderbook()
         {
             Market = "";
-            //OrderbookUnits = new();
+            OrderbookUnits = null!;//null이 아닐경우 json deserialization 에러
         }
 
         /// <summary>

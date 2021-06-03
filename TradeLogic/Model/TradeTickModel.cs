@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 
 namespace Universe.Coin.TradeLogic.Model
 {
-    public class TradeTickModel : ICalcModel
+    public class M : ICalcModel
     {
         //입력
         public DateTime TimeKST;
         public decimal UnitPrice, Volume, Price, Change;
         public long Serial;
-        public string Dir = "";
+        public TradeTickDir Dir;
 
         //계산용
         public decimal MovingAvg { get; set; }
@@ -22,10 +22,10 @@ namespace Universe.Coin.TradeLogic.Model
         public decimal CumRate { get; set; }
         public decimal DrawDown { get; set; }
 
-        public static readonly TradeTickModel Empty = new();
+        public static readonly M Empty = new();
 
-        public TradeTickModel() { }
-        public TradeTickModel(ITradeTick tick) => setApiModel(tick);
+        public M() { }
+        public M(ITradeTick tick) => setApiModel(tick);
 
         void setApiModel(ITradeTick tick)
         {
@@ -34,7 +34,7 @@ namespace Universe.Coin.TradeLogic.Model
             Volume = tick.TradeVolume;
             Price = UnitPrice * Volume;
             Change = tick.ChangePrice / 10000m;
-            Dir = tick.AskBid[0] == 'B' ? "▲" : "▼";
+            Dir = tick.AskBid[0] == 'B' ? TradeTickDir.U : TradeTickDir.D;
 
             //SequentialId에서 miliseconds 000 제거, 시간단위 이상 제거
             // == 1시간 내에서 유효한 unique serial
@@ -43,17 +43,17 @@ namespace Universe.Coin.TradeLogic.Model
             //Serial = tick.SequentialId % 10000000L;
         }
         public override string ToString()
-            => $"[{TimeKST:HHmmss.fff}] {Volume:F8} × {UnitPrice,6:F1} = {Price,7:F1}  {Dir,-6} | {Change,7:F1}";
+            => $"[{TimeKST:HH:mm:ss.fff}] {Volume:F8} × {UnitPrice,6:F1} = {Price,7:F1}  {Dir,1} {Change,5:F1}";
 
-        static TradeTickModel() => IViewModel.buildHeader(_names);
+        static M() => IViewModel.buildHeader(_names);
         static (string, int)[] _names =
         {
-            (nameof(TimeKST), 12),
+            (nameof(TimeKST), 14),
             (nameof(Volume), 10),
             ("UnPrice", 8),
             (nameof(Price), 9),
-            (" Dir", -6),
-            ("Δ", -7),
+            ("↕", 2),
+            ("Δ", 5),
             //(nameof(Serial), 0),
         };
 
@@ -62,9 +62,9 @@ namespace Universe.Coin.TradeLogic.Model
 
     public static class _TradeTickModel
     {
-        public static List<TradeTickModel> ToModels(this IEnumerable<ITradeTick> models)
-           => models.Select(x => new TradeTickModel(x)).Reverse().ToList();
-        public static TradeTickModel ToModel(this ITradeTick model) => new TradeTickModel(model);
+        public static M[] ToModels(this IEnumerable<ITradeTick> models)
+           => models.Select(x => new M(x)).Reverse().ToArray();
+        public static M ToModel(this ITradeTick model) => new M(model);
     }
 
 

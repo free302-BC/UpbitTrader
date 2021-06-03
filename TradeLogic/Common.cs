@@ -29,11 +29,16 @@ namespace Universe.Coin.TradeLogic
         PICA, CELO, NEAR, AUCTION, GRT, SNX
     }
     
-    public enum TickDir
+    public enum TickerDir
     {
         E,  //even
-        F,  //down, ask 매도
-        R   //rise, bid 매수
+        F,  //down
+        R   //rise
+    }
+    public enum TradeTickDir
+    {
+        D,  //ask 매도
+        U   //bid 매수
     }
 
     public enum CandleUnit
