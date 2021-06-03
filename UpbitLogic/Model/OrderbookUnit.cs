@@ -6,11 +6,12 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
+using Universe.Coin.TradeLogic.Model;
 
 namespace Universe.Coin.Upbit.Model
 {
     [DataContract]
-    public class OrderbookUnit
+    public class OrderbookUnit : IOrderbookUnit
     {
         /// <summary>
         /// 매도호가

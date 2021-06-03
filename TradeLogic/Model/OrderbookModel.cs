@@ -5,17 +5,17 @@ using System.Text;
 using System.Threading.Tasks;
 using Universe.Coin.TradeLogic.Model;
 
-namespace Universe.Coin.Upbit.Model
+namespace Universe.Coin.TradeLogic.Model
 {
-    public class OrderbookModel : ViewModelBase<OrderbookModel, Orderbook>
+    public class OrderbookModel : IViewModel<OrderbookModel, IOrderbook>
     {
         public DateTime time;
         public decimal askUP, bidUP, deltaUP; //unit price (price per 1 coin)
         public decimal askA, bidA;//amount (number of coins)
         public decimal askP, bidP;
         public OrderbookModel() { }
-        public OrderbookModel(Orderbook book) => setApiModel(book);
-        protected override OrderbookModel setApiModel(Orderbook book)
+        public OrderbookModel(IOrderbook book) => SetApiModel(book);
+        public OrderbookModel SetApiModel(IOrderbook book)
         {
             var order = book.OrderbookUnits[0];
             time = DateTimeOffset.FromUnixTimeMilliseconds(book.Timestamp).LocalDateTime;
@@ -58,13 +58,14 @@ namespace Universe.Coin.Upbit.Model
 
     }//class
 
+
     public static class _OrderbookModel
     {
-        public static List<OrderbookModel> ToModels(this IEnumerable<Orderbook> models)
-           => models.Select(x => OrderbookModel.ToModel(x)).Reverse().ToList();
-        public static OrderbookModel ToModel(this Orderbook model)
-           => OrderbookModel.ToModel(model);
+        public static List<OrderbookModel> ToModels(this IEnumerable<IOrderbook> models)
+           => models.Select(x => new OrderbookModel(x)).Reverse().ToList();
+        public static OrderbookModel ToModel(this IOrderbook model) => new OrderbookModel(model);
     }
+
 
 
 }

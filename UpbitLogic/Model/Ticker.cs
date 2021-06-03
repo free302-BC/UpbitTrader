@@ -10,10 +10,10 @@ using Universe.Coin.TradeLogic.Model;
 namespace Universe.Coin.Upbit.Model
 {
     [DataContract]
-    public class Ticker : IApiModel
+    public class Ticker : ITicker
     {
         public Ticker()
-            => Market = TradeDate = TradeTime = TradeDateKst = TradeTimeKst 
+            => Market = TradeDate = TradeTime = TradeDateKst = TradeTimeKst
                 = Change = Highest52WeekDate = Lowest52WeekDate = string.Empty;
 
         /// <summary>

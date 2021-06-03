@@ -112,14 +112,14 @@ namespace Universe.Coin.Upbit
 
         #region ---- Ticker : 현재시세 조회 ----
 
-        public Ticker ApiTicker(CurrencyId currency = CurrencyId.KRW, CoinId coin = CoinId.BTC)
+        public ITicker ApiTicker(CurrencyId currency = CurrencyId.KRW, CoinId coin = CoinId.BTC)
         {
             clearQueryString();
             setQueryString("markets", currency, coin);
             return InvokeApi<Ticker>(ApiId.TradeTicker)?.FirstOrDefault() ?? new();
         }
 
-        public Ticker[] ApiTicker(IEnumerable<(CurrencyId currency, CoinId coin)> markets)
+        public ITicker[] ApiTicker(IEnumerable<(CurrencyId currency, CoinId coin)> markets)
         {
             clearQueryString();
             foreach (var q in markets) _wc.QueryString.Add("markets", Helper.GetMarketId(q.currency, q.coin));

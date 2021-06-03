@@ -168,19 +168,19 @@ namespace Universe.Coin.Upbit.App
                 (CurrencyId.KRW, CoinId.DOGE)
             };
             var ticker = uc.ApiTicker(markets).ToModels();
-            info(IViewModel.Print(ticker));
+            info(IViewModel.Print((IEnumerable<IViewModel>)ticker));
         }
         void candleDay(Client uc)
         {
             var candles = uc.ApiCandle<CandleDay>(unit: CandleUnit.DAY, count: 20);
             var models = candles.ToModels();
-            info(IViewModel.Print(models));
+            info(IViewModel.Print((IEnumerable<IViewModel>)models));
         }
         void candleMinutes(Client uc)
         {
             var candles = uc.ApiCandle<CandleMinute>(unit: CandleUnit.M1, count: 20);
             var models = candles.ToModels();
-            info(IViewModel.Print(models));
+            info(IViewModel.Print((IEnumerable<IViewModel>)models));
         }
         void orderbook(Client uc)
         {
@@ -190,7 +190,7 @@ namespace Universe.Coin.Upbit.App
         void ticks(Client uc)
         {
             var ticks = uc.ApiTicks(count: 10).ToModels();
-            info(IViewModel.Print(ticks));
+            info(IViewModel.Print((IEnumerable<IViewModel>)ticks));
         }
     }//class
 }

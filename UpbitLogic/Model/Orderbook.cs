@@ -11,14 +11,14 @@ using Universe.Coin.TradeLogic.Model;
 namespace Universe.Coin.Upbit.Model
 {
     [DataContract]
-    public class Orderbook : IApiModel
+    public class Orderbook : IOrderbook
     {
         public Orderbook()
         {
             Market = "";
-            OrderbookUnits = new List<OrderbookUnit>();
+            OrderbookUnits = new List<IOrderbookUnit>();
         }
-                
+
         /// <summary>
         /// 마켓 코드
         /// </summary>
@@ -52,7 +52,7 @@ namespace Universe.Coin.Upbit.Model
         /// </summary>
         /// <value>호가</value>
         [DataMember(Name = "orderbook_units", EmitDefaultValue = false)]
-        public List<OrderbookUnit> OrderbookUnits { get; set; }
+        public List<IOrderbookUnit> OrderbookUnits { get; set; }
 
         const int w = 20;
         /// <summary>

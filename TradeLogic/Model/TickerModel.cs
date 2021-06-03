@@ -5,19 +5,19 @@ using System.Text;
 using System.Threading.Tasks;
 using Universe.Coin.TradeLogic.Model;
 
-namespace Universe.Coin.Upbit.Model
+namespace Universe.Coin.TradeLogic.Model
 {
-    public class TickerModel : ViewModelBase<TickerModel, Ticker>
+    public class TickerModel : IViewModel<TickerModel, ITicker>
     {
         string Market, TimeKST, Change;
         decimal Opening, High, Low, Closing, Delta;
         public TickerModel() => Market = TimeKST = Change = "";
 
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-        public TickerModel(Ticker ticker) => setApiModel(ticker);
+        public TickerModel(ITicker ticker) => SetApiModel(ticker);
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
-        protected override TickerModel setApiModel(Ticker ticker)
+        public TickerModel SetApiModel(ITicker ticker)
         {
             Market = ticker.Market;
             TimeKST = $"{ticker.TradeDateKst}.{ticker.TradeTimeKst}";
@@ -36,9 +36,9 @@ namespace Universe.Coin.Upbit.Model
         static readonly (string name, int wdith)[] _names =
         {
             (nameof(Market), 8),
-            (nameof(TimeKST), 15), 
-            (nameof(Opening), 8), 
-            (nameof(High), 8), 
+            (nameof(TimeKST), 15),
+            (nameof(Opening), 8),
+            (nameof(High), 8),
             (nameof(Low),  8),
             (nameof(Closing), 8),
             (nameof(Delta), 8),
@@ -46,13 +46,14 @@ namespace Universe.Coin.Upbit.Model
         };
         static TickerModel() => IViewModel.buildHeader(_names);
     }//class
-    
+
+
     public static class _TickerModel
     {
-        public static List<TickerModel> ToModels(this IEnumerable<Ticker> models)
-           => models.Select(x => TickerModel.ToModel(x)).ToList();
-        public static TickerModel ToModel(this Ticker model)
-           => TickerModel.ToModel(model);
+        public static List<TickerModel> ToModels(this IEnumerable<ITicker> models)
+           => models.Select(x => new TickerModel(x)).Reverse().ToList();
+        public static TickerModel ToModel(this ITicker model) => new TickerModel(model);
     }
+
 
 }

@@ -79,19 +79,19 @@ namespace UnitTester
                     WindowSize = 15,
                     WindowFunction = WindowFunction.Identical
                 };
-                var mc = new CalcCandle(param);
+
                 w.Restart();
-                mc.CalcMovingAvg(models);
+                ICalcCandle.CalcMovingAvg(models, param);
                 info($"{param.WindowFunction}: Δt= {w.ElapsedMilliseconds,6}ms",$"{models[0]}");
 
                 param.WindowFunction = WindowFunction.Linear;
                 w.Restart();
-                mc.CalcMovingAvg(models);
+                ICalcCandle.CalcMovingAvg(models, param);
                 info($"{param.WindowFunction}: Δt= {w.ElapsedMilliseconds,6}ms", $"{models[0]}");
 
                 param.WindowFunction = WindowFunction.Gaussian;
                 w.Restart();
-                mc.CalcMovingAvg(models);
+                ICalcCandle.CalcMovingAvg(models, param);
                 info($"{param.WindowFunction}: Δt= {w.ElapsedMilliseconds,6}ms", $"{models[0]}");
             }
 

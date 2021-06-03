@@ -10,10 +10,29 @@ using Universe.Coin.TradeLogic.Model;
 namespace Universe.Coin.TradeLogic.Calc
 {
     /// <summary>
-    /// IViewModel에 대한 모든 계산 interface의 기본
+    /// IViewModel에 대한 기본 계산 알고리즘 구현
     /// </summary>
     public partial interface ICalc
     {
+        /// <summary>
+        /// models의 모든 원소에 대해 getter, setter를 반복호출 ~ 속도 문제?
+        /// </summary>
+        /// <typeparam name="VM"></typeparam>
+        /// <param name="models"></param>
+        /// <param name="offset"></param>
+        /// <param name="count"></param>
+        /// <param name="param"></param>
+        /// <param name="getter"></param>
+        /// <param name="setter"></param>
+        static void CalcMovingAvg<VM>(VM[] models, int offset, int count, ICalcParam param,
+            Func<VM, decimal> getter, Action<VM, decimal> setter)
+            where VM : IViewModel
+        {
+            var values = models.Select(v => getter(v)).ToArray();
+            var avgs = CalcMovingAvg(values, offset, count, param.WindowSize, param.WindowFunction);
+            for (int i = 0; i < avgs.Length; i++) setter(models[i], avgs[i]);
+        }
+
         /// <summary>
         /// 가변 Window Size 기법으로 Moving Average 구함
         /// 데이터 갯수가 부족할 경우 ~ 그 갯수==Window Size
@@ -42,25 +61,6 @@ namespace Universe.Coin.TradeLogic.Calc
             return ma;
         }
 
-        /// <summary>
-        /// models의 모든 원소에 대해 getter, setter를 반복호출 ~ 속도 문제?
-        /// </summary>
-        /// <typeparam name="VM"></typeparam>
-        /// <param name="models"></param>
-        /// <param name="offset"></param>
-        /// <param name="count"></param>
-        /// <param name="param"></param>
-        /// <param name="getter"></param>
-        /// <param name="setter"></param>
-        static void CalcMovingAvg<VM>(VM[] models, int offset, int count, ICalcParam param,
-            Func<VM, decimal> getter, Action<VM, decimal> setter)
-            where VM: IViewModel
-        {
-            var values = models.Select(v => getter(v)).ToArray();
-            var avgs =  CalcMovingAvg(values, offset, count, param.WindowSize, param.WindowFunction);
-            for (int i = 0; i < avgs.Length; i++) setter(models[i], avgs[i]);
-        }
-
 
         #region ---- TEST ----
 
@@ -72,7 +72,7 @@ namespace Universe.Coin.TradeLogic.Calc
             static void save(decimal[] values, decimal[] ma, string fileName)
             {
                 var sb = new StringBuilder();
-                //sb.AppendLine($"{"Value"}\t{"MV"}\t{"Δ"}");
+                sb.AppendLine($"src\tma\tΔ");
                 for (int i = 0; i < ma.Length; i++)
                     sb.AppendLine($"{values[i]:F2}\t{ma[i],6:F2}\t{values[i] - ma[i],6:F2}");
                 File.WriteAllText(fileName, sb.ToString());

@@ -10,10 +10,9 @@
         <![CDATA[
       public static class _$AM$Model
       {
-          public static List<$AM$Model> ToModels(this IEnumerable<$AM$> models)
-             => models.Select(x => $AM$Model.ToModel(x)).Reverse().ToList();
-          public static $AM$Model ToModel(this $AM$ model)
-             => $AM$Model.ToModel(model);
+          public static List<$AM$Model> ToModels(this IEnumerable<I$AM$> models)
+             => models.Select(x => new $AM$Model(x)).Reverse().ToList();
+          public static I$AM$Model ToModel(this I$AM$ model) => new $AM$Model(model);
       }
       ]]>
       </Code>

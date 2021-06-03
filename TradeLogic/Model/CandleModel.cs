@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Universe.Coin.TradeLogic.Model
 {
-    public class CandleModel : ViewModelBase<CandleModel, ICandle>
+    public class CandleModel : IViewModel<CandleModel, ICandle>
     {
         //입력
         public ApiId ApiId;
@@ -17,12 +17,13 @@ namespace Universe.Coin.TradeLogic.Model
         //계산용
         public decimal MovingAvg, MacdOsc, Target, Rate, CumRate, DrawDown;
         public const decimal FeeRate = 0.0005m * 2m;
+
         public static readonly CandleModel Empty = new() { Delta = 99999m };
 
         public CandleModel() { }
-        public CandleModel(ICandle candle) => setApiModel(candle);
+        public CandleModel(ICandle candle) => SetApiModel(candle);
 
-        protected override CandleModel setApiModel(ICandle candle)
+        public CandleModel SetApiModel(ICandle candle)
         {
             ApiId = candle.ApiId;
             Unit = candle.CandleUnit;
@@ -58,10 +59,10 @@ namespace Universe.Coin.TradeLogic.Model
     public static class _CandleModel
     {
         public static CandleModel[] ToModels(this IEnumerable<ICandle> models)
-           => models.Select(x => CandleModel.ToModel(x)).Reverse().ToArray();
-        public static CandleModel ToModel(this ICandle model)
-           => CandleModel.ToModel(model);
+           => models.Select(x => new CandleModel(x)).Reverse().ToArray();
+        public static CandleModel ToModel(this ICandle model) => new CandleModel(model);
 
-    }
+    }   
+
 
 }

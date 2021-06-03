@@ -8,13 +8,13 @@ using Universe.Coin.TradeLogic.Model;
 
 namespace Universe.Coin.TradeLogic
 {
-    public interface IBackTest : ICalc
+    public interface IBackTest
     {
         static (int trades, decimal rate, decimal mdd) 
             BackTest(CandleModel[] models,  int offset, int count, ICalcParam param)
         {
-            var mc = new CalcCandle(param);
-            if (param.WindowFunction != WindowFunction.None) mc.CalcMovingAvg(models, offset, count);
+            if (param.WindowFunction != WindowFunction.None) 
+                ICalcCandle.CalcMovingAvg(models, offset, count, param);
 
             ICalcPR pr = param.WindowFunction != WindowFunction.None 
                 ? new MovingAvgPR(param) 
@@ -22,8 +22,8 @@ namespace Universe.Coin.TradeLogic
             pr.CalcProfitRate(models, offset, count);
             var trades = models.Take(count).Count(x => x.Rate != 1m && x.Rate != 0m);
 
-            var rate = mc.CalcCumRate(models, offset, count);
-            var mdd = mc.CalcDrawDown(models, offset, count);
+            var rate = ICalcCandle.CalcCumRate(models, offset, count);
+            var mdd = ICalcCandle.CalcDrawDown(models, offset, count);
             return (trades, rate, mdd);
         }
     }

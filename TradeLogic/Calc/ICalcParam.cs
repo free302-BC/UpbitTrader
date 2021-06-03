@@ -14,6 +14,8 @@ namespace Universe.Coin.TradeLogic.Calc
 
         public WindowFunction WindowFunction { get; set; }
 
+        public int[] MacdWindowSizes { get; set; }
+
         public bool ApplyStopLoss { get; set; }
 
         public ICalcParam Clone();

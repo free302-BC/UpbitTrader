@@ -10,7 +10,7 @@ using Universe.Coin.TradeLogic.Model;
 namespace Universe.Coin.Upbit.Model
 {
     [DataContract]
-    public class TradeTick : IApiModel
+    public class TradeTick : ITradeTick
     {
         public TradeTick() => Market = TradeDateUtc = TradeTimeUtc = AskBid = "";
 
