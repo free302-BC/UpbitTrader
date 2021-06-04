@@ -132,7 +132,6 @@ namespace Universe.Coin.Upbit.App
             }
         }
 
-
         /// <summary>
         /// 단일 k에 대하여 각 CandleUnit별로 backtest 수행
         /// </summary>

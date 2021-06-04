@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Universe.Coin.TradeLogic.Model
 {
-    public class M : ICalcModel
+    public class TradeTickModel : ICalcModel
     {
         //입력
         public DateTime TimeKST;
@@ -22,10 +22,10 @@ namespace Universe.Coin.TradeLogic.Model
         public decimal CumRate { get; set; }
         public decimal DrawDown { get; set; }
 
-        public static readonly M Empty = new();
+        public static readonly TradeTickModel Empty = new();
 
-        public M() { }
-        public M(ITradeTick tick) => setApiModel(tick);
+        public TradeTickModel() { }
+        public TradeTickModel(ITradeTick tick) => setApiModel(tick);
 
         void setApiModel(ITradeTick tick)
         {
@@ -45,7 +45,7 @@ namespace Universe.Coin.TradeLogic.Model
         public override string ToString()
             => $"[{TimeKST:HH:mm:ss.fff}] {Volume:F8} × {UnitPrice,6:F1} = {Price,7:F1}  {Dir,1} {Change,6:F1}";
 
-        static M() => IViewModel.buildHeader(_names);
+        static TradeTickModel() => IViewModel.buildHeader(_names);
         static (string, int)[] _names =
         {
             (nameof(TimeKST), 14),
@@ -62,9 +62,9 @@ namespace Universe.Coin.TradeLogic.Model
 
     public static class _TradeTickModel
     {
-        public static M[] ToModels(this IEnumerable<ITradeTick> models)
-           => models.Select(x => new M(x)).Reverse().ToArray();
-        public static M ToModel(this ITradeTick model) => new M(model);
+        public static TradeTickModel[] ToModels(this IEnumerable<ITradeTick> models)
+           => models.Select(x => new TradeTickModel(x)).Reverse().ToArray();
+        public static TradeTickModel ToModel(this ITradeTick model) => new TradeTickModel(model);
     }
 
 

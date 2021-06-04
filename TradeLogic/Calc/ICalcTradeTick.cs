@@ -7,12 +7,12 @@ using Universe.Coin.TradeLogic.Model;
 
 namespace Universe.Coin.TradeLogic.Calc
 {
-    using M = M;
+    using M = TradeTickModel;
 
     /// <summary>
     /// ICandle 모델에 대한 계산 알고리즘 구현
     /// </summary>
-    public interface ICalcTradeTicker
+    public interface ICalcTradeTick
     {
         #region ---- Profit Rate ----
 
@@ -49,7 +49,7 @@ namespace Universe.Coin.TradeLogic.Calc
         /// <param name="param"></param>
         public static void CalcProfitRate(M model, M prev, ICalcParam param)
         {
-            
+
         }
         #endregion
 
@@ -83,15 +83,15 @@ namespace Universe.Coin.TradeLogic.Calc
 
 
         #region ---- Cumulated Profit Rate & DrawDown ----
-        public static decimal CalcCumRate(M[] models) 
+        public static decimal CalcCumRate(M[] models)
             => CalcCumRate(models, 0, models.Length);
 
-        public static decimal CalcCumRate(M[] models, int offset, int count) 
+        public static decimal CalcCumRate(M[] models, int offset, int count)
             => ICalc.CalcCumRate(models, offset, count, m => m.Rate);
 
-        public static decimal CalcDrawDown(M[] models) 
+        public static decimal CalcDrawDown(M[] models)
             => CalcDrawDown(models, 0, models.Length);
-        public static decimal CalcDrawDown(M[] models, int offset, int count) 
+        public static decimal CalcDrawDown(M[] models, int offset, int count)
             => ICalc.CalcDrawDown(models, offset, count, m => m.CumRate);
 
         #endregion

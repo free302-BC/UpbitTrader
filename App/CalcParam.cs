@@ -15,11 +15,11 @@ namespace Universe.Coin.Upbit.App
         public int WindowSize { get; set; }
         public WindowFunction WindowFunction { get; set; }
         public bool ApplyStopLoss { get; set; }
-        public int[] MacdWindowSizes { get; set; } = new int[3];
+        public MacdParam MacdParam { get; set; }
         public ICalcParam Clone()
         {
             var clone = (CalcParam)MemberwiseClone();
-            clone.MacdWindowSizes = MacdWindowSizes.ToArray();
+            
             return clone;
         }
         public void Reload(ICalcParam param)
@@ -28,7 +28,7 @@ namespace Universe.Coin.Upbit.App
             WindowSize = param.WindowSize;
             WindowFunction = param.WindowFunction;
             ApplyStopLoss = param.ApplyStopLoss;
-            param.MacdWindowSizes.CopyTo(MacdWindowSizes, 0);
+            MacdParam = param.MacdParam;
         }
     }
 }

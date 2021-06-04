@@ -72,9 +72,9 @@ namespace Universe.Coin.TradeLogic.Calc
             static void save(decimal[] values, decimal[] ma, string fileName)
             {
                 var sb = new StringBuilder();
-                sb.AppendLine($"src\tma\tΔ");
+                sb.AppendLine($"src\tma");
                 for (int i = 0; i < ma.Length; i++)
-                    sb.AppendLine($"{values[i]:F2}\t{ma[i],6:F2}\t{values[i] - ma[i],6:F2}");
+                    sb.AppendLine($"{values[i]:F2}\t{ma[i],6:F2}");
                 File.WriteAllText(fileName, sb.ToString());
             }
         }

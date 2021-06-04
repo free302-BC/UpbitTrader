@@ -24,7 +24,7 @@ namespace Universe.Coin.TradeLogic.Calc
             where VM : ICalcModel
         {
             var values = models.Select(v => getter(v)).ToArray();
-            var osc = calcMacdOsc(values, offset, count, param.MacdWindowSizes);
+            var osc = calcMacdOsc(values, offset, count, param.MacdParam);
             for (int i = 0; i < osc.Length; i++) models[i].MacdOsc = osc[i];
         }
 
@@ -50,11 +50,16 @@ namespace Universe.Coin.TradeLogic.Calc
             return (avgs[0], avgs[1], macd, signal, osc);
         }
 
+        #region ---- TEST ----
+
         private static decimal[] _src =
         {
-            0.67m, 0.08m, 0.04m, 0.49m, 0.06m, 0.30m, 0.20m, 0.22m, 0.07m, 0.08m,
-            0.67m, 0.61m, 0.68m, 0.59m, 1.37m, 0.86m, 1.37m, 0.74m, 0.79m, 0.53m,
-            0.12m, 0.04m, 0.50m, 0.31m, 0.73m, 1.04m, 0.79m, 0.88m, 0.28m, 1.41m
+            4340.3m,4340.3m,4340.5m,4345.8m,4340.3m,4340.3m,4340.3m,4340.4m,4340.2m,
+            4340.2m,4340.0m,4340.4m,4340.3m,4340.0m,4340.0m,4340.0m,4340.0m,4339.2m,
+            4339.4m,4339.1m,4339.1m,4339.1m,4338.9m,4338.9m,4338.9m,4338.4m,4338.1m,
+            4338.0m,4338.0m,4336.0m,4336.2m,4335.9m,4339.9m,4339.9m,4335.9m,4335.9m,
+            4335.9m,4340.3m,4335.8m,4335.9m,4335.8m,4335.8m,4335.8m,4334.8m,4335.9m,
+            4334.8m,4333.9m,4333.7m,4333.9m,4334.8m,
         };
 
         public static void MacdTest()
@@ -74,6 +79,6 @@ namespace Universe.Coin.TradeLogic.Calc
                 File.WriteAllText("macd.txt", sb.ToString());
             }
         }
+        #endregion
     }
-
 }
