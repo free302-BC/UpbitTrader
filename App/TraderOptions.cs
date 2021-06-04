@@ -9,18 +9,15 @@ using Universe.Coin.TradeLogic.Calc;
 
 namespace Universe.Coin.Upbit.App
 {
-    public class TraderOptions : WorkerOptions, ICalcParam
+    public class TraderOptions : WorkerOptions
     {
-        public int WindowSize { get; set; }
-        public WindowFunction WindowFunction { get; set; }
-        public int[] MacdWindowSizes { get; set; } = new[] { 8, 16, 5 };
-        public decimal FactorK { get; set; }
-        public bool ApplyStopLoss { get; set; }
+        public bool Pausing { get; set; }
+        public CalcParam CalcParam { get; set; } = new();
 
-        public ICalcParam Clone()
+        public TraderOptions Clone()
         {
             var clone = (TraderOptions)MemberwiseClone();
-            clone.MacdWindowSizes = MacdWindowSizes.ToArray();
+            clone.CalcParam = (CalcParam)CalcParam.Clone();
             return clone;
         }
 
@@ -31,11 +28,7 @@ namespace Universe.Coin.Upbit.App
             if (src == null) throw new ArgumentException(
                $"{nameof(TraderOptions)}.{nameof(Reload)}(): can't reload from type <{source.GetType().Name}>");
 
-            FactorK = src.FactorK;
-            WindowSize = src.WindowSize;
-            WindowFunction = src.WindowFunction;
-            ApplyStopLoss = src.ApplyStopLoss;
-            MacdWindowSizes = src.MacdWindowSizes.ToArray();
+            CalcParam.Reload(src.CalcParam);
         }
     }
 }

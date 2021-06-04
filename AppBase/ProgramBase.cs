@@ -94,7 +94,7 @@ namespace Universe.AppBase
 
                 //options
                 if (workerNames == null)
-                    sc.AddOptions<S>(ctx.Configuration.GetSection(typeof(W).Name));
+                sc.AddOptions<S>(ctx.Configuration.GetSection(typeof(W).Name));
                 else
                     foreach (var name in workerNames)
                         sc.AddOptions<S>(name, ctx.Configuration.GetSection(name));

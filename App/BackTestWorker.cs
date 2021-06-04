@@ -81,8 +81,8 @@ namespace Universe.Coin.Upbit.App
                 iw.AddCmd(ConsoleKey.Enter, (m) => ev.Set());
                 iw.AddCmd(ConsoleKey.F1, onChangeTest);
                 iw.AddCmd(ConsoleKey.F2, m => onChangeNumericParam(m, 3, () => _set.Hours));
-                iw.AddCmd(ConsoleKey.F3, m => onChangeNumericParam(m, 0.1m, () => _set.FactorK));
-                iw.AddCmd(ConsoleKey.F4, m => onChangeNumericParam(m, 3, () => _set.WindowSize));
+                iw.AddCmd(ConsoleKey.F3, m => onChangeNumericParam(m, 0.1m, () => _set.CalcParam.FactorK));
+                iw.AddCmd(ConsoleKey.F4, m => onChangeNumericParam(m, 3, () => _set.CalcParam.WindowSize));
                 iw.AddCmd(ConsoleKey.F5, onToggleWF);
                 iw.AddCmd(ConsoleKey.F12, onRemoveFile);
 
@@ -115,9 +115,9 @@ namespace Universe.Coin.Upbit.App
                 void onToggleWF(ConsoleModifiers modifier)
                 {
                     var delta = modifier.HasFlag(ConsoleModifiers.Shift) ? -1 : +1;
-                    _set.WindowFunction
-                        = (WindowFunction)(((int)_set.WindowFunction + delta) % (int)(1 + WindowFunction.Gaussian));
-                    info($"WindowFunction: {_set.WindowFunction}");
+                    _set.CalcParam.WindowFunction
+                        = (WindowFunction)(((int)_set.CalcParam.WindowFunction + delta) % (int)(1 + WindowFunction.Gaussian));
+                    info($"WindowFunction: {_set.CalcParam.WindowFunction}");
                     //_ev.Set();
                 }
                 void onRemoveFile(ConsoleModifiers modifier)
@@ -144,8 +144,8 @@ namespace Universe.Coin.Upbit.App
             var results = new BtList();
             var sb = new StringBuilder();
             var hours = _set.Hours;
-            var k = _set.FactorK;
-            var ma = (_set.WindowFunction, _set.WindowSize);
+            var k = _set.CalcParam.FactorK;
+            var ma = (_set.CalcParam.WindowFunction, _set.CalcParam.WindowSize);
 
             info($"Entering {nameof(run_Units_K)}()...");
             sb.AppendLine($"-----------[ {(int)(hours / 24)}d {hours % 24}h : k={k:F1} ma={ma} ]------------");
@@ -155,7 +155,7 @@ namespace Universe.Coin.Upbit.App
                 var count = (int)(hours * 60 / (int)unit);
                 var models = prepareModels(uc, unit, count);
 
-                var x = IBackTest.BackTest(models, 0, count, _set);
+                var x = IBackTest.BackTest(models, 0, count, _set.CalcParam);
                 results.Add((unit, count, x));
                 sb.AppendLine($"{count,6} {unit,6}: {k,6:F2} {x.rate,8:F4} {x.mdd,6:F2}%");
             }
@@ -184,7 +184,7 @@ namespace Universe.Coin.Upbit.App
             var results = new FindList2();
             var sb = new StringBuilder();
             var hours = _set.Hours;
-            var ma = (_set.WindowFunction, _set.WindowSize);
+            var ma = (_set.CalcParam.WindowFunction, _set.CalcParam.WindowSize);
 
             info($"Entering {nameof(run_Units_FindK)}()...");
             sb.AppendLine($"-----------[ {(int)(hours / 24)}d {hours % 24}h : ma={ma} ]------------");
@@ -194,7 +194,7 @@ namespace Universe.Coin.Upbit.App
                 var count = (int)(hours * 60 / (int)unit);
                 var models = prepareModels(uc, unit, count);
 
-                var x = IFindK.FindK(models, 0, count, _set);
+                var x = IFindK.FindK(models, 0, count, _set.CalcParam);
                 results.Add((unit, count, x));
                 sb.AppendLine($"{count,6} {unit,6}: {x.k,6:F2} {x.rate,8:F4} {x.mdd,6:F2}%");
             }
@@ -243,7 +243,7 @@ namespace Universe.Coin.Upbit.App
                 for (int i = 0; i < numTest; i++)
                 {
                     //var currents = new ArraySegment<CandleModel>(models, count * i, count);
-                    var x = IFindK.FindK(models, count * i, count, _set);
+                    var x = IFindK.FindK(models, count * i, count, _set.CalcParam);
                     results.Add(x);
                     //sb.Append($"{(x.rate - 1) * 100,6:N2} ");
                 }
@@ -282,13 +282,13 @@ namespace Universe.Coin.Upbit.App
         void runBackTest(Client uc, CandleUnit unit, int count, StringBuilder? sb = null)
         {
             var models = prepareModels(uc, unit, count);
-            var (numTrades, finalRate, mdd) = IBackTest.BackTest(models, 0, count, _set);
+            var (numTrades, finalRate, mdd) = IBackTest.BackTest(models, 0, count, _set.CalcParam);
 
             bool doPrint = sb == null;
             sb = sb ?? new StringBuilder();
 
-            var k = _set.FactorK;
-            var ma = (_set.WindowFunction, _set.WindowSize);
+            var k = _set.CalcParam.FactorK;
+            var ma = (_set.CalcParam.WindowFunction, _set.CalcParam.WindowSize);
             sb.AppendLine($"-------- [ Backtest: {unit}, k={k:F1}, ma={ma} ]--------");
             if (_set.PrintCandle) sb.Append(models.Where(x => x.Rate != 1m && x.Rate != 0m).Print());
             sb.AppendLine("-------------------------------------------");

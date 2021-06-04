@@ -9,12 +9,14 @@
       "PrintCandle": false,
       "LoadFromFile": true,
 
-      "FactorK": 0.8,
-      "ApplyMovingAvg": true,
-      "WindowSize": 5,
-      "WindowFunction": 2,
-      "MacdWindowSizes": [8,16,5],
-      "ApplyStopLoss": false
+      "CalcParam": {
+        "FactorK": 0.8,
+        "ApplyMovingAvg": true,
+        "WindowSize": 5,
+        "WindowFunction": 2,
+        "MacdWindowSizes": [ 8, 16, 5 ],
+        "ApplyStopLoss": false
+      }
     }
     
   }

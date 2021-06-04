@@ -53,7 +53,7 @@ namespace Universe.Coin.Upbit.App
             while (true)
             {
                 var ki = Console.ReadKey(true);
-                info($"Invoking {ki.Key} cmd...");
+                //info($"Invoking {ki.Key} cmd...");
 
                 Listener? cmd = null;
                 lock (_lock)

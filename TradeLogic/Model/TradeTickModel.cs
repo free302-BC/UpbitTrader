@@ -43,7 +43,7 @@ namespace Universe.Coin.TradeLogic.Model
             //Serial = tick.SequentialId % 10000000L;
         }
         public override string ToString()
-            => $"[{TimeKST:HH:mm:ss.fff}] {Volume:F8} × {UnitPrice,6:F1} = {Price,7:F1}  {Dir,1} {Change,5:F1}";
+            => $"[{TimeKST:HH:mm:ss.fff}] {Volume:F8} × {UnitPrice,6:F1} = {Price,7:F1}  {Dir,1} {Change,6:F1}";
 
         static M() => IViewModel.buildHeader(_names);
         static (string, int)[] _names =
@@ -53,7 +53,7 @@ namespace Universe.Coin.TradeLogic.Model
             ("UnPrice", 8),
             (nameof(Price), 9),
             ("↕", 2),
-            ("Δ", 5),
+            ("Δ", 6),
             //(nameof(Serial), 0),
         };
 

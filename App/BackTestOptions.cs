@@ -9,19 +9,21 @@ using Universe.Coin.TradeLogic.Calc;
 
 namespace Universe.Coin.Upbit.App
 {
-    public class BackTestOptions : WorkerOptions, ICalcParam
+    public class BackTestOptions : WorkerOptions
     {
         public bool DoFindK { get; set; }
         public decimal Hours { get; set; }
         public bool LoadFromFile { get; set; }
         public bool PrintCandle { get; set; }
 
-        public decimal FactorK { get; set; }
-        //public bool ApplyMovingAvg { get; set; }
-        public int WindowSize { get; set; }
-        public WindowFunction WindowFunction { get; set; }
-        public bool ApplyStopLoss { get; set; }
-        public int[] MacdWindowSizes { get; set; } = new int[0];
+        public CalcParam CalcParam { get; set; } = new();
+
+        //public decimal FactorK { get; set; }
+        ////public bool ApplyMovingAvg { get; set; }
+        //public int WindowSize { get; set; }
+        //public WindowFunction WindowFunction { get; set; }
+        //public bool ApplyStopLoss { get; set; }
+        //public int[] MacdWindowSizes { get; set; } = new int[0];
 
         public override void Reload(IWorkerOptions source)
         {
@@ -34,18 +36,13 @@ namespace Universe.Coin.Upbit.App
             Hours = src.Hours;
             LoadFromFile = src.LoadFromFile;
             PrintCandle = src.PrintCandle;
-
-            FactorK = src.FactorK;
-            WindowSize = src.WindowSize;
-            WindowFunction = src.WindowFunction;
-            ApplyStopLoss = src.ApplyStopLoss;
-            MacdWindowSizes = src.MacdWindowSizes.ToArray();
+            CalcParam.Reload(src.CalcParam);
         }
 
-        public ICalcParam Clone()
+        public BackTestOptions Clone()
         {
             var clone = (BackTestOptions)MemberwiseClone();
-            clone.MacdWindowSizes = MacdWindowSizes.ToArray();
+            clone.CalcParam = (CalcParam)CalcParam.Clone();
             return clone;
         }
     }

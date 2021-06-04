@@ -75,7 +75,7 @@ namespace UnitTester
                 var models = _client.ApiCandle<CandleMinute>(count: 100000, unit: CandleUnit.M1).ToModels();
                 info($"Load Models: Δt= {w.ElapsedMilliseconds}ms", $"{models[0]}");
 
-                var param = new BackTestOptions() {
+                var param = new CalcParam() {
                     //ApplyMovingAvg = true,
                     WindowSize = 15,
                     WindowFunction = WindowFunction.Identical

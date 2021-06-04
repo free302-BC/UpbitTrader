@@ -29,7 +29,17 @@ namespace Universe.Coin.Upbit.App
             IOptionsMonitor<TraderOptions> set, 
             IServiceProvider sp)
             : base(logger, sp, set) 
-        { 
+        {
+            _evPausing = new(false);
+            onOptionsUpdate += ()=>{ if (!_set.Pausing) _evPausing.Set(); };
+
+            var iw = _sp.GetRequiredService<InputWorker>();
+            iw.AddCmd(ConsoleKey.F10, m => 
+            {
+                info($"Pausing= {_set.Pausing = !_set.Pausing}");
+                if (_set.Pausing) _evPausing.Reset();
+                else _evPausing.Set();
+            });
         }
 
         protected override void work()
@@ -48,6 +58,7 @@ namespace Universe.Coin.Upbit.App
             runAutoTrade(uc);
         }
 
+        readonly ManualResetEvent _evPausing;
         void runAutoTrade(Client uc)
         {
             var (next, sell, target) = restart(uc);
@@ -62,6 +73,8 @@ namespace Universe.Coin.Upbit.App
 
             while (true)
             {
+                if (_set.Pausing) _evPausing.WaitOne();
+
                 Thread.Sleep(90);
                 var now = DateTime.Now;
                 if (now < sell)
@@ -169,19 +182,19 @@ namespace Universe.Coin.Upbit.App
                 (CurrencyId.KRW, CoinId.DOGE)
             };
             var ticker = uc.ApiTicker(markets).ToModels();
-            info(IViewModel.Print((IEnumerable<IViewModel>)ticker));
+            info(IViewModel.Print(ticker));
         }
         void candleDay(Client uc)
         {
             var candles = uc.ApiCandle<CandleDay>(unit: CandleUnit.DAY, count: 20);
             var models = candles.ToModels();
-            info(IViewModel.Print((IEnumerable<IViewModel>)models));
+            info(IViewModel.Print(models));
         }
         void candleMinutes(Client uc)
         {
             var candles = uc.ApiCandle<CandleMinute>(unit: CandleUnit.M1, count: 20);
             var models = candles.ToModels();
-            info(IViewModel.Print((IEnumerable<IViewModel>)models));
+            info(IViewModel.Print(models));
         }
         void orderbook(Client uc)
         {
@@ -191,7 +204,7 @@ namespace Universe.Coin.Upbit.App
         void ticks(Client uc)
         {
             var ticks = uc.ApiTicks(count: 10).ToModels();
-            ICalc.CalcMovingAvg(ticks, 0, ticks.Length, _set, m => m.UnitPrice);
+            ICalc.CalcMovingAvg(ticks, 0, ticks.Length, _set.CalcParam, m => m.UnitPrice);
             info(IViewModel.Print(ticks));
         }
     }//class

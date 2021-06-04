@@ -19,7 +19,8 @@ namespace Universe.Coin.TradeLogic.Calc
         public bool ApplyStopLoss { get; set; }
 
         public ICalcParam Clone();
-        
+
+        public void Reload(ICalcParam param);
 
     }//interface
 }
