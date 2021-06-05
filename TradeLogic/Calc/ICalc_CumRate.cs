@@ -37,8 +37,11 @@ namespace Universe.Coin.TradeLogic.Calc
         private static decimal calcCumRate(decimal[] models, int offset, int count)
         {
             var cumRate = 1.0m;
-            for (int i = offset; i < count; i++)
-                models[i] = Math.Round(cumRate *= models[i], 4);
+            for (int i = 0; i < count; i++)
+            {
+                int j = offset + i;
+                models[j] = Math.Round(cumRate *= models[j], 4);
+            }
             return Math.Round(cumRate, 4);
         }
 
@@ -65,15 +68,16 @@ namespace Universe.Coin.TradeLogic.Calc
             return mdd;
         }
 
-        static decimal CalcDrawDown(decimal[] rates, int offset, int count)
+        static decimal CalcDrawDown(decimal[] models, int offset, int count)
         {
             var max = decimal.MinValue;
-            for (int i = offset; i < count; i++)
+            for (int i = 0; i < count; i++)
             {
-                max = max > rates[i] ? max : rates[i];
-                rates [i] = max > rates[i] ? Math.Round(100 * (max - rates[i]) / max, 2) : 0m;
+                int j = offset + i;
+                max = max > models[j] ? max : models[j];
+                models[j] = max > models[j] ? Math.Round(100 * (max - models[j]) / max, 2) : 0m;
             }
-            return Math.Round((max - 1) * 100, 3);
+            return Math.Round((max - 1) * 100, 2);
         }
     }
 

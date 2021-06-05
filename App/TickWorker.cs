@@ -42,28 +42,7 @@ namespace Universe.Coin.Upbit.App
             //ICalcTradeTick.CalcProfitRate(ticks, param);
             //ICalcTradeTick.CalcCumRate(ticks);
             //ICalcTradeTick.CalcDrawDown(ticks);
-
-            //normalize
-            var avgUp = ticks.Average(x => x.UnitPrice);
-            var sdUp = (decimal)Math.Sqrt((double)ticks.Average(x => (x.UnitPrice - avgUp) * (x.UnitPrice - avgUp)));
-            var avgMa = ticks.Average(x => x.MovingAvg);
-            var sdMa = (decimal)Math.Sqrt((double)ticks.Average(x => (x.MovingAvg - avgMa) * (x.MovingAvg- avgMa)));
-            var avgOsc = ticks.Average(x => x.MacdOsc);
-            var sdOsc = (decimal)Math.Sqrt((double)ticks.Average(x => (x.MacdOsc - avgOsc) * (x.MacdOsc - avgOsc)));
-
-            foreach (var t in ticks)
-            {
-                t.UnitPrice = (t.UnitPrice - avgUp) / sdUp;
-                t.MovingAvg = (t.MovingAvg - avgMa) / sdMa;
-                t.MacdOsc = (t.MacdOsc - avgOsc) / sdOsc;
-            }
-
-            var sb = new StringBuilder();
-            for (int i = 0; i < ticks.Length; i++)
-            {
-                sb.AppendLine($"{ticks[i].UnitPrice}\t{ticks[i].MovingAvg}\t{ticks[i].MacdOsc}");
-            }
-            File.WriteAllText("ticks.txt", sb.ToString());
+            
             info(IViewModel.Print(ticks));
         }
 

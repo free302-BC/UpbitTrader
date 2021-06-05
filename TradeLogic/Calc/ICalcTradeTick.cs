@@ -37,8 +37,12 @@ namespace Universe.Coin.TradeLogic.Calc
                 ? models[offset - 1]
                 : M.Empty, param);
 
-            for (int i = offset + 1; i < offset + count && i < models.Length; i++)
-                CalcProfitRate(models[i], models[i - 1], param);
+            for (int i = 1; i < count; i++)
+            {
+                var j = offset + i;
+                if (j >= models.Length) break;
+                CalcProfitRate(models[j], models[j - 1], param);
+            }
         }
 
         /// <summary>

@@ -7,6 +7,8 @@ using Universe.Coin.TradeLogic.Model;
 
 namespace Universe.Coin.TradeLogic.Calc
 {
+    using M = CandleModel;
+
     /// <summary>
     /// ICandle 모델에 대한 계산 알고리즘 구현
     /// </summary>
@@ -19,7 +21,7 @@ namespace Universe.Coin.TradeLogic.Calc
         /// </summary>
         /// <param name="models"></param>
         /// <param name="param"></param>
-        public static void CalcProfitRate(CandleModel[] models, ICalcParam param)
+        public static void CalcProfitRate(M[] models, ICalcParam param)
             => CalcProfitRate(models, 0, models.Length, param);
 
         /// <summary>
@@ -29,14 +31,18 @@ namespace Universe.Coin.TradeLogic.Calc
         /// <param name="offset"></param>
         /// <param name="count"></param>
         /// <param name="param"></param>
-        public static void CalcProfitRate(CandleModel[] models, int offset, int count, ICalcParam param)
+        public static void CalcProfitRate(M[] models, int offset, int count, ICalcParam param)
         {
             CalcProfitRate(models[offset], offset > 0
                 ? models[offset - 1]
-                : CandleModel.Empty, param);
+                : M.Empty, param);
 
-            for (int i = offset + 1; i < offset + count && i < models.Length; i++)
-                CalcProfitRate(models[i], models[i - 1], param);
+            for (int i = 1; i < count; i++)
+            {
+                var j = offset + i;
+                if (j >= models.Length) break;
+                CalcProfitRate(models[j], models[j - 1], param);
+            }
         }
 
         /// <summary>
@@ -45,7 +51,7 @@ namespace Universe.Coin.TradeLogic.Calc
         /// <param name="model"></param>
         /// <param name="prev"></param>
         /// <param name="param"></param>
-        public static void CalcProfitRate(CandleModel model, CandleModel prev, ICalcParam param)
+        public static void CalcProfitRate(M model, M prev, ICalcParam param)
         {
             var k = param.FactorK;
             model.Target = Math.Round(model.Opening + prev.Delta * k, 2);
@@ -55,14 +61,14 @@ namespace Universe.Coin.TradeLogic.Calc
                 : (model.High > model.Target && model.Opening >= prev.MovingAvg);
 
             model.Rate = doTrade
-                    ? Math.Round(model.Closing / model.Target - CandleModel.FeeRate, 4)
+                    ? Math.Round(model.Closing / model.Target - M.FeeRate, 4)
                     : 1.0000m;
         }
         #endregion
 
 
         #region ---- MACD OSC ----
-        public static void CalcMacdOsc(CandleModel[] models, ICalcParam param)
+        public static void CalcMacdOsc(M[] models, ICalcParam param)
         {
             ICalc.CalcMacdOsc(models, 0, models.Length, param, m => m.Closing);
         }
@@ -78,11 +84,11 @@ namespace Universe.Coin.TradeLogic.Calc
         /// <param name="models"></param>
         /// <param name="windowSize"></param>
         /// <param name="winFunc"></param>
-        public static void CalcMovingAvg(CandleModel[] models, ICalcParam param)
+        public static void CalcMovingAvg(M[] models, ICalcParam param)
         {
             CalcMovingAvg(models, 0, models.Length, param);
         }
-        public static void CalcMovingAvg(CandleModel[] models, int offset, int count, ICalcParam param)
+        public static void CalcMovingAvg(M[] models, int offset, int count, ICalcParam param)
         {
             ICalc.CalcMovingAvg(models, offset, count, param, m => m.Closing);
         }
@@ -90,15 +96,15 @@ namespace Universe.Coin.TradeLogic.Calc
 
 
         #region ---- Cumulated Profit Rate & DrawDown ----
-        public static decimal CalcCumRate(CandleModel[] models) 
+        public static decimal CalcCumRate(M[] models) 
             => CalcCumRate(models, 0, models.Length);
 
-        public static decimal CalcCumRate(CandleModel[] models, int offset, int count) 
+        public static decimal CalcCumRate(M[] models, int offset, int count) 
             => ICalc.CalcCumRate(models, offset, count, m => m.Rate);
 
-        public static decimal CalcDrawDown(CandleModel[] models) 
+        public static decimal CalcDrawDown(M[] models) 
             => CalcDrawDown(models, 0, models.Length);
-        public static decimal CalcDrawDown(CandleModel[] models, int offset, int count) 
+        public static decimal CalcDrawDown(M[] models, int offset, int count) 
             => ICalc.CalcDrawDown(models, offset, count, m => m.CumRate);
 
         #endregion

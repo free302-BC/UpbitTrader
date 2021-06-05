@@ -49,7 +49,7 @@ namespace Universe.Coin.TradeLogic.Calc
 
             //TODO: offset ~ offset 이전 데이터 계산포함?
             var ma = new decimal[values.Length];
-            for (int i = offset; i < count; i++)//i ~ models index
+            for (int i = 0; i < count; i++)//i ~ models index
             {
                 int size = Math.Min(i + 1 + offset, windowSize);//i ~ models index
                 var weights = winFuncs[size];
@@ -64,7 +64,7 @@ namespace Universe.Coin.TradeLogic.Calc
 
         #region ---- TEST ----
 
-        public static void TestMovingAvg()
+        public static void MovingAvgTest()
         {
             var ma = calcMovingAvg(_src, 0, _src.Length, 5, WindowFunction.Linear);
             save(_src, ma, "moving_average.txt");
