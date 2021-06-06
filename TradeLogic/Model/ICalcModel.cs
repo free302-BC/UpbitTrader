@@ -12,12 +12,14 @@ namespace Universe.Coin.TradeLogic.Model
     public interface ICalcModel : IViewModel
     {
         //계산용
-        public decimal MovingAvg { get; set; }
-        public decimal MacdOsc { get; set; }
-        public decimal Target { get; set; }
-        public decimal Rate { get; set; }
-        public decimal CumRate { get; set; }
-        public decimal DrawDown { get; set; }
+        decimal MovingAvg { get; set; }
+        decimal MacdOsc { get; set; }
+        decimal Target { get; set; }
+        BackTestSignal BtSignal { get; set; }
+
+        decimal Rate { get; set; }
+        decimal CumRate { get; set; }
+        decimal DrawDown { get; set; }
 
         const decimal FeeRate = 0.0005m * 2m;
     }

@@ -60,6 +60,7 @@ namespace Universe.Coin.TradeLogic.Calc
                 ? (model.High > model.Target)
                 : (model.High > model.Target && model.Opening >= prev.MovingAvg);
 
+            model.BtSignal = doTrade ? BackTestSignal.DoTrade : BackTestSignal.NoTrade;
             model.Rate = doTrade
                     ? Math.Round(model.Closing / model.Target - M.FeeRate, 4)
                     : 1.0000m;

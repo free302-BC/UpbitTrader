@@ -25,5 +25,5 @@ namespace Universe.Coin.TradeLogic.Model
             return sb.ToString();
         }
     }
-
+   
 }

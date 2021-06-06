@@ -35,10 +35,20 @@ namespace Universe.Coin.TradeLogic
         F,  //down
         R   //rise
     }
-    public enum TradeTickDir
+    public enum TradeTickDir : int
     {
-        D,  //ask 매도
-        U   //bid 매수
+        D = -1,  //ask 매도
+        U = 1  //bid 매수
+    }
+    public enum BackTestSignal
+    {
+        NoTrade, DoTrade
+    }
+    public enum TimingSignal
+    {
+        None,
+        Sell,   //매도 신호
+        Buy     //매수 신호
     }
 
     public enum CandleUnit

@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -10,6 +9,8 @@ using Universe.Coin.TradeLogic.Model;
 
 namespace Universe.Coin.Upbit.Model
 {
+    using JS = Utf8Json.JsonSerializer;
+
     [DataContract]
     public class Orderbook : IOrderbook
     {
@@ -61,7 +62,7 @@ namespace Universe.Coin.Upbit.Model
             set
             {
                 OrderbookUnits = value
-                    .Select(v => JsonConvert.DeserializeObject<OrderbookUnit>(v.ToString()!)!)
+                    .Select(v => JS.Deserialize<OrderbookUnit>(v.ToString()!)!)
                     .Select(x => (IOrderbookUnit)x).ToList();
             }
         }

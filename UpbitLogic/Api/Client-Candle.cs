@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -115,7 +114,7 @@ namespace Universe.Coin.Upbit
         public ITicker[] ApiTicker(IEnumerable<(CurrencyId currency, CoinId coin)> markets)
         {
             clearQueryString();
-            foreach (var q in markets) _wc.QueryString.Add("markets", Helper.GetMarketId(q.currency, q.coin));
+            foreach (var q in markets) setQueryString("markets", Helper.GetMarketId(q.currency, q.coin));
             return InvokeApi<Ticker>(ApiId.TradeTicker) ?? Array.Empty<Ticker>();
         }
         #endregion

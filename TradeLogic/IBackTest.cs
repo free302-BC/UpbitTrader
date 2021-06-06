@@ -17,7 +17,7 @@ namespace Universe.Coin.TradeLogic
                 ICalcCandle.CalcMovingAvg(models, offset, count, param);
 
             ICalcCandle.CalcProfitRate(models, offset, count, param);
-            var trades = models.Take(count).Count(x => x.Rate != 1m && x.Rate != 0m);
+            var trades = models.Take(count).Count(x => x.BtSignal == BackTestSignal.DoTrade);
 
             var rate = ICalcCandle.CalcCumRate(models, offset, count);
             var mdd = ICalcCandle.CalcDrawDown(models, offset, count);

@@ -6,43 +6,84 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Universe.AppBase;
+using Universe.Coin.TradeLogic;
 using Universe.Coin.TradeLogic.Calc;
 using Universe.Coin.TradeLogic.Model;
+using Universe.Coin.Upbit.Model;
 
 namespace Universe.Coin.Upbit.App
 {
+    using JS = Utf8Json.JsonSerializer;
+
     public class TickWorker : WorkerBase<TickWorker, BackTestOptions>
     {
+        readonly Client _client;
+
         public TickWorker(
-            ILogger<TickWorker> logger, 
-            IServiceProvider sp, 
+            ILogger<TickWorker> logger,
+            IServiceProvider sp,
             IOptionsMonitor<BackTestOptions> set)
             : base(logger, sp, set)
         {
-        }
+            _client = new Client(_set.AccessKey, _set.SecretKey, _sp.GetRequiredService<ILogger<Client>>());
+            updateClient();
 
-        protected override void work()
-        {
-            var logger = _sp.GetRequiredService<ILogger<Client>>();
-            var uc = new Client(_set.AccessKey, _set.SecretKey, logger);
-            while (true)
+            onOptionsUpdate += updateClient;
+
+            var iw = _sp.GetRequiredService<InputWorker>();
+            iw.AddCmd(ConsoleKey.F9, m => updateClient());
+
+            void updateClient()
             {
-                run_Tick_K(uc);
-                break;
+                info($"Pausing= {_set.Pausing = !_set.Pausing}");
+                _client.Pause(_set.Pausing);
             }
         }
+        protected override void work()
+        {
+            run_Tick_K(_client);
+
+            var request = new WsRequest();
+            request.Add("orderbook", Helper.GetMarketId(CurrencyId.KRW, CoinId.BTC));
+
+            _client.OnReceived += uc_OnReceived;
+            _client.ConnectWs(request);
+        }
+
+        private void uc_OnReceived(string json)
+        {
+            var type = JS.Deserialize<WsResponse>(json).requestType;
+
+            if (type == "trade")
+            {
+                var model = JS.Deserialize<TradeTick>(json)?.ToModel() ?? new();
+                report(model, (int)model.Dir);
+            }
+            if (type == "ticker")
+            {
+                var model = JS.Deserialize<Ticker>(json)?.ToModel() ?? new();
+                report(model);
+            }
+            if (type == "orderbook")
+            {
+                var model = JS.Deserialize<Orderbook>(json)?.ToModel() ?? new();
+                report(model);
+            }
+        }
+
         void run_Tick_K(Client uc)
         {
             var param = _set.CalcParam;
-            var ticks = uc.ApiTicks(count: 50).ToModels();
+            var ticks = uc.ApiTicks(count: 10).ToModels();
             ICalcTradeTick.CalcMovingAvg(ticks, param);
             ICalcTradeTick.CalcMacdOsc(ticks, param);
             //ICalcTradeTick.CalcProfitRate(ticks, param);
             //ICalcTradeTick.CalcCumRate(ticks);
             //ICalcTradeTick.CalcDrawDown(ticks);
-            
+
             info(IViewModel.Print(ticks));
         }
 

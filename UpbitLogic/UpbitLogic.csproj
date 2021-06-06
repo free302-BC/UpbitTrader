@@ -29,12 +29,11 @@
     </GetCurrentBuildVersion>
   </Target>
   <ItemGroup>
-    <PackageReference Include="JsonSubTypes" Version="1.8.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.0-preview.4.21253.7" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.11.1" />
     <PackageReference Include="Universe.CryptoLogic" Version="1.13.0" />
     <PackageReference Include="Universe.Utility" Version="3.3.0" />
+    <PackageReference Include="Utf8Json" Version="1.3.7" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TradeLogic\TradeLogic.csproj" />

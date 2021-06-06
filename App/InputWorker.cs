@@ -44,7 +44,7 @@ namespace Universe.Coin.Upbit.App
                 else _listeners[key] = cmd;
             }
         }
-
+        
         public new void info(object? message) => base.info(message);
 
         object _lock = new object();

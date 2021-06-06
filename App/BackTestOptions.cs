@@ -15,6 +15,7 @@ namespace Universe.Coin.Upbit.App
         public decimal Hours { get; set; }
         public bool LoadFromFile { get; set; }
         public bool PrintCandle { get; set; }
+        public bool Pausing { get; set; }
 
         public CalcParam CalcParam { get; set; } = new();
 
