@@ -34,8 +34,8 @@ namespace Universe.Coin.Upbit
         static CurrencyDic loadCurrencyJson(JsonSerializerOptions opt)
         {
             var json = File.ReadAllText(_MarketCoinsFile);
-            var markets = JsonSerializer.Deserialize<_CurrencyDic>(json, opt) ?? new _CurrencyDic();
-            return markets.ToDictionary(x => x.Key, x => x.Value.Select(y => y.To<CoinId>()).ToHashSet());
+            var markets = JsonSerializer.Deserialize<CurrencyDic>(json, opt) ?? new CurrencyDic();
+            return markets;//.ToDictionary(x => x.Key, x => x.Value.Select(y => y.To<CoinId>()).ToHashSet());
         }
         public static string GetMarketId(CurrencyId currency = CurrencyId.KRW, CoinId coin = CoinId.BTC)
         {
@@ -62,14 +62,14 @@ namespace Universe.Coin.Upbit
             string[] _coinsUSDT =
             { "BTC", "ETH", "LTC", "XRP", "ETC", "OMG", "ADA", "TUSD", "SC", "TRX", "BCH", "DGB", "DOGE", "ZRX", "RVN", "BAT" };
 
-            var opt = JsonSerializer.Deserialize<JsonSerializerOptions>(File.ReadAllText(_jsonOptionFile))!;
-            opt.Encoder = JavaScriptEncoder.Create(UnicodeRanges.BasicLatin, UnicodeRanges.HangulSyllables);
+            var opt = GetJsonOptions();
+
             var coins = new CoinDic();
             for (int i = 0; i < _conisKRW.Length; i++) coins[_conisKRW[i].To<CoinId>()] = (_englishKRW[i], _koreanKRW[i]);
             for (int i = 0; i < _coinsBTC.Length; i++) coins[_coinsBTC[i].To<CoinId>()] = (_englishBTC[i], _koreanBTC[i]);
             File.WriteAllText(_CoinNameFile, JsonSerializer.Serialize(coins, opt));
 
-            var markets = new Dictionary<CurrencyId, HashSet<string>>
+            var markets = new _CurrencyDic
             {
                 { CurrencyId.KRW, new (_conisKRW) },
                 { CurrencyId.BTC, new (_coinsBTC) },

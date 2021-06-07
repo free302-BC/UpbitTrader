@@ -13,21 +13,22 @@ using System.Text.Encodings.Web;
 using Universe.Utility;
 using Universe.CryptoLogic;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Universe.Coin.Upbit
 {
     public partial class Helper
     {
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+#pragma warning disable CS8618
         static Helper()
-#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         {
             try
             {
-                var opt = JsonSerializer.Deserialize<JsonSerializerOptions>(File.ReadAllText(_jsonOptionFile)) ?? new();
-                _apiDic = loadApiJson(opt)!;//API url & path
-                _coinNames = loadCoinJson(opt)!;//coin name dic
-                _currencyCoins = loadCurrencyJson(opt)!;//currency-coin dic -> market
+                var opt = GetJsonOptions();
+
+                _apiDic = loadApiJson(opt);//API url & path
+                _coinNames = loadCoinJson(opt);//coin name dic
+                _currencyCoins = loadCurrencyJson(opt);//currency-coin dic -> market
             }
             catch (JsonException ex)
             {
@@ -46,5 +47,18 @@ namespace Universe.Coin.Upbit
             }
         }
 
+        public static JsonSerializerOptions GetJsonOptions()
+        {
+            var opt = new JsonSerializerOptions();
+            opt.IncludeFields = true;
+            opt.WriteIndented = true;
+            opt.PropertyNameCaseInsensitive = false;
+            opt.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
+            opt.Encoder = JavaScriptEncoder.Create(UnicodeRanges.BasicLatin, UnicodeRanges.HangulSyllables);
+            return opt;
+        }
+
     }//class
+#pragma warning restore CS8618
+
 }

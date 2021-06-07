@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Universe.Coin.TradeLogic.Model;
 
@@ -18,28 +19,28 @@ namespace Universe.Coin.Upbit.Model
         /// 업비트에서 제공중인 시장 정보
         /// </summary>
         /// <value>업비트에서 제공중인 시장 정보</value>
-        [DataMember(Name = "market", EmitDefaultValue = false)]
+        [JsonPropertyName("market")]
         public string Market { get; set; }
 
         /// <summary>
         /// 거래 대상 암호화폐 한글명
         /// </summary>
         /// <value>거래 대상 암호화폐 한글명</value>
-        [DataMember(Name = "korean_name", EmitDefaultValue = false)]
+        [JsonPropertyName("korean_name")]
         public string KoreanName { get; set; }
 
         /// <summary>
         /// 거래 대상 암호화폐 영문명
         /// </summary>
         /// <value>거래 대상 암호화폐 영문명</value>
-        [DataMember(Name = "english_name", EmitDefaultValue = false)]
+        [JsonPropertyName("english_name")]
         public string EnglishName { get; set; }
 
         /// <summary>
         /// 유의 종목 여부 - NONE (해당 사항 없음) - CAUTION (투자유의) 
         /// </summary>
         /// <value>유의 종목 여부 - NONE (해당 사항 없음) - CAUTION (투자유의) </value>
-        [DataMember(Name = "market_warning", EmitDefaultValue = false)]
+        [JsonPropertyName("market_warning")]
         public string MarketWarning { get; set; }
 
         /// <summary>

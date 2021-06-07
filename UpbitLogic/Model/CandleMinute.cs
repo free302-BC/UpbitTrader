@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Universe.Coin.TradeLogic;
 using Universe.Coin.TradeLogic.Model;
@@ -29,7 +30,7 @@ namespace Universe.Coin.Upbit.Model
         /// 분 단위(유닛)
         /// </summary>
         /// <value>분 단위(유닛)</value>
-        [DataMember(Name = "unit", EmitDefaultValue = false)]
+        [JsonPropertyName("unit")]
         public decimal Unit { get; set; }
 
         /// <summary>

@@ -15,6 +15,7 @@ using Universe.CryptoLogic;
 using System.Text.Json;
 using System.Diagnostics.CodeAnalysis;
 using Universe.Coin.TradeLogic;
+using System.Text.Json.Serialization;
 
 namespace Universe.Coin.Upbit
 {
@@ -51,17 +52,8 @@ namespace Universe.Coin.Upbit
             for (int i = 0; i < len; i++)
                 dic.Add((ApiId)i, (_path[i], _method[i], _comment[i], _resetAuth.Contains((ApiId)i)));
 
-            //save json options file
-            var opt = new JsonSerializerOptions();
-            opt.IncludeFields = true;
-            opt.WriteIndented = true;
-            opt.PropertyNameCaseInsensitive = true;
-            File.WriteAllText(_jsonOptionFile, JsonSerializer.Serialize(opt, opt), Encoding.UTF8);
-
-            //save api path file
-            var optEncoder = new JsonSerializerOptions(opt);
-            optEncoder.Encoder = JavaScriptEncoder.Create(UnicodeRanges.BasicLatin, UnicodeRanges.HangulSyllables);
-            var json = JsonSerializer.Serialize(dic, optEncoder);
+            var opt = GetJsonOptions();            
+            var json = JsonSerializer.Serialize(dic, opt);
             File.WriteAllText(_apiPathFile, json, Encoding.UTF8);
         }
         static ApiDic loadApiJson(JsonSerializerOptions opt)

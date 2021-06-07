@@ -52,10 +52,10 @@ namespace Universe.Coin.Upbit.App
             //ticker(uc);
             //candleDay(uc);
             //candleMinutes(uc);
-            //orderbook(uc);
             //ticks(uc);
+            orderbook(uc);
 
-            runAutoTrade(uc);
+            //runAutoTrade(uc);
         }
 
         readonly ManualResetEvent _evPausing;
@@ -198,7 +198,7 @@ namespace Universe.Coin.Upbit.App
         }
         void orderbook(Client uc)
         {
-            var order = new OrderbookModel(uc.ApiOrderbook());//call price
+            var order = uc.ApiOrderbook().ToModel();
             info(order);
         }
         void ticks(Client uc)

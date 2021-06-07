@@ -16,12 +16,7 @@ namespace Universe.Coin.TradeLogic.Model
         public OrderbookModel() { }
         public OrderbookModel(IOrderbook book)
         {
-            setApiModel(book);
-        }
-
-        void setApiModel(IOrderbook book)
-        {
-            var order = book.OrderbookUnits[0];
+            var order = book.OrderbookUnits.First();
             time = DateTimeOffset.FromUnixTimeMilliseconds(book.Timestamp).LocalDateTime;
 
             askA = order.AskSize;
@@ -34,6 +29,7 @@ namespace Universe.Coin.TradeLogic.Model
             askP = askA * askUP;
             bidP = bidA * bidUP;
         }
+        
         public override bool Equals(object? obj)
         {
             if (obj == null || !(obj is OrderbookModel)) return false;

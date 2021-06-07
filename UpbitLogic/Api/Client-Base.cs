@@ -6,7 +6,10 @@ using System.Linq;
 using System.Net;
 using System.Net.WebSockets;
 using System.Text;
+using System.Text.Encodings.Web;
 using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.Text.Unicode;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
@@ -18,7 +21,7 @@ using Universe.Utility;
 
 namespace Universe.Coin.Upbit
 {
-    using JS = Utf8Json.JsonSerializer;
+    using JS = System.Text.Json.JsonSerializer;
 
     /// <summary>
     /// API client base
@@ -133,7 +136,7 @@ namespace Universe.Coin.Upbit
             try
             {
                 string json = _wc.DownloadString(Helper.GetApiPath(apiId, postPath));
-                var models = JS.Deserialize<T[]>(json) ?? Array.Empty<T>();
+                var models = JS.Deserialize<T[]>(json, _jsonOption) ?? Array.Empty<T>();
                 return models;
             }
             catch (WebException ex)
@@ -149,6 +152,17 @@ namespace Universe.Coin.Upbit
         protected void setQueryString(string name, int count) => _wc.QueryString[name] = count.ToString();
         protected void setQueryString(string name, CurrencyId currency, CoinId coin)
             => _wc.QueryString[name] = Helper.GetMarketId(currency, coin);
+
+        #endregion
+
+
+        #region ---- Static JSON ----
+
+        static JsonSerializerOptions _jsonOption;
+        static ClientBase()
+        {
+            _jsonOption = Helper.GetJsonOptions();
+        }
 
         #endregion
 

@@ -16,7 +16,7 @@ using Universe.Coin.Upbit.Model;
 
 namespace Universe.Coin.Upbit.App
 {
-    using JS = Utf8Json.JsonSerializer;
+    using JS = System.Text.Json.JsonSerializer;
 
     public class TickWorker : WorkerBase<TickWorker, BackTestOptions>
     {
@@ -55,7 +55,7 @@ namespace Universe.Coin.Upbit.App
 
         private void uc_OnReceived(string json)
         {
-            var type = JS.Deserialize<WsResponse>(json).requestType;
+            var type = JS.Deserialize<WsResponse>(json)!.requestType;//TODO: !
 
             if (type == "trade")
             {

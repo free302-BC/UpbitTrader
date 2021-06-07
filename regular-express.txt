@@ -1,6 +1,15 @@
+https://regexr.com/
+
 [ToString()]
 \(\"+[ ]+(.+?)\"\).*\((.*)\).*\"\)
 ($"$1{$2}")
 sb.Append("  Market: ").Append(Market).Append("\n");
 sb.Append($"Market: {Market}");
 
+
+[JsonPropertyName]
+\[DataMember\([ ]*Name.+\"([\w]+)\".+?\]
+[JsonPropertyName("$1")]
+
+[DataMember(Name = "market", EmitDefaultValue = false)]
+[JsonPropertyName("market")]

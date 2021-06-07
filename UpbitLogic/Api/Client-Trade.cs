@@ -22,7 +22,11 @@ namespace Universe.Coin.Upbit
         {
             clearQueryString();
             setQueryString("markets", currency, coin);
-            return InvokeApi<Orderbook>(ApiId.OrderOrderbook)?.FirstOrDefault()?? new();
+
+            return InvokeApi<Orderbook>(ApiId.OrderOrderbook).Cast<IOrderbook>()?.FirstOrDefault() 
+                ?? new Orderbook();
+
+            //return InvokeApi<Orderbook>(ApiId.OrderOrderbook)?.FirstOrDefault()?? new();
         }
         public ITradeTick[] ApiTicks(CurrencyId currency = CurrencyId.KRW, CoinId coin = CoinId.BTC, int count = 1)
         {

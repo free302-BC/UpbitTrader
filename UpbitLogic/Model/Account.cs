@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Universe.Coin.TradeLogic.Model;
 
@@ -21,42 +22,42 @@ namespace Universe.Coin.Upbit.Model
         /// 화폐를 의미하는 영문 대문자 코드
         /// </summary>
         /// <value>화폐를 의미하는 영문 대문자 코드</value>
-        [DataMember(Name = "currency", EmitDefaultValue = false)]
+        [JsonPropertyName("currency")]
         public string Currency { get; set; }
 
         /// <summary>
         /// 주문가능 금액/수량
         /// </summary>
         /// <value>주문가능 금액/수량</value>
-        [DataMember(Name = "balance", EmitDefaultValue = false)]
+        [JsonPropertyName("balance")]
         public decimal Balance { get; set; }
 
         /// <summary>
         /// 주문 중 묶여있는 금액/수량
         /// </summary>
         /// <value>주문 중 묶여있는 금액/수량</value>
-        [DataMember(Name = "locked", EmitDefaultValue = false)]
+        [JsonPropertyName("locked")]
         public decimal Locked { get; set; }
 
         /// <summary>
         /// 매수평균가
         /// </summary>
         /// <value>매수평균가</value>
-        [DataMember(Name = "avg_buy_price", EmitDefaultValue = false)]
+        [JsonPropertyName("avg_buy_price")]
         public decimal AvgBuyPrice { get; set; }
 
         /// <summary>
         /// 매수평균가 수정 여부
         /// </summary>
         /// <value>매수평균가 수정 여부</value>
-        [DataMember(Name = "avg_buy_price_modified", EmitDefaultValue = false)]
+        [JsonPropertyName("avg_buy_price_modified")]
         public bool AvgBuyPriceModified { get; set; }
 
         /// <summary>
         /// 평단가 기준 화폐
         /// </summary>
         /// <value>평단가 기준 화폐</value>
-        [DataMember(Name = "unit_currency", EmitDefaultValue = false)]
+        [JsonPropertyName("unit_currency")]
         public string UnitCurrency { get; set; }
 
         /// <summary>

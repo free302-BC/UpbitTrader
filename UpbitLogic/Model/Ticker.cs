@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Universe.Coin.TradeLogic.Model;
 
@@ -20,175 +21,175 @@ namespace Universe.Coin.Upbit.Model
         /// 종목 구분 코드
         /// </summary>
         /// <value>종목 구분 코드</value>
-        [DataMember(Name = "market", EmitDefaultValue = false)]
+        [JsonPropertyName("market")]
         public string Market { get; set; }
 
         /// <summary>
         /// 최근 거래 일자(UTC)
         /// </summary>
         /// <value>최근 거래 일자(UTC)</value>
-        [DataMember(Name = "trade_date", EmitDefaultValue = false)]
+        [JsonPropertyName("trade_date")]
         public string TradeDate { get; set; }
 
         /// <summary>
         /// 최근 거래 시각(UTC)
         /// </summary>
         /// <value>최근 거래 시각(UTC)</value>
-        [DataMember(Name = "trade_time", EmitDefaultValue = false)]
+        [JsonPropertyName("trade_time")]
         public string TradeTime { get; set; }
 
         /// <summary>
         /// 최근 거래 일자(KST)
         /// </summary>
         /// <value>최근 거래 일자(KST)</value>
-        [DataMember(Name = "trade_date_kst", EmitDefaultValue = false)]
+        [JsonPropertyName("trade_date_kst")]
         public string TradeDateKst { get; set; }
 
         /// <summary>
         /// 최근 거래 시각(KST)
         /// </summary>
         /// <value>최근 거래 시각(KST)</value>
-        [DataMember(Name = "trade_time_kst", EmitDefaultValue = false)]
+        [JsonPropertyName("trade_time_kst")]
         public string TradeTimeKst { get; set; }
 
         /// <summary>
         /// 시가
         /// </summary>
         /// <value>시가</value>
-        [DataMember(Name = "opening_price", EmitDefaultValue = false)]
+        [JsonPropertyName("opening_price")]
         public decimal OpeningPrice { get; set; }
 
         /// <summary>
         /// 고가
         /// </summary>
         /// <value>고가</value>
-        [DataMember(Name = "high_price", EmitDefaultValue = false)]
+        [JsonPropertyName("high_price")]
         public decimal HighPrice { get; set; }
 
         /// <summary>
         /// 저가
         /// </summary>
         /// <value>저가</value>
-        [DataMember(Name = "low_price", EmitDefaultValue = false)]
+        [JsonPropertyName("low_price")]
         public decimal LowPrice { get; set; }
 
         /// <summary>
         /// 종가
         /// </summary>
         /// <value>종가</value>
-        [DataMember(Name = "trade_price", EmitDefaultValue = false)]
+        [JsonPropertyName("trade_price")]
         public decimal TradePrice { get; set; }
 
         /// <summary>
         /// 전일 종가
         /// </summary>
         /// <value>전일 종가</value>
-        [DataMember(Name = "prev_closing_price", EmitDefaultValue = false)]
+        [JsonPropertyName("prev_closing_price")]
         public decimal PrevClosingPrice { get; set; }
 
         /// <summary>
         /// EVEN : 보합 RISE : 상승 FALL : 하락 
         /// </summary>
         /// <value>EVEN : 보합 RISE : 상승 FALL : 하락 </value>
-        [DataMember(Name = "change", EmitDefaultValue = false)]
+        [JsonPropertyName("change")]
         public string Change { get; set; }
 
         /// <summary>
         /// 변화액의 절대값
         /// </summary>
         /// <value>변화액의 절대값</value>
-        [DataMember(Name = "change_price", EmitDefaultValue = false)]
+        [JsonPropertyName("change_price")]
         public decimal ChangePrice { get; set; }
 
         /// <summary>
         /// 변화율의 절대값
         /// </summary>
         /// <value>변화율의 절대값</value>
-        [DataMember(Name = "change_rate", EmitDefaultValue = false)]
+        [JsonPropertyName("change_rate")]
         public decimal ChangeRate { get; set; }
 
         /// <summary>
         /// 부호가 있는 변화액
         /// </summary>
         /// <value>부호가 있는 변화액</value>
-        [DataMember(Name = "signed_change_price", EmitDefaultValue = false)]
+        [JsonPropertyName("signed_change_price")]
         public decimal SignedChangePrice { get; set; }
 
         /// <summary>
         /// 부호가 있는 변화율
         /// </summary>
         /// <value>부호가 있는 변화율</value>
-        [DataMember(Name = "signed_change_rate", EmitDefaultValue = false)]
+        [JsonPropertyName("signed_change_rate")]
         public decimal SignedChangeRate { get; set; }
 
         /// <summary>
         /// 가장 최근 거래량
         /// </summary>
         /// <value>가장 최근 거래량</value>
-        [DataMember(Name = "trade_volume", EmitDefaultValue = false)]
+        [JsonPropertyName("trade_volume")]
         public decimal TradeVolume { get; set; }
 
         /// <summary>
         /// 누적 거래대금 (UTC 0시 기준)
         /// </summary>
         /// <value>누적 거래대금 (UTC 0시 기준)</value>
-        [DataMember(Name = "acc_trade_price", EmitDefaultValue = false)]
+        [JsonPropertyName("acc_trade_price")]
         public decimal AccTradePrice { get; set; }
 
         /// <summary>
         /// 24시간 누적 거래대금
         /// </summary>
         /// <value>24시간 누적 거래대금</value>
-        [DataMember(Name = "acc_trade_price_24h", EmitDefaultValue = false)]
+        [JsonPropertyName("acc_trade_price_24h")]
         public decimal AccTradePrice24h { get; set; }
 
         /// <summary>
         /// 누적 거래량 (UTC 0시 기준)
         /// </summary>
         /// <value>누적 거래량 (UTC 0시 기준)</value>
-        [DataMember(Name = "acc_trade_volume", EmitDefaultValue = false)]
+        [JsonPropertyName("acc_trade_volume")]
         public decimal AccTradeVolume { get; set; }
 
         /// <summary>
         /// 24시간 누적 거래량
         /// </summary>
         /// <value>24시간 누적 거래량</value>
-        [DataMember(Name = "acc_trade_volume_24h", EmitDefaultValue = false)]
+        [JsonPropertyName("acc_trade_volume_24h")]
         public decimal AccTradeVolume24h { get; set; }
 
         /// <summary>
         /// 52주 신고가
         /// </summary>
         /// <value>52주 신고가</value>
-        [DataMember(Name = "highest_52_week_price", EmitDefaultValue = false)]
+        [JsonPropertyName("highest_52_week_price")]
         public decimal Highest52WeekPrice { get; set; }
 
         /// <summary>
         /// 52주 신고가 달성일
         /// </summary>
         /// <value>52주 신고가 달성일</value>
-        [DataMember(Name = "highest_52_week_date", EmitDefaultValue = false)]
+        [JsonPropertyName("highest_52_week_date")]
         public string Highest52WeekDate { get; set; }
 
         /// <summary>
         /// 52주 신저가
         /// </summary>
         /// <value>52주 신저가</value>
-        [DataMember(Name = "lowest_52_week_price", EmitDefaultValue = false)]
+        [JsonPropertyName("lowest_52_week_price")]
         public decimal Lowest52WeekPrice { get; set; }
 
         /// <summary>
         /// 52주 신저가 달성일
         /// </summary>
         /// <value>52주 신저가 달성일</value>
-        [DataMember(Name = "lowest_52_week_date", EmitDefaultValue = false)]
+        [JsonPropertyName("lowest_52_week_date")]
         public string Lowest52WeekDate { get; set; }
 
         /// <summary>
         /// 타임스탬프
         /// </summary>
         /// <value>타임스탬프</value>
-        [DataMember(Name = "timestamp", EmitDefaultValue = false)]
+        [JsonPropertyName("timestamp")]
         public long Timestamp { get; set; }
 
         /// <summary>

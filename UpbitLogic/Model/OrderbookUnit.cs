@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Universe.Coin.TradeLogic.Model;
 
@@ -16,28 +17,28 @@ namespace Universe.Coin.Upbit.Model
         /// 매도호가
         /// </summary>
         /// <value>매도호가</value>
-        [DataMember(Name = "ask_price", EmitDefaultValue = false)]
+        [JsonPropertyName("ask_price")]
         public decimal AskPrice { get; set; }
 
         /// <summary>
         /// 매수호가
         /// </summary>
         /// <value>매수호가</value>
-        [DataMember(Name = "bid_price", EmitDefaultValue = false)]
+        [JsonPropertyName("bid_price")]
         public decimal BidPrice { get; set; }
 
         /// <summary>
         /// 매도 잔량
         /// </summary>
         /// <value>매도 잔량</value>
-        [DataMember(Name = "ask_size", EmitDefaultValue = false)]
+        [JsonPropertyName("ask_size")]
         public decimal AskSize { get; set; }
 
         /// <summary>
         /// 매수 잔량
         /// </summary>
         /// <value>매수 잔량</value>
-        [DataMember(Name = "bid_size", EmitDefaultValue = false)]
+        [JsonPropertyName("bid_size")]
         public decimal BidSize { get; set; }
 
         /// <summary>

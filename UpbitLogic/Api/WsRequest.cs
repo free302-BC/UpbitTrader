@@ -20,7 +20,7 @@ namespace Universe.Coin.Upbit
             _value.Add(new() { { "format", "DEFAULT" } });
 
             Add("trade", "KRW-BTC");
-            Add("ticker", "KRW-ETH");
+            //Add("ticker", "KRW-ETH");
         }
         public void Add(string type, string market)
         {

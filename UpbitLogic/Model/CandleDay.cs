@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Universe.Coin.TradeLogic;
 
@@ -20,28 +21,28 @@ namespace Universe.Coin.Upbit.Model
         /// 전일 종가 (UTC 0시 기준)
         /// </summary>
         /// <value>전일 종가 (UTC 0시 기준)</value>
-        [DataMember(Name = "prev_closing_price", EmitDefaultValue = false)]
+        [JsonPropertyName("prev_closing_price")]
         public decimal PrevClosingPrice { get; set; }
 
         /// <summary>
         /// 전일 종가 대비 변화 금액
         /// </summary>
         /// <value>전일 종가 대비 변화 금액</value>
-        [DataMember(Name = "change_price", EmitDefaultValue = false)]
+        [JsonPropertyName("change_price")]
         public decimal ChangePrice { get; set; }
 
         /// <summary>
         /// 전일 종가 대비 변화량
         /// </summary>
         /// <value>전일 종가 대비 변화량</value>
-        [DataMember(Name = "change_rate", EmitDefaultValue = false)]
+        [JsonPropertyName("change_rate")]
         public decimal ChangeRate { get; set; }
 
         /// <summary>
         /// 종가 환산 화폐 단위로 환산된 가격 (요청에 convertingPriceUnit 파라미터 없을 시 해당 필드 포함되지 않음.) 
         /// </summary>
         /// <value>종가 환산 화폐 단위로 환산된 가격 (요청에 convertingPriceUnit 파라미터 없을 시 해당 필드 포함되지 않음.) </value>
-        [DataMember(Name = "converted_trade_price", EmitDefaultValue = false)]
+        [JsonPropertyName("converted_trade_price")]
         public decimal ConvertedTradePrice { get; set; }
 
         /// <summary>

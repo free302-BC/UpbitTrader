@@ -4,12 +4,13 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Universe.Coin.TradeLogic.Model;
 
 namespace Universe.Coin.Upbit.Model
 {
-    using JS = Utf8Json.JsonSerializer;
+    using JS = System.Text.Json.JsonSerializer;
 
     [DataContract]
     public class Orderbook : IOrderbook
@@ -17,55 +18,46 @@ namespace Universe.Coin.Upbit.Model
         public Orderbook()
         {
             Market = "";
-            OrderbookUnits = null!;//null이 아닐경우 json deserialization 에러
+            //OrderbookUnits = null!;//null이 아닐경우 json deserialization 에러 (Newtonsoft)
+            OrderbookUnits = new List<OrderbookUnit>();
         }
 
         /// <summary>
         /// 마켓 코드
         /// </summary>
         /// <value>마켓 코드</value>
-        [DataMember(Name = "market", EmitDefaultValue = false)]
-        public string Market { get; set; } = "";
+        [JsonPropertyName("market")]
+        public string Market { get; set; }
 
         /// <summary>
         /// 호가 생성 시각
         /// </summary>
         /// <value>호가 생성 시각</value>
-        [DataMember(Name = "timestamp", EmitDefaultValue = false)]
+        [JsonPropertyName("timestamp")]
         public long Timestamp { get; set; }
 
         /// <summary>
         /// 호가 매도 총 잔량
         /// </summary>
         /// <value>호가 매도 총 잔량</value>
-        [DataMember(Name = "total_ask_size", EmitDefaultValue = false)]
+        [JsonPropertyName("total_ask_size")]
         public decimal TotalAskSize { get; set; }
 
         /// <summary>
         /// 호가 매수 총량
         /// </summary>
         /// <value>호가 매수 총량</value>
-        [DataMember(Name = "total_bid_size", EmitDefaultValue = false)]
+        [JsonPropertyName("total_bid_size")]
         public decimal TotalBidSize { get; set; }
 
         /// <summary>
         /// 호가
         /// </summary>
         /// <value>호가</value>
-        //[DataMember(Name = "orderbook_units", EmitDefaultValue = false)]
-        public List<IOrderbookUnit> OrderbookUnits { get; set; }
+        [JsonPropertyName("orderbook_units")]
+        [JsonConverter(typeof(JcEnumerable<IOrderbookUnit, OrderbookUnit>))]
+        public IEnumerable<IOrderbookUnit> OrderbookUnits { get; set; }
 
-        [DataMember(Name = "orderbook_units", EmitDefaultValue = false)]
-        object[] units
-        {
-            get => OrderbookUnits?.Select(x => (OrderbookUnit)x)?.ToArray() ?? Array.Empty<object>();
-            set
-            {
-                OrderbookUnits = value
-                    .Select(v => JS.Deserialize<OrderbookUnit>(v.ToString()!)!)
-                    .Select(x => (IOrderbookUnit)x).ToList();
-            }
-        }
 
         const int w = 20;
         /// <summary>

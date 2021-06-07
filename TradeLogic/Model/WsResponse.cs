@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Universe.Coin.TradeLogic.Model
@@ -10,7 +11,6 @@ namespace Universe.Coin.TradeLogic.Model
     
 #pragma warning disable CS8618
 
-    [DataContract]
     public class WsResponse : IApiModel
     {
         //public WsResponse()
@@ -18,11 +18,11 @@ namespace Universe.Coin.TradeLogic.Model
         //    requestType = requestMarket = requestStreamType = "";
         //}
 
-        [DataMember(Name = "type")]
+        [JsonPropertyName("type")]
         public string requestType;// { get; set; }
-        [DataMember(Name = "code")]
+        [JsonPropertyName("code")]
         public string requestMarket;// { get; set; }
-        [DataMember(Name = "stream_type")]
+        [JsonPropertyName("stream_type")]
         public string requestStreamType;// { get; set; }
 
     }
