@@ -10,10 +10,9 @@ using Universe.Coin.TradeLogic.Model;
 
 namespace Universe.Coin.Upbit.Model
 {
-    [DataContract]
     public class TradeTick : ITradeTick
     {
-        public TradeTick() => Market = TradeDateUtc = TradeTimeUtc = AskBid = "";
+        //public TradeTick() => Market = TradeDateUtc = TradeTimeUtc = AskBid = Code = "";
 
         /// <summary>
         /// 마켓 구분 코드
@@ -21,6 +20,9 @@ namespace Universe.Coin.Upbit.Model
         /// <value>마켓 구분 코드</value>
         [JsonPropertyName("market")]
         public string Market { get; set; }
+
+        [JsonPropertyName("code")]
+        public string Code { get; set; }
 
         /// <summary>
         /// 체결 일자 (UTC 기준)
@@ -79,9 +81,8 @@ namespace Universe.Coin.Upbit.Model
         public string AskBid { get; set; }
 
         /// <summary>
-        /// 체결 번호 (Unique)  &#x60;sequential_id&#x60; 필드는 체결의 유일성 판단을 위한 근거로 쓰일 수 있습니다. 하지만 체결의 순서를 보장하지는 못합니다. 
+        /// 체결 번호 (Unique)
         /// </summary>
-        /// <value>체결 번호 (Unique)  &#x60;sequential_id&#x60; 필드는 체결의 유일성 판단을 위한 근거로 쓰일 수 있습니다. 하지만 체결의 순서를 보장하지는 못합니다. </value>
         [JsonPropertyName("sequential_id")]
         public long SequentialId { get; set; }
         

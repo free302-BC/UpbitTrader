@@ -149,9 +149,12 @@ namespace Universe.Coin.Upbit
 
         protected void clearQueryString() => _wc.QueryString.Clear();
         protected void setQueryString(string name, string value) => _wc.QueryString[name] = value;
+        protected void addQueryString(string name, string value) => _wc.QueryString.Add(name,value);
         protected void setQueryString(string name, int count) => _wc.QueryString[name] = count.ToString();
         protected void setQueryString(string name, CurrencyId currency, CoinId coin)
             => _wc.QueryString[name] = Helper.GetMarketId(currency, coin);
+        protected void addQueryString(string name, CurrencyId currency, CoinId coin)
+            => _wc.QueryString.Add(name, Helper.GetMarketId(currency, coin));
 
         #endregion
 

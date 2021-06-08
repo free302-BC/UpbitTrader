@@ -10,12 +10,11 @@ using Universe.Coin.TradeLogic.Model;
 
 namespace Universe.Coin.Upbit.Model
 {
-    [DataContract]
     public class Ticker : ITicker
     {
-        public Ticker()
-            => Market = TradeDate = TradeTime = TradeDateKst = TradeTimeKst
-                = Change = Highest52WeekDate = Lowest52WeekDate = string.Empty;
+        //public Ticker()
+        //    => Market = TradeDate = TradeTime = TradeDateKst = TradeTimeKst
+        //        = Change = Highest52WeekDate = Lowest52WeekDate = string.Empty;
 
         /// <summary>
         /// 종목 구분 코드
@@ -23,6 +22,9 @@ namespace Universe.Coin.Upbit.Model
         /// <value>종목 구분 코드</value>
         [JsonPropertyName("market")]
         public string Market { get; set; }
+
+        [JsonPropertyName("code")]
+        public string Code { get; set; }
 
         /// <summary>
         /// 최근 거래 일자(UTC)

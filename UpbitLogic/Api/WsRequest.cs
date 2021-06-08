@@ -19,17 +19,20 @@ namespace Universe.Coin.Upbit
             _value.Add(new() { { "ticket", Guid.NewGuid().ToString() } });
             _value.Add(new() { { "format", "DEFAULT" } });
 
-            Add("trade", "KRW-BTC");
-            //Add("ticker", "KRW-ETH");
+            //Add("trade", "KRW-BTC");
+            Add("orderbook", new[] { "KRW-BTC" });//, "KRW-ETH"
+            Add("trade", new[] { "KRW-BTC" });
         }
-        public void Add(string type, string market)
+        public void Add(string type, string[] markets)
         {
             var dic = new WsType();
             dic.Add("type", type);
-            dic.Add("codes", new string[] { market });
+            //dic.Add("codes", new string[] { market });
+            dic.Add("codes", markets);
             dic.Add("isOnlyRealtime", true);
             _value.Add(dic);
         }
+
 
 
         public string ToJson() => JsonSerializer.Serialize(_value);

@@ -49,13 +49,13 @@ namespace Universe.Coin.Upbit.App
 
             //market(uc);
             //account(uc);
-            //ticker(uc);
+            ticker(uc);
             //candleDay(uc);
             //candleMinutes(uc);
             //ticks(uc);
-            orderbook(uc);
+            //orderbook(uc);
 
-            //runAutoTrade(uc);
+            runAutoTrade(uc);
         }
 
         readonly ManualResetEvent _evPausing;

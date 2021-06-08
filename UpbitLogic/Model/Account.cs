@@ -13,7 +13,6 @@ namespace Universe.Coin.Upbit.Model
     /// <summary>
     /// 사용자의 계좌 정보
     /// </summary>
-    [DataContract]
     public class Account : IApiModel
     {
         public Account() => Currency = UnitCurrency = string.Empty;

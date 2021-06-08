@@ -5,7 +5,10 @@ namespace Universe.Coin.TradeLogic.Model
     {
         string AskBid { get; set; }
         decimal ChangePrice { get; set; }
+        
         string Market { get; set; }
+        string Code { get; set; }
+
         decimal PrevPrice { get; set; }
         long SequentialId { get; set; }
         long Timestamp { get; set; }

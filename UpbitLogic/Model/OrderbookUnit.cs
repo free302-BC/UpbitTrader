@@ -10,7 +10,6 @@ using Universe.Coin.TradeLogic.Model;
 
 namespace Universe.Coin.Upbit.Model
 {
-    [DataContract]
     public class OrderbookUnit : IOrderbookUnit
     {
         /// <summary>

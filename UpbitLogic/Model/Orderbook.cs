@@ -4,15 +4,15 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Universe.Coin.TradeLogic.Model;
 
 namespace Universe.Coin.Upbit.Model
 {
-    using JS = System.Text.Json.JsonSerializer;
+    using JS = JsonSerializer;
 
-    [DataContract]
     public class Orderbook : IOrderbook
     {
         public Orderbook()
@@ -28,6 +28,9 @@ namespace Universe.Coin.Upbit.Model
         /// <value>마켓 코드</value>
         [JsonPropertyName("market")]
         public string Market { get; set; }
+
+        [JsonPropertyName("code")]
+        public string Code { get; set; }
 
         /// <summary>
         /// 호가 생성 시각

@@ -10,7 +10,8 @@ namespace Universe.Coin.TradeLogic.Model
     public interface IOrderbook : IApiModel
     {
         string Market { get; set; }
-        
+        string Code { get; set; }//web socket model
+
         IEnumerable<IOrderbookUnit> OrderbookUnits { get; set; }
 
         long Timestamp { get; set; }
@@ -20,10 +21,12 @@ namespace Universe.Coin.TradeLogic.Model
         static JsonSerializerOptions _jsonOption;
         static IOrderbook()
         {
-            _jsonOption = new JsonSerializerOptions();
-            _jsonOption.IncludeFields = true;
-            _jsonOption.WriteIndented = true;
-            _jsonOption.PropertyNameCaseInsensitive = false;
+            _jsonOption = new JsonSerializerOptions
+            {
+                IncludeFields = true,
+                WriteIndented = true,
+                PropertyNameCaseInsensitive = false
+            };
         }
 
     }//class

@@ -3,6 +3,9 @@ namespace Universe.Coin.TradeLogic.Model
 {
     public interface ITicker : IApiModel
     {
+        string Market { get; set; }
+        string Code { get; set; }
+
         decimal AccTradePrice { get; set; }
         decimal AccTradePrice24h { get; set; }
         decimal AccTradeVolume { get; set; }
@@ -16,7 +19,6 @@ namespace Universe.Coin.TradeLogic.Model
         string Lowest52WeekDate { get; set; }
         decimal Lowest52WeekPrice { get; set; }
         decimal LowPrice { get; set; }
-        string Market { get; set; }
         decimal OpeningPrice { get; set; }
         decimal PrevClosingPrice { get; set; }
         decimal SignedChangePrice { get; set; }

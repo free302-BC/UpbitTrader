@@ -10,7 +10,6 @@ using Universe.Coin.TradeLogic;
 
 namespace Universe.Coin.Upbit.Model
 {
-    [DataContract]
     public class CandleDay : CandleBase//<CandleDay>
     {
         public CandleDay() : base(ApiId.CandleDays, CandleUnit.DAY)

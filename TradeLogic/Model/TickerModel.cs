@@ -22,8 +22,12 @@ namespace Universe.Coin.TradeLogic.Model
 
         public TickerModel(ITicker ticker)
         {
-            Market = ticker.Market;
-            TimeKST = parse(ticker.TradeDateKst, ticker.TradeTimeKst);
+            Market = string.IsNullOrWhiteSpace(ticker.Market) ? ticker.Code : ticker.Market;
+            Market = Market[^3..];
+
+            //TimeKST = parse(ticker.TradeDateKst, ticker.TradeTimeKst);
+            TimeKST = DateTimeOffset.FromUnixTimeMilliseconds(ticker.Timestamp).LocalDateTime;
+
             Opening = Math.Round(ticker.OpeningPrice / 10000.0m, 1);
             High = Math.Round(ticker.HighPrice / 10000.0m, 1);
             Low = Math.Round(ticker.LowPrice / 10000.0m, 1);
@@ -37,34 +41,21 @@ namespace Universe.Coin.TradeLogic.Model
                 'F' => TickerDir.F,
                 _ => throw new NotImplementedException()
             };
-
-            DateTime parse(string date, string time)
-            {
-                var v = int.Parse(date);
-                var year = v / 10000;
-                var month = (v % 10000) / 100;
-                var day = v % 100;
-                v = int.Parse(time);
-                var hour = v / 10000;
-                var minute = (v % 10000) / 100;
-                var sec = v % 100;
-                return new DateTime(year, month, day, hour, minute, sec, DateTimeKind.Local);
-            }
         }
 
         public override string ToString()
-            => $"{Market,8} {TimeKST,15} {Opening,8:F1} {High,8:F1} {Low,8:F1} {Closing,8:F1} : {Delta,8:F1} {Dir}";
+            => $"[{TimeKST:HH:mm:ss.fff}] {Opening,8:F1} {High,8:F1} {Low,8:F1} {Closing,8:F1} : {Delta,8:F1} {Dir} | {Market,8}";
 
         static readonly (string name, int wdith)[] _names =
         {
-            (nameof(Market), 8),
-            (nameof(TimeKST), 15),
+            (nameof(TimeKST), 14),
             (nameof(Opening), 8),
             (nameof(High), 8),
             (nameof(Low),  8),
             (nameof(Closing), 8),
             (nameof(Delta), 8),
-            (nameof(Dir), 8)
+            (nameof(Dir), 8),
+            (nameof(Market), 8)
         };
         static TickerModel() => IViewModel.buildHeader(_names);
     }//class
@@ -74,7 +65,7 @@ namespace Universe.Coin.TradeLogic.Model
     {
         public static List<TickerModel> ToModels(this IEnumerable<ITicker> models)
            => models.Select(x => new TickerModel(x)).Reverse().ToList();
-        public static TickerModel ToModel(this ITicker model) => new TickerModel(model);
+        public static TickerModel ToModel(this ITicker model) => new(model);
     }
 
 

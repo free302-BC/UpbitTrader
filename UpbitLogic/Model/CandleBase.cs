@@ -11,7 +11,6 @@ using Universe.Coin.TradeLogic.Model;
 
 namespace Universe.Coin.Upbit.Model
 {
-    [DataContract]
     public class CandleBase : ICandle// where C: CandleBase<C>
     {
         public CandleBase()

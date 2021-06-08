@@ -9,6 +9,7 @@ namespace Universe.Coin.TradeLogic.Model
 {
     public class OrderbookModel : IViewModel
     {
+        public string Market;
         public DateTime time;
         public decimal askUP, bidUP, deltaUP; //unit price (price per 1 coin)
         public decimal askA, bidA;//amount (number of coins)
@@ -16,6 +17,9 @@ namespace Universe.Coin.TradeLogic.Model
         public OrderbookModel() { }
         public OrderbookModel(IOrderbook book)
         {
+            Market = string.IsNullOrWhiteSpace(book.Market) ? book.Code : book.Market;
+            Market = Market[^3..];
+
             var order = book.OrderbookUnits.First();
             time = DateTimeOffset.FromUnixTimeMilliseconds(book.Timestamp).LocalDateTime;
 
@@ -41,7 +45,7 @@ namespace Universe.Coin.TradeLogic.Model
         public override int GetHashCode() => Utility.HashCode.Of(askUP).And(askA).And(bidUP).And(bidA);
 
         public override string ToString()
-            => $"[{time:HH:mm:ss.fff}] {askA:F8} × {askUP,6:F1} = {askP,7:F1}  | {deltaUP,6:F1} | {bidP,7:F1} = {bidUP,6:F1} × {bidA:F8}";
+            => $"[{time:HH:mm:ss.fff}] {askA:F8} × {askUP,6:F1} = {askP,7:F1}  | {deltaUP,6:F1} | {bidP,7:F1} = {bidUP,6:F1} × {bidA:F8} {Market}";
         static OrderbookModel() => IViewModel.buildHeader(_names);
         static readonly (string name, int wdith)[] _names =
         {
@@ -62,7 +66,7 @@ namespace Universe.Coin.TradeLogic.Model
     {
         public static List<OrderbookModel> ToModels(this IEnumerable<IOrderbook> models)
            => models.Select(x => new OrderbookModel(x)).Reverse().ToList();
-        public static OrderbookModel ToModel(this IOrderbook model) => new OrderbookModel(model);
+        public static OrderbookModel ToModel(this IOrderbook model) => new(model);
     }
 
 

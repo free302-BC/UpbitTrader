@@ -11,7 +11,6 @@ using Universe.Coin.TradeLogic.Model;
 
 namespace Universe.Coin.Upbit.Model
 {
-    [DataContract]
     public class CandleMinute : CandleBase//<CandleMinute>
     {
         public CandleMinute() : base(ApiId.CandleMinutes, CandleUnit.M1)
