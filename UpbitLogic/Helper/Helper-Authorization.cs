@@ -76,15 +76,6 @@ namespace Universe.Coin.Upbit
         public static string buildQueryHash(NameValueCollection nvc) => $"{nvc}".ToHashString();
         #endregion
 
-        #region ---- TEST ----
-
-        public static void SaveEncrptedKey(string accessKey, string secretKey, string filePath)
-        {
-            var ak = accessKey.Encode();
-            var sk = secretKey.Encode();
-            File.WriteAllText(filePath, $"{ak}\n{sk}");
-        } 
-        #endregion
 
     }//class
 }

@@ -16,7 +16,7 @@ namespace UnitTester
             var p1 = new BackTestOptions();
             p1.CalcParam.FactorK = 0.123m;
             p1.CalcParam.MacdParam = new(1, 2, 3);
-            var p2 = p1.Clone();
+            var p2 = (BackTestOptions)p1.Clone();
             Assert.Equal(p1.CalcParam.FactorK, p2.CalcParam.FactorK);
             Assert.Equal(p1.CalcParam.MacdParam, p2.CalcParam.MacdParam);
 

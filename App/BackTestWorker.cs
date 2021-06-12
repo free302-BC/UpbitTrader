@@ -33,22 +33,79 @@ namespace Universe.Coin.Upbit.App
     using BtRes = ValueTuple<int, decimal, decimal>;//(trades, rate, mdd)
     using BtList = List<(CandleUnit unit, int count, (int trades, decimal rate, decimal mdd) res)>;
 
-    public class BackTestWorker : WorkerBase<BackTestWorker, BackTestOptions>, IDisposable
+    public class BackTestWorker : TradeWorkerBase<BackTestWorker, BackTestOptions>
     {
         #region ---- Ctor ----
 
         public BackTestWorker(
             ILogger<BackTestWorker> logger,
             IOptionsMonitor<BackTestOptions> set,
-            IServiceProvider sp)
-            : base(logger, sp, set, GetNewId())
+            IServiceProvider sp,
+            InputWorker inputWorker)
+            : base(logger, sp, set, inputWorker, GetNewId())
         {
             _ev = new(false);
             onOptionsUpdate += () => info($"{nameof(BackTestOptions)} updated!");
 
-            _jsonOpt = JsonSerializer.Deserialize<JsonSerializerOptions>(File.ReadAllText(_jsonOptionFile))!;
+            registerHotkey();
         }
-        public void Dispose() => _ev?.Dispose();
+        void registerHotkey()
+        {
+            registerHotkey(ConsoleKey.Spacebar, m => _ev.Set());
+            registerHotkey(ConsoleKey.Enter, m => _ev.Set());
+            registerHotkey(ConsoleKey.F1, m =>
+            {
+                _set.DoFindK = !_set.DoFindK;
+                info($"DoFindK: {_set.DoFindK}");
+            });
+
+            registerHotkey(ConsoleKey.F2, m => onChangeNumericParam(m, 3, () => _set.Hours));
+            registerHotkey(ConsoleKey.F3, m => onChangeNumericParam(m, 0.1m, () => _set.CalcParam.FactorK));
+            registerHotkey(ConsoleKey.F4, m => onChangeNumericParam(m, 3, () => _set.CalcParam.WindowSize));
+            registerHotkey(ConsoleKey.F5, onToggleWF);
+            registerHotkey(ConsoleKey.F12, onRemoveFile);
+
+            void onChangeNumericParam<P>(ConsoleModifiers modifier, P delta, Expression<Func<P>> selector)
+            {
+                var set = selector.ToDelegate();
+                dynamic dv = delta!;
+                dynamic v0 = set.getter()!;
+
+                if (modifier.HasFlag(ConsoleModifiers.Control))
+                {
+                    if (modifier.HasFlag(ConsoleModifiers.Shift))
+                        set.setter(v0 / 2);
+                    else
+                        set.setter(v0 * 2);
+                }
+                else
+                {
+                    set.setter(v0 + (modifier.HasFlag(ConsoleModifiers.Shift) ? -dv : +dv));
+                }
+                info($"{((MemberExpression)selector.Body).Member.Name}: {set.getter()}");
+            }
+            void onToggleWF(ConsoleModifiers modifier)
+            {
+                var delta = modifier.HasFlag(ConsoleModifiers.Shift) ? -1 : +1;
+                _set.CalcParam.WindowFunction
+                    = (WindowFunction)(((int)_set.CalcParam.WindowFunction + delta) % (int)(1 + WindowFunction.Gaussian));
+                info($"WindowFunction: {_set.CalcParam.WindowFunction}");
+            }
+            void onRemoveFile(ConsoleModifiers modifier)
+            {
+                var units = new[]
+                { CandleUnit.M240, CandleUnit.M60, CandleUnit.M30,
+                        CandleUnit.M15, CandleUnit.M10, CandleUnit.M3, CandleUnit.M1 };
+                foreach (var u in units) removeFile(u);
+                info($"Cache files removed");
+            }
+        }
+
+        public new void Dispose()
+        {
+            base.Dispose();
+            _ev?.Dispose();
+        }
 
         #endregion
 
@@ -60,7 +117,6 @@ namespace Universe.Coin.Upbit.App
         {
             var logger = _sp.GetRequiredService<ILogger<Client>>();
             var uc = new Client(_set.AccessKey, _set.SecretKey, logger);
-            registerHotkey(_ev);
 
             while (true)
             {
@@ -74,62 +130,6 @@ namespace Universe.Coin.Upbit.App
                 _ev.WaitOne();
             }
 
-            void registerHotkey(EventWaitHandle ev)
-            {
-                var iw = _sp.GetRequiredService<InputWorker>();
-                iw.AddCmd(ConsoleKey.Spacebar, (m) => ev.Set());
-                iw.AddCmd(ConsoleKey.Enter, (m) => ev.Set());
-                iw.AddCmd(ConsoleKey.F1, onChangeTest);
-                iw.AddCmd(ConsoleKey.F2, m => onChangeNumericParam(m, 3, () => _set.Hours));
-                iw.AddCmd(ConsoleKey.F3, m => onChangeNumericParam(m, 0.1m, () => _set.CalcParam.FactorK));
-                iw.AddCmd(ConsoleKey.F4, m => onChangeNumericParam(m, 3, () => _set.CalcParam.WindowSize));
-                iw.AddCmd(ConsoleKey.F5, onToggleWF);
-                iw.AddCmd(ConsoleKey.F12, onRemoveFile);
-
-                void onChangeTest(ConsoleModifiers modifier)
-                {
-                    _set.DoFindK = !_set.DoFindK;
-                    info($"DoFindK: {_set.DoFindK}");
-                    //_ev.Set();
-                }
-                void onChangeNumericParam<P>(ConsoleModifiers modifier, P delta, Expression<Func<P>> selector)
-                {
-                    var set = selector.ToDelegate();
-                    dynamic dv = delta!;
-                    dynamic v0 = set.getter()!;
-
-                    if (modifier.HasFlag(ConsoleModifiers.Control))
-                    {
-                        if (modifier.HasFlag(ConsoleModifiers.Shift))
-                            set.setter(v0 / 2);
-                        else
-                            set.setter(v0 * 2);
-                    }
-                    else
-                    {
-                        set.setter(v0 + (modifier.HasFlag(ConsoleModifiers.Shift) ? -dv : +dv));
-                    }
-                    info($"{((MemberExpression)selector.Body).Member.Name}: {set.getter()}");
-                    //ev.Set();
-                }
-                void onToggleWF(ConsoleModifiers modifier)
-                {
-                    var delta = modifier.HasFlag(ConsoleModifiers.Shift) ? -1 : +1;
-                    _set.CalcParam.WindowFunction
-                        = (WindowFunction)(((int)_set.CalcParam.WindowFunction + delta) % (int)(1 + WindowFunction.Gaussian));
-                    info($"WindowFunction: {_set.CalcParam.WindowFunction}");
-                    //_ev.Set();
-                }
-                void onRemoveFile(ConsoleModifiers modifier)
-                {
-                    var units = new[]
-                    { CandleUnit.M240, CandleUnit.M60, CandleUnit.M30, 
-                        CandleUnit.M15, CandleUnit.M10, CandleUnit.M3, CandleUnit.M1 };
-                    foreach (var u in units) removeFile(u);
-                    info($"Cache files removed");
-                    //_ev.Set();
-                }
-            }
         }
 
         /// <summary>
@@ -316,13 +316,9 @@ namespace Universe.Coin.Upbit.App
             return models.Take(count).ToArray();
         }
 
-        JsonSerializerOptions _jsonOpt;
-        const string _jsonOptionFile = "api_json_option.json";
         void save(CandleModel[] models, CandleUnit unit)
         {
-            var opt = new JsonSerializerOptions(_jsonOpt);
-            opt.Encoder = JavaScriptEncoder.Create(UnicodeRanges.BasicLatin, UnicodeRanges.HangulSyllables);
-            var json = JsonSerializer.Serialize(models, opt);
+            var json = JsonSerializer.Serialize(models, _jsonOptions);
             File.WriteAllText($"{unit}.json", json);
         }
         CandleModel[] load(CandleUnit unit)
@@ -331,7 +327,7 @@ namespace Universe.Coin.Upbit.App
             if (File.Exists(fn))
             {
                 var json = File.ReadAllText(fn);
-                var models = JsonSerializer.Deserialize<CandleModel[]>(json, _jsonOpt);
+                var models = JsonSerializer.Deserialize<CandleModel[]>(json, _jsonOptions);
                 if (models != null) return models;
             }
             return Array.Empty<CandleModel>();
@@ -369,16 +365,9 @@ namespace Universe.Coin.Upbit.App
 
         #region ---- TEST ----
 
-
-        void testHash()
-        {
-            var nvc = new NameValueCollection();
-            nvc.Add("count", "123");
-            Helper.buildQueryHash(nvc);
-        }
         void saveKey(WorkerOptions set)
         {
-            Helper.SaveEncrptedKey(set.AccessKey, set.SecretKey, "key.txt");
+            ITradeOptions.SaveEncrptedKey(set.AccessKey, set.SecretKey, "key.txt");
         }
 
 

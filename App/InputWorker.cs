@@ -19,11 +19,12 @@ using Universe.Utility;
 
 namespace Universe.Coin.Upbit.App
 {
-    using EventDic = Dictionary<ConsoleKey, Listener>;
-    public delegate void Listener(ConsoleModifiers modifiers);
+    using EventDic = Dictionary<ConsoleKey, InputWorker.Listener>;
 
     public class InputWorker : WorkerBase<InputWorker, WorkerOptions>
     {
+        public delegate void Listener(ConsoleModifiers modifiers);
+
         public InputWorker(
             ILogger<InputWorker> logger,
             IServiceProvider sp,

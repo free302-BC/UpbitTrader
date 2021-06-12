@@ -1,7 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -9,6 +6,9 @@ using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Universe.AppBase;
 using Universe.Coin.TradeLogic;
 using Universe.Coin.TradeLogic.Calc;
@@ -17,27 +17,20 @@ using Universe.Coin.Upbit.Model;
 
 namespace Universe.Coin.Upbit.App
 {
-    using JS = System.Text.Json.JsonSerializer;
+    using JS = JsonSerializer;
 
-    public class TickWorker : WorkerBase<TickWorker, BackTestOptions>
+    public class TickWorker : TradeWorkerBase<TickWorker, BackTestOptions>
     {
-        readonly Client _client;
-        readonly JsonSerializerOptions _jsonOptions;
-
         public TickWorker(
             ILogger<TickWorker> logger,
             IServiceProvider sp,
-            IOptionsMonitor<BackTestOptions> set)
-            : base(logger, sp, set)
+            IOptionsMonitor<BackTestOptions> set,
+            InputWorker inputWorker)
+            : base(logger, sp, set, inputWorker)
         {
-            _jsonOptions = Helper.GetJsonOptions();
-            _client = new Client(_set.AccessKey, _set.SecretKey, _sp.GetRequiredService<ILogger<Client>>());
             updateClient();
-
             onOptionsUpdate += updateClient;
-
-            var iw = _sp.GetRequiredService<InputWorker>();
-            iw.AddCmd(ConsoleKey.F9, m => updateClient());
+            registerHotkey(ConsoleKey.F9, m => updateClient());
 
             void updateClient()
             {
@@ -49,10 +42,10 @@ namespace Universe.Coin.Upbit.App
         {
             //run_Tick_K(_client);
 
+            _client.OnReceived += uc_OnReceived;
+            
             var request = new WsRequest();
             //request.Add("orderbook", Helper.GetMarketId(CurrencyId.KRW, CoinId.BTC));
-
-            _client.OnReceived += uc_OnReceived;
             _client.ConnectWs(request);
         }
 

@@ -36,10 +36,10 @@ namespace Universe.Coin.Upbit
         readonly ClientWebSocket _ws;
         readonly CancellationTokenSource _cts;
 
-        public ClientBase(string accessKeyEnc, string secretKeyEnc, ILogger logger)
+        public ClientBase(string accessKey, string secretKey, ILogger logger)
         {
             _logger = logger;
-            _key = (accessKeyEnc.Decode(), secretKeyEnc.Decode());
+            _key = (accessKey, secretKey);
             _wc = new();
             _wc.SetAuthToken(_key);
             _wc.SetAcceptance();

@@ -11,7 +11,7 @@ namespace Universe.Coin.Upbit
     using WsType = Dictionary<string, object>;
     public class WsRequest
     {
-        List<WsType> _value { get; set; }
+        List<WsType> _value;// { get; set; }
 
         public WsRequest()
         {
@@ -22,6 +22,7 @@ namespace Universe.Coin.Upbit
             //Add("trade", "KRW-BTC");
             Add("orderbook", new[] { "KRW-BTC" });//, "KRW-ETH"
             Add("trade", new[] { "KRW-BTC" });
+            Add("trade", new[] { "KRW-ETH" });
         }
         public void Add(string type, string[] markets)
         {

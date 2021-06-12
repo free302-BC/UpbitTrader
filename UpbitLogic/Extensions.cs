@@ -42,16 +42,5 @@ namespace Universe.Coin.Upbit
             logger.LogError(msg);
         }
 
-        public static string Decode(this string hexa) => Crypto.Decode(getKey(), hexa.FromHexa()).ToUtf8String();
-        public static string Encode(this string plain) => Crypto.Encode(getKey(), plain, false).ToHexa();
-
-        static readonly int[] _key =
-        {
-            172 ^ 0xFF, 158 ^ 0xFF, 186 ^ 0xFF, 29 ^ 0xFF, 129 ^ 0xFF, 117 ^ 0xFF, 73 ^ 0xFF, 069 ^ 0xFF,
-            145 ^ 0xFF, 240 ^ 0xFF, 030 ^ 0xFF, 72 ^ 0xFF, 113 ^ 0xFF, 062 ^ 0xFF, 81 ^ 0xFF, 205 ^ 0xFF
-        };
-        static string getKey() => new Guid(_key.Select(x => (byte)(x ^ 0xFF)).ToArray()).ToString();
-
-
     }//class
 }

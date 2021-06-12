@@ -14,20 +14,21 @@ namespace Universe.Coin.Upbit.App
         public bool Pausing { get; set; }
         public CalcParam CalcParam { get; set; } = new();
 
-        public TraderOptions Clone()
+        public new IWorkerOptions Clone()
         {
             var clone = (TraderOptions)MemberwiseClone();
             clone.CalcParam = (CalcParam)CalcParam.Clone();
+
+            ((WorkerOptions)clone).Reload(this);
+
             return clone;
         }
 
-        public override void Reload(IWorkerOptions source)
+        public new void Reload(IWorkerOptions source)
         {
             base.Reload(source);
-            var src = source as TraderOptions;
-            if (src == null) throw new ArgumentException(
-               $"{nameof(TraderOptions)}.{nameof(Reload)}(): can't reload from type <{source.GetType().Name}>");
-
+            var src = (TraderOptions)source;
+            Pausing = src.Pausing;
             CalcParam.Reload(src.CalcParam);
         }
     }

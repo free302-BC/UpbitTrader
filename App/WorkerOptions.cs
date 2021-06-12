@@ -7,27 +7,27 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using Universe.AppBase;
+using Universe.Coin.TradeLogic;
 
 namespace Universe.Coin.Upbit.App
 {
-    public class WorkerOptions : WorkerOptionsBase
+    public class WorkerOptions : TradeOptionsBase, IWorkerOptions
     {
-        public string AccessKey { get; set; } = "";
-        public string SecretKey { get; set; } = "";
-
-        public override void Reload(IWorkerOptions source)
+        public void Reload(IWorkerOptions source)
         {
-            base.Reload(source);
-            var src = source as WorkerOptions;
-            if (src == null)  throw new ArgumentException(
-                $"{nameof(WorkerOptions)}.{nameof(Reload)}(): can't reload from type <{source.GetType().Name}>");
+            IWorkerOptions.checkType(this, source);
+            var src = (WorkerOptions)source;
             AccessKey = src.AccessKey;
-            SecretKey = src.SecretKey;            
+            SecretKey = src.SecretKey;
         }
 
-        //public static implicit operator KeyPair(WorkerSetting set) => (set.AccessKey, set.SecretKey);
-        //public static implicit operator WorkerSetting((string AccessKey, string SecretKey) keys)
-        //    => new WorkerSetting { AccessKey = keys.AccessKey, SecretKey = keys.SecretKey };
+        public IWorkerOptions Clone()
+        {
+            var dest = new WorkerOptions();
+            dest.AccessKey = AccessKey;
+            dest.SecretKey = SecretKey;
+            return dest;
+        }
 
     }//class    
 }

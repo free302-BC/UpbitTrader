@@ -31,15 +31,23 @@ namespace UnitTester
         public WorkerTester()
         {
             _logger = null!;
-            _client = new Client(_accessKey, _secretKey, _logger);
+
+            ITradeOptions opt = new TradeOptionsBase()
+            {
+                AccessKey = _accessKey,
+                SecretKey = _secretKey
+            };
+
+            _client = new Client(opt.GetAccessKey(), opt.GetSecretKey(), _logger);
         }
 
         [Fact]
         public void Run()
         {
-            AddWorker<TestWorker, WorkerOptionsBase>();
+            AddWorker<TestWorker, WorkerOptions>();
             RunHost();
         }
+
         [Fact]
         void apiParamTest()
         {
@@ -48,16 +56,22 @@ namespace UnitTester
             Debug.WriteLine(result);
         }
 
-        public class TestWorker : WorkerBase<TestWorker, WorkerOptionsBase>
+        public class TestWorker : WorkerBase<TestWorker, WorkerOptions>
         {
             readonly Client _client;
             public TestWorker(
                 ILogger<TestWorker> logger,
                 IServiceProvider sp,
-                IOptionsMonitor<WorkerOptionsBase> set, string id = "")
+                IOptionsMonitor<WorkerOptions> set, string id = "")
                 : base(logger, sp, set, id)
             {
-                _client = new Client(_accessKey, _secretKey, logger);
+                ITradeOptions opt = new TradeOptionsBase()
+                {
+                    AccessKey = _accessKey,
+                    SecretKey = _secretKey
+                };
+
+                _client = new Client(opt.GetAccessKey(), opt.GetSecretKey(), _logger);
             }
 
             new void info(object message) => Debug.WriteLine($"{message}");
@@ -66,16 +80,18 @@ namespace UnitTester
             protected override void work()
             {
                 MovingAvg_Speed_Test();
+
                 _sp.GetRequiredService<IHost>().StopAsync().Wait();
             }
-            
+
             void MovingAvg_Speed_Test()
             {
                 var w = Stopwatch.StartNew();
                 var models = _client.ApiCandle<CandleMinute>(count: 100000, unit: CandleUnit.M1).ToModels();
                 info($"Load Models: Δt= {w.ElapsedMilliseconds}ms", $"{models[0]}");
 
-                var param = new CalcParam() {
+                var param = new CalcParam()
+                {
                     //ApplyMovingAvg = true,
                     WindowSize = 15,
                     WindowFunction = WindowFunction.Identical
@@ -89,7 +105,7 @@ namespace UnitTester
                 w.Restart();
                 param.WindowFunction = WindowFunction.Identical;
                 ICalcCandle.CalcMovingAvg(models, param);
-                info($"{param.WindowFunction,20}:Δt= {w.ElapsedMilliseconds}ms",$"{models[0]}");
+                info($"{param.WindowFunction,20}:Δt= {w.ElapsedMilliseconds}ms", $"{models[0]}");
 
                 param.WindowFunction = WindowFunction.Linear;
                 w.Restart();

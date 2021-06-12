@@ -17,8 +17,8 @@ namespace Universe.Coin.Upbit
 {
     public partial class Client : ClientBase, IClient
     {
-        public Client(string accessKeyEnc, string secretKeyEnc, ILogger logger) :
-            base(accessKeyEnc, secretKeyEnc, logger)
+        public Client(string accessKey, string secretKey, ILogger logger) :
+            base(accessKey, secretKey, logger)
         { }
 
         public MarketInfo[] ApiMarketInfo() => InvokeApi<MarketInfo>(ApiId.MarketInfoAll);

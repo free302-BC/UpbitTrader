@@ -19,19 +19,12 @@ namespace Universe.Coin.Upbit.App
 
         public CalcParam CalcParam { get; set; } = new();
 
-        //public decimal FactorK { get; set; }
-        ////public bool ApplyMovingAvg { get; set; }
-        //public int WindowSize { get; set; }
-        //public WindowFunction WindowFunction { get; set; }
-        //public bool ApplyStopLoss { get; set; }
-        //public int[] MacdWindowSizes { get; set; } = new int[0];
-
-        public override void Reload(IWorkerOptions source)
+        public new void Reload(IWorkerOptions source)
         {
             base.Reload(source);
-            var src = source as BackTestOptions;
-            if (src == null) throw new ArgumentException(
-               $"{nameof(BackTestOptions)}.{nameof(Reload)}(): can't reload from type <{source.GetType().Name}>");
+            var src = (BackTestOptions)source;
+            //if (src == null) throw new ArgumentException(
+            //   $"{nameof(BackTestOptions)}.{nameof(Reload)}(): can't reload from type <{source.GetType().Name}>");
 
             DoFindK = src.DoFindK;
             Hours = src.Hours;
@@ -39,11 +32,13 @@ namespace Universe.Coin.Upbit.App
             PrintCandle = src.PrintCandle;
             CalcParam.Reload(src.CalcParam);
         }
-
-        public BackTestOptions Clone()
+        public new IWorkerOptions Clone()
         {
             var clone = (BackTestOptions)MemberwiseClone();
             clone.CalcParam = (CalcParam)CalcParam.Clone();
+
+            ((WorkerOptions)clone).Reload(this);
+
             return clone;
         }
     }

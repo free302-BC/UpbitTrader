@@ -13,7 +13,14 @@ using Microsoft.Extensions.Options;
 
 namespace Universe.AppBase
 {
-    public abstract class WorkerBase<W, S> : IHostedService where W : WorkerBase<W, S> where S : IWorkerOptions
+    /// <summary>
+    /// IHostedService를 구현하는 베이스 클래스
+    /// </summary>
+    /// <typeparam name="W"></typeparam>
+    /// <typeparam name="S"></typeparam>
+    public abstract class WorkerBase<W, S> : IHostedService 
+        where W : WorkerBase<W, S> 
+        where S : IWorkerOptions
     {
         protected readonly ILogger _logger;
         public string Id { get; set; }
@@ -50,7 +57,7 @@ namespace Universe.AppBase
                     }
                 });
             }
-        }
+        }        
 
         protected void report(object message, int color = 0)
         {
