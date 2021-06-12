@@ -1,7 +1,9 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using Universe.Coin.TradeLogic.Model;
@@ -67,6 +69,21 @@ namespace Universe.Coin.TradeLogic
             Action<P> setterWithoutInstance = p => setter(instance, p);
 
             return (v0, setterWithoutInstance);
+        }
+
+        public static void LogWebException(this ILogger logger, WebException ex)
+        {
+            var nl = Environment.NewLine;
+            var msg = $"uri= { ex.Response?.ResponseUri}{nl}ex.Status={ex.Status}{nl}ex.Message= {ex.Message}";
+            if (ex.Response != null)
+            {
+                var res = (HttpWebResponse)ex.Response;
+                Span<byte> buffer = stackalloc byte[1024];
+                res.GetResponseStream().Read(buffer);
+                var text = Encoding.ASCII.GetString(buffer);
+                msg = $"{msg}{nl}res.StatusCode= {res.StatusCode}{nl}res.Content= {text}";
+            }
+            logger.LogError(msg);
         }
 
     }

@@ -26,7 +26,6 @@ namespace Universe.Coin.Upbit
     {
         const string _apiBaseUrl = "https://api.upbit.com/v1/";
         const string _apiPathFile = "api_path.json";
-        const string _jsonOptionFile = "api_json_option.json";
         static readonly ApiDic _apiDic;
 
         public static string GetApiPath(ApiId api, string postPath = "") 

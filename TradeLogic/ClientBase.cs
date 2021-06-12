@@ -16,39 +16,41 @@ using System.Web;
 using Microsoft.Extensions.Logging;
 using Universe.Coin.TradeLogic;
 using Universe.Coin.TradeLogic.Model;
-using Universe.Coin.Upbit.Model;
 using Universe.Utility;
 
-namespace Universe.Coin.Upbit
+namespace Universe.Coin.TradeLogic
 {
-    using JS = System.Text.Json.JsonSerializer;
+    using JS = JsonSerializer;
 
     /// <summary>
     /// API client base
     /// </summary>
-    public abstract class ClientBase : IDisposable
+    public abstract class ClientBase : ITradeClientBase
     {
-        const string _wssUri = "wss://api.upbit.com/websocket/v1";
-        const string _market = "KRW-BTC";
-        readonly KeyPair _key;
-        readonly ILogger _logger;
-        readonly WebClient _wc;
-        readonly ClientWebSocket _ws;
+        protected readonly KeyPair _key;
+        protected readonly ILogger _logger;
+
+        readonly string _wsUri;
+        protected readonly WebClient _wc;
+        protected readonly ClientWebSocket _ws;
         readonly CancellationTokenSource _cts;
 
-        public ClientBase(string accessKey, string secretKey, ILogger logger)
+        public ClientBase(string wsUri, string accessKey, string secretKey, ILogger logger)
         {
+            _wsUri = wsUri;
             _logger = logger;
             _key = (accessKey, secretKey);
-            _wc = new();
-            _wc.SetAuthToken(_key);
-            _wc.SetAcceptance();
 
+            _wc = new();
             _ws = new();
-            _ws.Options.KeepAliveInterval = new TimeSpan(0, 1, 30);
+            init();
+
             _cts = new();
             _evPausing = new(false);
         }
+
+        protected abstract void init();
+
         public void Dispose()
         {
             _wc?.Dispose();
@@ -63,7 +65,7 @@ namespace Universe.Coin.Upbit
         /// <summary>
         /// 
         /// </summary>
-        public event Action<string>? OnReceived;
+        public event Action<string>? OnWsReceived;
 
         /// <summary>
         /// 
@@ -76,19 +78,27 @@ namespace Universe.Coin.Upbit
         }
         readonly ManualResetEvent _evPausing;
 
+
         /// <summary>
         /// 
         /// </summary>
-        public void ConnectWs(WsRequest request)
+        public void ConnectWs(IWsRequest request)
         {
-            connect().ContinueWith(t => sendWsRequest().Wait()).Wait();
+            connectAsync();
+            sendWsRequest();
             Task.Run(wsReceiver);
 
-            async Task connect()
+            void connectAsync()
             {
-                await _ws.ConnectAsync(new Uri(_wssUri), _cts.Token)
-                    .ContinueWith(t => _logger.LogInformation($"Websocket connected: {_wssUri}"),
-                        TaskContinuationOptions.OnlyOnRanToCompletion);
+                _ws.ConnectAsync(new Uri(_wsUri), _cts.Token)
+                    .ContinueWith(t => _logger.LogInformation($"Websocket connected: {_wsUri}"),
+                        TaskContinuationOptions.OnlyOnRanToCompletion).Wait();
+            }
+            ValueTask sendWsRequest()
+            {
+                var json = request.ToJsonBytes();
+                var rm = new ReadOnlyMemory<byte>(json, 0, json.Length);
+                return _ws.SendAsync(rm, WebSocketMessageType.Binary, true, _cts.Token);
             }
 
             void wsReceiver()
@@ -105,15 +115,8 @@ namespace Universe.Coin.Upbit
 
                     var res = _ws.ReceiveAsync(buffer, _cts.Token).Result;
                     var json = Encoding.UTF8.GetString(array, 0, res.Count);
-                    OnReceived?.Invoke(json);
+                    OnWsReceived?.Invoke(json);
                 }
-            }
-
-            async Task sendWsRequest()
-            {
-                var json = request.ToJsonBytes();
-                var rm = new ReadOnlyMemory<byte>(json, 0, json.Length);
-                await _ws.SendAsync(rm, WebSocketMessageType.Binary, true, _cts.Token);
             }
         }
 
@@ -129,32 +132,29 @@ namespace Universe.Coin.Upbit
         /// <param name="apiId"></param>
         /// <param name="postPath">Api URL에 추가할 경로: ex) minutes candle의 unit</param>
         /// <returns></returns>
-        public T[] InvokeApi<T>(ApiId apiId, string postPath = "") where T : IApiModel, new()
+        public virtual T[] InvokeApi<T>(ApiId api, string postPath = "") where T : IApiModel, new()
         {
-            if (Helper.GetApi(apiId).ResetAuthToken) _wc.SetAuthToken(_key);
+            var httpUri = prepareInvoke(api, postPath);
 
             try
             {
-                string json = _wc.DownloadString(Helper.GetApiPath(apiId, postPath));
+                string json = _wc.DownloadString(httpUri);
                 var models = JS.Deserialize<T[]>(json, _jsonOption) ?? Array.Empty<T>();
                 return models;
             }
             catch (WebException ex)
             {
-                _logger.LogWebException(ex, apiId);
-                if (apiId == ApiId.CandleMinutes) throw;
+                _logger.LogWebException(ex);
                 return Array.Empty<T>();
             }
         }
+        protected abstract string prepareInvoke(ApiId apiId, string postPath);
+
 
         protected void clearQueryString() => _wc.QueryString.Clear();
         protected void setQueryString(string name, string value) => _wc.QueryString[name] = value;
-        protected void addQueryString(string name, string value) => _wc.QueryString.Add(name,value);
+        protected void addQueryString(string name, string value) => _wc.QueryString.Add(name, value);
         protected void setQueryString(string name, int count) => _wc.QueryString[name] = count.ToString();
-        protected void setQueryString(string name, CurrencyId currency, CoinId coin)
-            => _wc.QueryString[name] = Helper.GetMarketId(currency, coin);
-        protected void addQueryString(string name, CurrencyId currency, CoinId coin)
-            => _wc.QueryString.Add(name, Helper.GetMarketId(currency, coin));
 
         #endregion
 
@@ -164,9 +164,18 @@ namespace Universe.Coin.Upbit
         static JsonSerializerOptions _jsonOption;
         static ClientBase()
         {
-            _jsonOption = Helper.GetJsonOptions();
+            _jsonOption = getJsonOptions();
         }
-
+        static JsonSerializerOptions getJsonOptions()
+        {
+            var opt = new JsonSerializerOptions();
+            opt.IncludeFields = true;
+            opt.WriteIndented = true;
+            opt.PropertyNameCaseInsensitive = false;
+            opt.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
+            opt.Encoder = JavaScriptEncoder.Create(UnicodeRanges.BasicLatin, UnicodeRanges.HangulSyllables);
+            return opt;
+        }
         #endregion
 
     }//class

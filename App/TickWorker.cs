@@ -42,7 +42,7 @@ namespace Universe.Coin.Upbit.App
         {
             //run_Tick_K(_client);
 
-            _client.OnReceived += uc_OnReceived;
+            _client.OnWsReceived += uc_OnReceived;
             
             var request = new WsRequest();
             //request.Add("orderbook", Helper.GetMarketId(CurrencyId.KRW, CoinId.BTC));

@@ -27,20 +27,5 @@ namespace Universe.Coin.Upbit
             => wc.Headers["Accept"] = "application/json";
 
 
-        public static void LogWebException(this ILogger logger, WebException ex, ApiId api)
-        {
-            var nl = Environment.NewLine;
-            var msg = $"api= {api}{nl}uri= { ex.Response?.ResponseUri}{nl}ex.Status={ex.Status}{nl}ex.Message= {ex.Message}";
-            if (ex.Response != null)
-            {
-                HttpWebResponse res = (HttpWebResponse)ex.Response;
-                Span<byte> buffer = stackalloc byte[1024];
-                res.GetResponseStream().Read(buffer);
-                var text = Encoding.ASCII.GetString(buffer);
-                msg = $"{msg}{nl}res.StatusCode= {res.StatusCode}{nl}res.Content= {text}";
-            }
-            logger.LogError(msg);
-        }
-
     }//class
 }
