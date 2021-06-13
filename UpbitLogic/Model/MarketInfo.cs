@@ -10,7 +10,7 @@ using Universe.Coin.TradeLogic.Model;
 
 namespace Universe.Coin.Upbit.Model
 {
-    public class MarketInfo : IApiModel
+    public class MarketInfo : IMarketInfo
     {
         public MarketInfo() => Market = KoreanName = EnglishName = MarketWarning = string.Empty;
 

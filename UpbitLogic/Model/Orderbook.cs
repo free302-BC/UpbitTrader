@@ -9,18 +9,20 @@ using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Universe.Coin.TradeLogic.Model;
 
+#pragma warning disable CS8618
+
 namespace Universe.Coin.Upbit.Model
 {
     using JS = JsonSerializer;
 
     public class Orderbook : IOrderbook
     {
-        public Orderbook()
-        {
-            Market = "";
-            //OrderbookUnits = null!;//null이 아닐경우 json deserialization 에러 (Newtonsoft)
-            OrderbookUnits = new List<OrderbookUnit>();
-        }
+        //public Orderbook()
+        //{
+        //    Market = "";
+        //    //OrderbookUnits = null!;//null이 아닐경우 json deserialization 에러 (Newtonsoft)
+        //    OrderbookUnits = new List<OrderbookUnit>();
+        //}
 
         /// <summary>
         /// 마켓 코드
@@ -79,3 +81,5 @@ namespace Universe.Coin.Upbit.Model
         }
     }
 }
+
+#pragma warning restore CS8618

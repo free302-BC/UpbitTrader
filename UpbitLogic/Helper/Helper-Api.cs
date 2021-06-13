@@ -51,8 +51,7 @@ namespace Universe.Coin.Upbit
             for (int i = 0; i < len; i++)
                 dic.Add((ApiId)i, (_path[i], _method[i], _comment[i], _resetAuth.Contains((ApiId)i)));
 
-            var opt = GetJsonOptions();            
-            var json = JsonSerializer.Serialize(dic, opt);
+            var json = JsonSerializer.Serialize(dic, _jsonOption);
             File.WriteAllText(_apiPathFile, json, Encoding.UTF8);
         }
         static ApiDic loadApiJson(JsonSerializerOptions opt)

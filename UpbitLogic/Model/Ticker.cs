@@ -8,6 +8,8 @@ using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Universe.Coin.TradeLogic.Model;
 
+#pragma warning disable CS8618
+
 namespace Universe.Coin.Upbit.Model
 {
     public class Ticker : ITicker
@@ -232,3 +234,5 @@ namespace Universe.Coin.Upbit.Model
     }
 
 }
+
+#pragma warning restore CS8618

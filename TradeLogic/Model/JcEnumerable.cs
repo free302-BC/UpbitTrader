@@ -17,8 +17,7 @@ namespace Universe.Coin.TradeLogic.Model
     /// </summary>
     /// <typeparam name="I">인터페이스</typeparam>
     /// <typeparam name="C">구현 클래스</typeparam>
-    public class JcEnumerable<I, C> : JsonConverter<IEnumerable<I>>
-        where C : class, I
+    public class JcEnumerable<I, C> : JsonConverter<IEnumerable<I>> where C : class, I
     {
         public override IEnumerable<I> Read(
             ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)

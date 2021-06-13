@@ -11,6 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 using Universe.Coin.TradeLogic;
+using Universe.Coin.TradeLogic.Model;
 using Universe.Coin.Upbit.Model;
 using Universe.Utility;
 
@@ -42,9 +43,10 @@ namespace Universe.Coin.Upbit
             => addQueryString(name, Helper.GetMarketId(currency, coin));
 
 
-        public MarketInfo[] ApiMarketInfo() => InvokeApi<MarketInfo>(ApiId.MarketInfoAll);
+        public IMarketInfo[] ApiMarketInfo() => InvokeApi<MarketInfo>(ApiId.MarketInfoAll);
 
         public string ApiTest(IApiParam param) => param.ToString()!;
 
+        
     }//class
 }

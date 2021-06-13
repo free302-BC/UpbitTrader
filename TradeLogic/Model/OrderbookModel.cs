@@ -14,7 +14,11 @@ namespace Universe.Coin.TradeLogic.Model
         public decimal askUP, bidUP, deltaUP; //unit price (price per 1 coin)
         public decimal askA, bidA;//amount (number of coins)
         public decimal askP, bidP;
+
+#pragma warning disable CS8618
         public OrderbookModel() { }
+#pragma warning restore CS8618
+
         public OrderbookModel(IOrderbook book)
         {
             Market = string.IsNullOrWhiteSpace(book.Market) ? book.Code : book.Market;

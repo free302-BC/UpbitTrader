@@ -26,8 +26,10 @@ namespace Universe.Coin.TradeLogic.Model
 
         public static readonly TradeTickModel Empty = new();
 
+#pragma warning disable CS8618
         public TradeTickModel() { }
         public TradeTickModel(ITradeTick tick) => setApiModel(tick);
+#pragma warning restore CS8618
 
         void setApiModel(ITradeTick tick)
         {

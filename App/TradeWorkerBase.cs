@@ -21,7 +21,7 @@ namespace Universe.Coin.Upbit.App
         where S : WorkerOptions, ITradeOptions
     {
         protected readonly InputWorker _inputWorker;
-        protected readonly Client _client;
+        protected readonly IClient _client;
         protected readonly JsonSerializerOptions _jsonOptions;
 
         protected TradeWorkerBase(

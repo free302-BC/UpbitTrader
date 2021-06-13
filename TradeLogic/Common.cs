@@ -8,6 +8,13 @@ using System.Threading.Tasks;
 
 namespace Universe.Coin.TradeLogic
 {
+    public enum TradeEvent 
+    { 
+        Ticker, //현재가
+        Order,  //주문 orderbook
+        Trade   //체결
+    }
+
     public enum HttpMethod { GET, POST, DELETE }
     
     /// <summary>

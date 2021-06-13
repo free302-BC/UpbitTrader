@@ -8,8 +8,11 @@ using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Universe.Coin.TradeLogic.Model;
 
+#pragma warning disable CS8618
+
 namespace Universe.Coin.Upbit.Model
 {
+    //[JsonConverter(typeof())]
     public class TradeTick : ITradeTick
     {
         //public TradeTick() => Market = TradeDateUtc = TradeTimeUtc = AskBid = Code = "";
@@ -107,3 +110,5 @@ namespace Universe.Coin.Upbit.Model
         }
     }//class
 }
+
+#pragma warning restore CS8618

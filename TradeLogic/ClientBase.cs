@@ -29,6 +29,8 @@ namespace Universe.Coin.TradeLogic
     {
         protected readonly KeyPair _key;
         protected readonly ILogger _logger;
+        protected readonly JsonSerializerOptions _jsonOptions;
+        public JsonSerializerOptions JsonOptions => _jsonOptions;
 
         readonly string _wsUri;
         protected readonly WebClient _wc;
@@ -39,6 +41,7 @@ namespace Universe.Coin.TradeLogic
         {
             _wsUri = wsUri;
             _logger = logger;
+            _jsonOptions = new JsonSerializerOptions(ITradeClientBase._jsonOption);//clone
             _key = (accessKey, secretKey);
 
             _wc = new();
@@ -49,6 +52,10 @@ namespace Universe.Coin.TradeLogic
             _evPausing = new(false);
         }
 
+        /// <summary>
+        /// 추가적인 객체 초기화 코드
+        /// WebClient header, websocket keep-alive-time
+        /// </summary>
         protected abstract void init();
 
         public void Dispose()
@@ -139,7 +146,7 @@ namespace Universe.Coin.TradeLogic
             try
             {
                 string json = _wc.DownloadString(httpUri);
-                var models = JS.Deserialize<T[]>(json, _jsonOption) ?? Array.Empty<T>();
+                var models = JS.Deserialize<T[]>(json, _jsonOptions) ?? Array.Empty<T>();
                 return models;
             }
             catch (WebException ex)
@@ -148,6 +155,13 @@ namespace Universe.Coin.TradeLogic
                 return Array.Empty<T>();
             }
         }
+
+        /// <summary>
+        /// Http Header, Query string 등 추가
+        /// </summary>
+        /// <param name="apiId"></param>
+        /// <param name="postPath"></param>
+        /// <returns>http uri</returns>
         protected abstract string prepareInvoke(ApiId apiId, string postPath);
 
 
@@ -158,25 +172,6 @@ namespace Universe.Coin.TradeLogic
 
         #endregion
 
-
-        #region ---- Static JSON ----
-
-        static JsonSerializerOptions _jsonOption;
-        static ClientBase()
-        {
-            _jsonOption = getJsonOptions();
-        }
-        static JsonSerializerOptions getJsonOptions()
-        {
-            var opt = new JsonSerializerOptions();
-            opt.IncludeFields = true;
-            opt.WriteIndented = true;
-            opt.PropertyNameCaseInsensitive = false;
-            opt.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
-            opt.Encoder = JavaScriptEncoder.Create(UnicodeRanges.BasicLatin, UnicodeRanges.HangulSyllables);
-            return opt;
-        }
-        #endregion
 
     }//class
 }

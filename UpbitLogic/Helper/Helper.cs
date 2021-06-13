@@ -24,11 +24,11 @@ namespace Universe.Coin.Upbit
         {
             try
             {
-                var opt = GetJsonOptions();
+                _jsonOption = getJsonOptions();
 
-                _apiDic = loadApiJson(opt);//API url & path
-                _coinNames = loadCoinJson(opt);//coin name dic
-                _currencyCoins = loadCurrencyJson(opt);//currency-coin dic -> market
+                _apiDic = loadApiJson(_jsonOption);//API url & path
+                _coinNames = loadCoinJson(_jsonOption);//coin name dic
+                _currencyCoins = loadCurrencyJson(_jsonOption);//currency-coin dic -> market
             }
             catch (JsonException ex)
             {
@@ -47,7 +47,8 @@ namespace Universe.Coin.Upbit
             }
         }
 
-        public static JsonSerializerOptions GetJsonOptions()
+        static JsonSerializerOptions _jsonOption;
+        static JsonSerializerOptions getJsonOptions()
         {
             var opt = new JsonSerializerOptions();
             opt.IncludeFields = true;

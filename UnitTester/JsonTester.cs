@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using Universe.Coin.TradeLogic.Model;
 using Universe.Coin.Upbit;
 using Universe.Coin.Upbit.Model;
+using Universe.Coin.TradeLogic;
 using Xunit;
 
 namespace UnitTester
@@ -45,7 +46,7 @@ namespace UnitTester
             opt.PropertyNameCaseInsensitive = false;
 
             var response = JS.Deserialize<WsResponse>(tickJson, opt);
-            Assert.Equal("trade", response.requestType);
+            Assert.Equal(TradeEvent.Trade, response.Event);
         }
 
         [Fact]

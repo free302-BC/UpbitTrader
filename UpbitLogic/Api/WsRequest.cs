@@ -10,9 +10,13 @@ using Universe.Utility;
 namespace Universe.Coin.Upbit
 {
     using WsType = Dictionary<string, object>;
+    using OptPair = ValueTuple<string, object>;
+
     public class WsRequest : IWsRequest
     {
-        List<WsType> _value;
+        static readonly OptPair _opt = ("isOnlyRealtime", true);
+        const string _market = "KRW-BTC";
+        readonly List<WsType> _value;
 
         public WsRequest()
         {
@@ -21,31 +25,36 @@ namespace Universe.Coin.Upbit
             _value.Add(new() { { "format", "DEFAULT" } });
         }
 
-        public IWsRequest BuildDefault()
+        public IWsRequest ToDefault()
         {
-            var req = new WsRequest();
-            req.Add("orderbook", "KRW-BTC");
-            req.Add("trade", "KRW-BTC");
-            return req;
+            if(_value.Count > 2) _value.RemoveRange(2, _value.Count);
+            AddTrade();
+            AddOrderbook();
+            AddTicker();
+            return this;
         }
 
-        public void Add(string type, string market)
-        {
-            Add(type, market, ("isOnlyRealtime", true));
-        }
-        public void Add(string type, string market, (string key, object value) option = default)
+        public void AddTrade(CurrencyId currency = CurrencyId.KRW, CoinId coin = CoinId.BTC, OptPair option = default) 
+            => add("trade", currency, coin, option);
+        public void AddOrderbook(CurrencyId currency = CurrencyId.KRW, CoinId coin = CoinId.BTC, OptPair option = default) 
+            => add("orderbook", currency, coin, option);
+        public void AddTicker(CurrencyId currency = CurrencyId.KRW, CoinId coin = CoinId.BTC, OptPair option = default) 
+            => add("ticker", currency, coin, option);
+
+        void add(string type, CurrencyId currency = CurrencyId.KRW, CoinId coin = CoinId.BTC, 
+            (string key, object value) option = default)
         {
             var dic = new WsType();
             dic.Add("type", type);
-            dic.Add("codes", new string[] { market });
-            
-            if (option != default) dic.Add(option.key!, option.value!);
+            dic.Add("codes", new string[] { Helper.GetMarketId(currency, coin) });
+
+            if (option != default && option.key != null) dic.Add(option.key, option.value ?? "");
+            else dic.Add(_opt.Item1, _opt.Item2);
             _value.Add(dic);
         }
 
         public string ToJson() => JsonSerializer.Serialize(_value);
         public byte[] ToJsonBytes() => ToJson().ToUtf8Bytes();
-
+        
     }//class
-
 }

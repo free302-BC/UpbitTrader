@@ -13,7 +13,9 @@ using Universe.AppBase;
 using Universe.Coin.TradeLogic;
 using Universe.Coin.TradeLogic.Calc;
 using Universe.Coin.TradeLogic.Model;
+
 using Universe.Coin.Upbit.Model;
+using Universe.Utility;
 
 namespace Universe.Coin.Upbit.App
 {
@@ -37,33 +39,48 @@ namespace Universe.Coin.Upbit.App
                 info($"Pausing= {_set.Pausing = !_set.Pausing}");
                 _client.Pause(_set.Pausing);
             }
+            initUpbit();
         }
+
+        JsonSerializerOptions _joptUpbit;
+        void initUpbit()
+        {
+            _joptUpbit = new(_jsonOptions);
+            var type = UvLoader.Create<IWsRequest>(_upbit, "Universe.Coin.Upbit.WsResponse").GetType();
+            JcInterface<IWsResponse> jc = new(type);
+            _joptUpbit.Converters.Add(jc);
+
+        }
+
+        const string _upbit = "Universe.Coin.Upbit.dll";
+
         protected override void work()
         {
             //run_Tick_K(_client);
 
             _client.OnWsReceived += uc_OnReceived;
-            
-            var request = new WsRequest();
-            //request.Add("orderbook", Helper.GetMarketId(CurrencyId.KRW, CoinId.BTC));
+
+            var request = UvLoader.Create<IWsRequest>(_upbit, "Universe.Coin.Upbit.WsRequest");
+            request.AddTrade(CurrencyId.KRW, CoinId.BTC);
+            request.AddOrderbook(CurrencyId.KRW, CoinId.BTC);
             _client.ConnectWs(request);
         }
 
         private void uc_OnReceived(string json)
         {
-            var type = JS.Deserialize<WsResponse>(json, _jsonOptions)!.requestType;//TODO: !
+            var @event = JS.Deserialize<WsResponse>(json, _jsonOptions)!.Event;
 
-            if (type == "trade")
+            if (@event == TradeEvent.Trade)
             {
                 var model = JS.Deserialize<TradeTick>(json, _jsonOptions)?.ToModel() ?? new();
                 report(model, (int)model.Dir);
             }
-            if (type == "ticker")
+            if (@event == TradeEvent.Ticker)
             {
                 var model = JS.Deserialize<Ticker>(json, _jsonOptions)?.ToModel() ?? new();
                 report(model);
             }
-            if (type == "orderbook")
+            if (@event == TradeEvent.Order)
             {
                 var model = JS.Deserialize<Orderbook>(json, _jsonOptions)?.ToModel() ?? new();
                 report(model);

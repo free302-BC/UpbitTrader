@@ -62,12 +62,10 @@ namespace Universe.Coin.Upbit
             string[] _coinsUSDT =
             { "BTC", "ETH", "LTC", "XRP", "ETC", "OMG", "ADA", "TUSD", "SC", "TRX", "BCH", "DGB", "DOGE", "ZRX", "RVN", "BAT" };
 
-            var opt = GetJsonOptions();
-
             var coins = new CoinDic();
             for (int i = 0; i < _conisKRW.Length; i++) coins[_conisKRW[i].To<CoinId>()] = (_englishKRW[i], _koreanKRW[i]);
             for (int i = 0; i < _coinsBTC.Length; i++) coins[_coinsBTC[i].To<CoinId>()] = (_englishBTC[i], _koreanBTC[i]);
-            File.WriteAllText(_CoinNameFile, JsonSerializer.Serialize(coins, opt));
+            File.WriteAllText(_CoinNameFile, JsonSerializer.Serialize(coins, _jsonOption));
 
             var markets = new _CurrencyDic
             {
@@ -75,7 +73,7 @@ namespace Universe.Coin.Upbit
                 { CurrencyId.BTC, new (_coinsBTC) },
                 { CurrencyId.USDT, new (_coinsUSDT) }
             };
-            File.WriteAllText(_MarketCoinsFile, JsonSerializer.Serialize(markets, opt));
+            File.WriteAllText(_MarketCoinsFile, JsonSerializer.Serialize(markets, _jsonOption));
         }
 
         static readonly string[] _conisKRW =
