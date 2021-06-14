@@ -29,7 +29,7 @@ namespace Universe.Coin.TradeLogic
     {
         protected readonly KeyPair _key;
         protected readonly ILogger _logger;
-        protected readonly JsonSerializerOptions _jsonOptions;
+        readonly JsonSerializerOptions _jsonOptions;
         public JsonSerializerOptions JsonOptions => _jsonOptions;
 
         readonly string _wsUri;
@@ -41,15 +41,17 @@ namespace Universe.Coin.TradeLogic
         {
             _wsUri = wsUri;
             _logger = logger;
-            _jsonOptions = new JsonSerializerOptions(ITradeClientBase._jsonOption);//clone
             _key = (accessKey, secretKey);
 
             _wc = new();
             _ws = new();
-            init();
 
             _cts = new();
             _evPausing = new(false);
+
+            init();
+            _jsonOptions = new JsonSerializerOptions(ITradeClientBase._jsonOptions);//clone
+            registerJsonConverters(_jsonOptions.Converters);
         }
 
         /// <summary>
@@ -57,6 +59,13 @@ namespace Universe.Coin.TradeLogic
         /// WebClient header, websocket keep-alive-time
         /// </summary>
         protected abstract void init();
+
+        /// <summary>
+        /// InvokeApi()에서 사용되는 JsonSerializerOptions 설정
+        /// IApiModel 을 구현하는 모든 클래스의 JsonConverter를 등록해야 함.
+        /// </summary>
+        /// <param name="jsonOptions"></param>
+        protected abstract void registerJsonConverters(in IList<JsonConverter> converters);
 
         public void Dispose()
         {
@@ -169,6 +178,7 @@ namespace Universe.Coin.TradeLogic
         protected void setQueryString(string name, string value) => _wc.QueryString[name] = value;
         protected void addQueryString(string name, string value) => _wc.QueryString.Add(name, value);
         protected void setQueryString(string name, int count) => _wc.QueryString[name] = count.ToString();
+                
 
         #endregion
 

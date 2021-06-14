@@ -26,15 +26,13 @@
 
   "TickWorker": {
 
-    "ImplAssemblyFile": "Universe.Coin.Upbit.dll",
+    "AssemblyFiles": {
+      "Upbit": "Universe.Coin.Upbit.dll",
+      "Binance": "Universe.Coin.Binance.dll"
+    },
 
     "AccessKey": "E5AEDC2AF2111C0DE0837B20147366A695CAC34FE4137F01E9B2751215561A82CAEBCB44ED343B28",
     "SecretKey": "D4CFF355ED1A7D21C4B14709400E00A1DAA9C267EF360032DAC06F06134625AED9F9F256D230181F",
-
-    "Hours": 200,
-    "DoFindK": false,
-    "PrintCandle": false,
-    "LoadFromFile": true,
 
     "CalcParam": {
       "FactorK": 0.8,
@@ -46,6 +44,7 @@
         "Slow": 16,
         "Signal": 5
       },
+
       "ApplyStopLoss": false
     }
   }

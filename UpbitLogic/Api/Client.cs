@@ -8,6 +8,8 @@ using System.Linq;
 using System.Net;
 using System.Net.WebSockets;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using System.Web;
 using Universe.Coin.TradeLogic;
@@ -30,7 +32,17 @@ namespace Universe.Coin.Upbit
             _wc.SetAuthToken(_key);
             _wc.SetAcceptance();
             _ws.Options.KeepAliveInterval = new TimeSpan(0, 1, 30);
-        }        
+        }
+
+        /// <summary>
+        /// TradeLogic의 interface를 구현하는 모델의 json converter 등록
+        /// </summary>
+        /// <param name="converters"></param>
+        protected override void registerJsonConverters(in IList<JsonConverter> converters)
+        {
+
+        }
+
         protected override string prepareInvoke(ApiId api, string postPath)
         {
             if (Helper.GetApi(api).ResetAuthToken) _wc.SetAuthToken(_key);

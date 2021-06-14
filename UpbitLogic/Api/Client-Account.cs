@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using System.Web;
 using Universe.Coin.TradeLogic;
@@ -32,7 +33,6 @@ namespace Universe.Coin.Upbit
             var krw = accounts.FirstOrDefault(a => a.Currency == coin.ToString());
             return krw?.Balance ?? 0m;
         }
-
-
+        
     }//class
 }

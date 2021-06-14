@@ -33,7 +33,7 @@ namespace Universe.Coin.Upbit.App
 
             AddWorker<BackTestWorker, BackTestOptions>("backtest.json", BackTestWorker.GetIds());
             AddWorker<TraderWorker, TraderOptions>();
-            AddWorker<TickWorker, BackTestOptions>("backtest.json");
+            AddWorker<TickWorker, TickWorkerOptions>("backtest.json");
             RunHost();
         }
 

@@ -42,13 +42,14 @@ namespace Universe.Coin.Upbit.App
             initUpbit();
         }
 
-        JsonSerializerOptions _joptUpbit;
+        JsonSerializerOptions _optUpbit;
         void initUpbit()
         {
-            _joptUpbit = new(_jsonOptions);
+            _optUpbit = new(_jsonOptions);
+
             var type = UvLoader.Create<IWsRequest>(_upbit, "Universe.Coin.Upbit.WsResponse").GetType();
             JcInterface<IWsResponse> jc = new(type);
-            _joptUpbit.Converters.Add(jc);
+            _optUpbit.Converters.Add(jc);
 
         }
 

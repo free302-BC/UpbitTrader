@@ -11,28 +11,42 @@ namespace Universe.Coin.TradeLogic
 {
     public interface ITradeClientBase : IDisposable
     {
-        JsonSerializerOptions JsonOptions { get; }
-        void ConnectWs(IWsRequest request);
 
+        #region ---- WebSocket ----
+        void ConnectWs(IWsRequest request);
         event Action<string>? OnWsReceived;
         void Pause(bool doPause);
+        #endregion
+
+
+        #region ---- Rest API ----
 
         T[] InvokeApi<T>(ApiId apiId, string postPath = "") where T : IApiModel, new();
 
+        #endregion
+
+
+        #region ---- Json Options ----
+
         static ITradeClientBase()
         {
-            _jsonOption = new JsonSerializerOptions
+            _jsonOptions = new JsonSerializerOptions
             {
                 IncludeFields = true,
                 WriteIndented = true,
                 PropertyNameCaseInsensitive = false
             };
-            _jsonOption.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
-            _jsonOption.Encoder = JavaScriptEncoder.Create(UnicodeRanges.BasicLatin, UnicodeRanges.HangulSyllables);
+            _jsonOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
+            _jsonOptions.Encoder = JavaScriptEncoder.Create(UnicodeRanges.BasicLatin, UnicodeRanges.HangulSyllables);
+            //initJsonOption(_jsonOption);
         }
 
-        protected static readonly JsonSerializerOptions _jsonOption;        
+        JsonSerializerOptions JsonOptions { get; }
+        protected static readonly JsonSerializerOptions _jsonOptions;
         
-    }
+
+        #endregion
+
+    }//class
 
 }
