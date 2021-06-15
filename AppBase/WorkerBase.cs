@@ -29,10 +29,11 @@ namespace Universe.AppBase
 
         public void Reload(S set) => _set.Reload(set);
 
-        public WorkerBase(ILogger<W> logger, IServiceProvider sp, IOptionsMonitor<S> set, string id = "")
+        public WorkerBase(IServiceProvider sp, string id = "")
         {
-            _logger = logger;
             _sp = sp;
+            _logger = _sp.GetRequiredService<ILogger<W>>();
+            var set = _sp.GetRequiredService<IOptionsMonitor<S>>();
 
             if (string.IsNullOrWhiteSpace(id))
             {

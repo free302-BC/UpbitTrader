@@ -32,6 +32,7 @@ namespace Universe.Coin.Upbit
             _wc.SetAuthToken(_key);
             _wc.SetAcceptance();
             _ws.Options.KeepAliveInterval = new TimeSpan(0, 1, 30);
+
         }
 
         /// <summary>
@@ -40,7 +41,7 @@ namespace Universe.Coin.Upbit
         /// <param name="converters"></param>
         protected override void registerJsonConverters(in IList<JsonConverter> converters)
         {
-
+            //converters.Add(new WsResponseJC());                                                                                                                                   
         }
 
         protected override string prepareInvoke(ApiId api, string postPath)

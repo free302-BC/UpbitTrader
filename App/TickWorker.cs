@@ -17,18 +17,13 @@ using Universe.Coin.TradeLogic.Model;
 using Universe.Coin.Upbit.Model;
 using Universe.Utility;
 
-namespace Universe.Coin.Upbit.App
+namespace Universe.Coin.App
 {
     using JS = JsonSerializer;
 
     public class TickWorker : TradeWorkerBase<TickWorker, TickWorkerOptions>
     {
-        public TickWorker(
-            ILogger<TickWorker> logger,
-            IServiceProvider sp,
-            IOptionsMonitor<TickWorkerOptions> set,
-            InputWorker inputWorker)
-            : base(logger, sp, set, inputWorker)
+        public TickWorker(IServiceProvider sp, string id = "") : base(sp, id)
         {
             updateClient();
             onOptionsUpdate += updateClient;
@@ -36,32 +31,18 @@ namespace Universe.Coin.Upbit.App
 
             void updateClient()
             {
-                info($"Pausing= {_set.Pausing = !_set.Pausing}");
+                info($"[{Id}] Pausing= {_set.Pausing = !_set.Pausing}");
                 _client.Pause(_set.Pausing);
             }
-            initUpbit();
         }
-
-        JsonSerializerOptions _optUpbit;
-        void initUpbit()
-        {
-            _optUpbit = new(_jsonOptions);
-
-            var type = UvLoader.Create<IWsResponse>(_upbit, "Universe.Coin.Upbit.Model.WsResponse").GetType();
-            JcInterface<IWsResponse> jc = new(type);
-            _optUpbit.Converters.Add(jc);
-
-        }
-
-        const string _upbit = "Universe.Coin.Upbit.dll";
-
+                
         protected override void work()
         {
             //run_Tick_K(_client);
 
             _client.OnWsReceived += uc_OnReceived;
 
-            var request = UvLoader.Create<IWsRequest>(_upbit, "Universe.Coin.Upbit.WsRequest");
+            var request = UvLoader.Create<IWsRequest>(_set.AssemblyFile, "Universe.Coin.Upbit.WsRequest");
             request.AddTrade(CurrencyId.KRW, CoinId.BTC);
             request.AddOrderbook(CurrencyId.KRW, CoinId.BTC);
             _client.ConnectWs(request);
@@ -69,7 +50,9 @@ namespace Universe.Coin.Upbit.App
 
         private void uc_OnReceived(string json)
         {
-            var @event = JS.Deserialize<WsResponse>(json, _jsonOptions)!.Event;
+            var type = UvLoader.Create<IWsResponse>(_set.AssemblyFile, "Universe.Coin.Upbit.Model.WsResponse").GetType();
+            //var @event = JS.Deserialize<IWsResponse>(json, _jsonOptions)!.Event;
+            var @event = ((IWsResponse)JS.Deserialize(json, type, _jsonOptions)!).Event;
 
             if (@event == TradeEvent.Trade)
             {
@@ -88,7 +71,7 @@ namespace Universe.Coin.Upbit.App
             }
         }
 
-        void run_Tick_K(Client uc)
+        void run_Tick_K(IClient uc)
         {
             var param = _set.CalcParam;
             var ticks = uc.ApiTicks(count: 10).ToModels();

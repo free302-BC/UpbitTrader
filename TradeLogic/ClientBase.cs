@@ -101,8 +101,15 @@ namespace Universe.Coin.TradeLogic
         public void ConnectWs(IWsRequest request)
         {
             connectAsync();
+            Task.Run(wsReceiver)
+                .ContinueWith(t =>
+                {
+                    _logger.LogError($"WsRecever finished.");
+                    _logger.LogError(t.Exception?.Message); 
+                } 
+                //,TaskContinuationOptions.OnlyOnFaulted
+                );
             sendWsRequest();
-            Task.Run(wsReceiver);
 
             void connectAsync()
             {
@@ -112,6 +119,7 @@ namespace Universe.Coin.TradeLogic
             }
             ValueTask sendWsRequest()
             {
+                _logger.LogInformation($"Websocket sending request...");
                 var json = request.ToJsonBytes();
                 var rm = new ReadOnlyMemory<byte>(json, 0, json.Length);
                 return _ws.SendAsync(rm, WebSocketMessageType.Binary, true, _cts.Token);
@@ -120,7 +128,7 @@ namespace Universe.Coin.TradeLogic
             void wsReceiver()
             {
                 Thread.CurrentThread.Name = "WsRecever";
-                _logger.LogInformation("Starting websocket receiving...");
+                _logger.LogInformation("Entering websocket receiving...");
 
                 var array = new byte[1024 * 1024];
                 Memory<byte> buffer = new(array);
@@ -133,6 +141,7 @@ namespace Universe.Coin.TradeLogic
                     var json = Encoding.UTF8.GetString(array, 0, res.Count);
                     OnWsReceived?.Invoke(json);
                 }
+                _logger.LogInformation("Exiting websocket receiving...");
             }
         }
 

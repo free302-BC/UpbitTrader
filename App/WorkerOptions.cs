@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using Universe.AppBase;
 using Universe.Coin.TradeLogic;
 
-namespace Universe.Coin.Upbit.App
+namespace Universe.Coin.App
 {
     public class WorkerOptions : ITradeOptions, IWorkerOptions
     {

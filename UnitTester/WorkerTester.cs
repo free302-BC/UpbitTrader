@@ -14,7 +14,7 @@ using Universe.Coin.TradeLogic;
 using Universe.Coin.TradeLogic.Calc;
 using Universe.Coin.TradeLogic.Model;
 using Universe.Coin.Upbit;
-using Universe.Coin.Upbit.App;
+using Universe.Coin.App;
 using Universe.Coin.Upbit.Model;
 using Xunit;
 using Xunit.Abstractions;
@@ -66,11 +66,7 @@ namespace UnitTester
         public class TestWorker : WorkerBase<TestWorker, WorkerOptions>
         {
             readonly Client _client;
-            public TestWorker(
-                ILogger<TestWorker> logger,
-                IServiceProvider sp,
-                IOptionsMonitor<WorkerOptions> set, string id = "")
-                : base(logger, sp, set, id)
+            public TestWorker(IServiceProvider sp, string id = "") : base(sp, id)
             {
                 ITradeOptions opt = new TradeOptions()
                 {

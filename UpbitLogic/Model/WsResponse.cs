@@ -34,4 +34,11 @@ namespace Universe.Coin.Upbit.Model
         static TradeEventJC() => init(_names);
     }
 
+    public class WsResponseJC : JcInterface<IWsResponse>
+    {
+        public WsResponseJC() : base(typeof(WsResponseJC))
+        {
+        }
+    }
+
 }

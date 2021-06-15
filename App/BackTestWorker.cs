@@ -12,19 +12,19 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Universe.AppBase;
 using System.Text.Json;
-using Universe.Coin.Upbit.Model;
 using System.IO;
 using System.Collections.Specialized;
-using Universe.Coin.TradeLogic;
-using Universe.Coin.TradeLogic.Model;
 using System.Diagnostics;
 using System.Numerics;
 using System.Text.Encodings.Web;
 using System.Text.Unicode;
+using Universe.AppBase;
+using Universe.Coin.TradeLogic;
+using Universe.Coin.TradeLogic.Model;
+using Universe.Coin.Upbit.Model;
 
-namespace Universe.Coin.Upbit.App
+namespace Universe.Coin.App
 {
     using FindRes = ValueTuple<int, decimal, decimal, decimal>;//(trades, k, rate, mdd)
     using FindList = List<(int trades, decimal k, decimal rate, decimal mdd)>;
@@ -37,12 +37,7 @@ namespace Universe.Coin.Upbit.App
     {
         #region ---- Ctor ----
 
-        public BackTestWorker(
-            ILogger<BackTestWorker> logger,
-            IOptionsMonitor<BackTestOptions> set,
-            IServiceProvider sp,
-            InputWorker inputWorker)
-            : base(logger, sp, set, inputWorker, GetNewId())
+        public BackTestWorker(IServiceProvider sp, string id = "") : base(sp, id)
         {
             _ev = new(false);
             onOptionsUpdate += () => info($"{nameof(BackTestOptions)} updated!");
@@ -115,8 +110,8 @@ namespace Universe.Coin.Upbit.App
         readonly ManualResetEvent _ev;
         protected override void work()
         {
-            var logger = _sp.GetRequiredService<ILogger<Client>>();
-            var uc = new Client(_set.AccessKey, _set.SecretKey, logger);
+            var logger = _sp.GetRequiredService<ILogger<IClient>>();
+            var uc = new Upbit.Client(_set.AccessKey, _set.SecretKey, logger);
 
             while (true)
             {
@@ -136,7 +131,7 @@ namespace Universe.Coin.Upbit.App
         /// 단일 k에 대하여 각 CandleUnit별로 backtest 수행
         /// </summary>
         /// <param name="uc"></param>
-        void run_Units_K(Client uc)
+        void run_Units_K(IClient uc)
         {
             var units = new[]
             { CandleUnit.M240, CandleUnit.M60, CandleUnit.M30, CandleUnit.M15, CandleUnit.M10, CandleUnit.M3, CandleUnit.M1 };
@@ -176,7 +171,7 @@ namespace Universe.Coin.Upbit.App
         /// 전체 구간에 대한 최적 k를 구했을 경우 ~ 고정 k에 대한 이론적 최대 수익율
         /// </summary>
         /// <param name="uc"></param>
-        void run_Units_FindK(Client uc)
+        void run_Units_FindK(IClient uc)
         {
             var units = new[]
             { CandleUnit.M240, CandleUnit.M60, CandleUnit.M30, CandleUnit.M15, CandleUnit.M10, CandleUnit.M3, CandleUnit.M1 };
@@ -215,7 +210,7 @@ namespace Universe.Coin.Upbit.App
         /// 각3시간 구간별 최적 k를 찾았을 경우 ~ 변동 k에 대한 이론적 최대 이익
         /// </summary>
         /// <param name="uc"></param>
-        void run_Units_FindK_3Hours(Client uc)
+        void run_Units_FindK_3Hours(IClient uc)
         {
             var units = new[]
             { /*CandleUnit.U240, */CandleUnit.M60, CandleUnit.M30, CandleUnit.M15, CandleUnit.M10, CandleUnit.M3, CandleUnit.M1 };
@@ -278,7 +273,7 @@ namespace Universe.Coin.Upbit.App
 
         #region ---- BackTest ----
 
-        void runBackTest(Client uc, CandleUnit unit, int count, StringBuilder? sb = null)
+        void runBackTest(IClient uc, CandleUnit unit, int count, StringBuilder? sb = null)
         {
             var models = prepareModels(uc, unit, count);
             var (numTrades, finalRate, mdd) = IBackTest.BackTest(models, 0, count, _set.CalcParam);
@@ -305,7 +300,7 @@ namespace Universe.Coin.Upbit.App
 
         #region ---- Save/Load ----
 
-        CandleModel[] prepareModels(Client uc, CandleUnit unit, int count)
+        CandleModel[] prepareModels(IClient uc, CandleUnit unit, int count)
         {
             CandleModel[] models = _set.LoadFromFile ? load(unit) : Array.Empty<CandleModel>();
             if (models.Length < count)
@@ -336,29 +331,6 @@ namespace Universe.Coin.Upbit.App
         {
             File.Delete($"{unit}.json");
         }
-
-        #endregion
-
-
-        #region ---- Worker ID ----
-
-        static object _lock;
-        static List<string> _ids;
-        static volatile int _index;
-        static BackTestWorker()
-        {
-            _ids = new();
-            _index = 0;
-            _lock = new();
-
-            //TODO: load from json or DB
-            for (int i = 0; i < 3; i++) _ids.Add($"{nameof(BackTestWorker)}:{i + 1}");
-        }
-        public static string GetNewId()
-        {
-            lock (_lock) return _ids[_index++];
-        }
-        public static List<string> GetIds() => _ids;
 
         #endregion
 

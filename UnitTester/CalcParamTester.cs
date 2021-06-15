@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Universe.Coin.Upbit.App;
+using Universe.Coin.App;
 using Xunit;
 
 namespace UnitTester

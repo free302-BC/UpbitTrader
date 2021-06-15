@@ -7,7 +7,7 @@ using Universe.AppBase;
 using Universe.Coin.TradeLogic;
 using Universe.Coin.TradeLogic.Calc;
 
-namespace Universe.Coin.Upbit.App
+namespace Universe.Coin.App
 {
     public class TraderWorkerOptions : WorkerOptions
     {

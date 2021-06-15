@@ -12,8 +12,9 @@ using Microsoft.Extensions.Options;
 using Microsoft.Extensions.DependencyInjection;
 using Universe.AppBase;
 using Universe.Coin.TradeLogic;
+//using Universe.Coin.Upbit;
 
-namespace Universe.Coin.Upbit.App
+namespace Universe.Coin.App
 {
     public abstract class TradeWorkerBase<W, S> 
                 : WorkerBase<W, S>, IDisposable
@@ -24,16 +25,12 @@ namespace Universe.Coin.Upbit.App
         protected readonly IClient _client;
         protected readonly JsonSerializerOptions _jsonOptions;
 
-        protected TradeWorkerBase(
-            ILogger<W> logger, 
-            IServiceProvider sp, 
-            IOptionsMonitor<S> set,
-            InputWorker inputWorker,
-            string id = "") : base(logger, sp, set, id)
+        protected TradeWorkerBase(IServiceProvider sp, string id = "") : base(sp, id)
         {
-            _inputWorker = inputWorker;
+            _inputWorker = sp.GetRequiredService<InputWorker>();
             _jsonOptions = buildJsonOptions();
-            _client = new Client(_set.GetAccessKey(), _set.GetSecretKey(), _sp.GetRequiredService<ILogger<Client>>());
+            _client = new Upbit.Client(_set.GetAccessKey(), _set.GetSecretKey(), 
+                _sp.GetRequiredService<ILogger<Upbit.Client>>());
         }
 
         public void Dispose()

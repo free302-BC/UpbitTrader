@@ -17,7 +17,7 @@ using System.IO;
 using System.Collections.Specialized;
 using Universe.Utility;
 
-namespace Universe.Coin.Upbit.App
+namespace Universe.Coin.App
 {
     using EventDic = Dictionary<ConsoleKey, InputWorker.Listener>;
 
@@ -25,11 +25,7 @@ namespace Universe.Coin.Upbit.App
     {
         public delegate void Listener(ConsoleModifiers modifiers);
 
-        public InputWorker(
-            ILogger<InputWorker> logger,
-            IServiceProvider sp,
-            IOptionsMonitor<WorkerOptions> set)
-            : base(logger, sp, set)
+        public InputWorker(IServiceProvider sp, string id = "") : base(sp, id)
         {
             _listeners = new();
             _lock = new();

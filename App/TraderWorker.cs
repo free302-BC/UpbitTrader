@@ -20,21 +20,17 @@ using Universe.Coin.TradeLogic.Model;
 using Universe.Coin.TradeLogic;
 using Universe.Coin.TradeLogic.Calc;
 
-namespace Universe.Coin.Upbit.App
+namespace Universe.Coin.App
 {
     public class TraderWorker : WorkerBase<TraderWorker, TraderWorkerOptions>
     {
-        public TraderWorker(
-            ILogger<TraderWorker> logger, 
-            IOptionsMonitor<TraderWorkerOptions> set, 
-            IServiceProvider sp)
-            : base(logger, sp, set) 
+        public TraderWorker(IServiceProvider sp, string id = "") : base(sp)
         {
             _evPausing = new(false);
-            onOptionsUpdate += ()=>{ if (!_set.Pausing) _evPausing.Set(); };
+            onOptionsUpdate += () => { if (!_set.Pausing) _evPausing.Set(); };
 
             var iw = _sp.GetRequiredService<InputWorker>();
-            iw.AddCmd(ConsoleKey.F10, m => 
+            iw.AddCmd(ConsoleKey.F10, m =>
             {
                 info($"Pausing= {_set.Pausing = !_set.Pausing}");
                 if (_set.Pausing) _evPausing.Reset();
@@ -44,8 +40,8 @@ namespace Universe.Coin.Upbit.App
 
         protected override void work()
         {
-            var logger = _sp.GetRequiredService<ILogger<Client>>();
-            var uc = new Client(_set.AccessKey, _set.SecretKey, logger);
+            var logger = _sp.GetRequiredService<ILogger<IClient>>();
+            var uc = new Upbit.Client(_set.AccessKey, _set.SecretKey, logger);
 
             //market(uc);
             //account(uc);
@@ -59,7 +55,7 @@ namespace Universe.Coin.Upbit.App
         }
 
         readonly ManualResetEvent _evPausing;
-        void runAutoTrade(Client uc)
+        void runAutoTrade(IClient uc)
         {
             var (next, sell, target) = restart(uc);
 
@@ -147,7 +143,7 @@ namespace Universe.Coin.Upbit.App
                 }
             }//while
 
-            (DateTime next, DateTime sell, decimal target) restart(Client uc)
+            (DateTime next, DateTime sell, decimal target) restart(IClient uc)
             {
                 var models = uc.ApiCandle<CandleDay>(unit: CandleUnit.DAY, count: 2).ToModels();
                 var start = models[1].TimeKST;
@@ -159,14 +155,14 @@ namespace Universe.Coin.Upbit.App
 
                 return (next, sell, target);
             }
-        }        
+        }
 
-        void market(Client uc)
+        void market(IClient uc)
         {
             var markets = uc.ApiMarketInfo();
             info(IApiModel.Print(markets));
         }
-        void account(Client uc)
+        void account(IClient uc)
         {
             var accounts = uc.ApiAccount();
             info(IApiModel.Print(accounts));
@@ -174,7 +170,7 @@ namespace Universe.Coin.Upbit.App
             var btc = uc.GetBalance(CoinId.BTC);//get btc
             info($"KRW= {krw}, BTC={btc}");
         }
-        void ticker(Client uc)
+        void ticker(IClient uc)
         {
             var markets = new[] {
                 (CurrencyId.KRW, CoinId.BTC),
@@ -184,24 +180,24 @@ namespace Universe.Coin.Upbit.App
             var ticker = uc.ApiTicker(markets).ToModels();
             info(IViewModel.Print(ticker));
         }
-        void candleDay(Client uc)
+        void candleDay(IClient uc)
         {
             var candles = uc.ApiCandle<CandleDay>(unit: CandleUnit.DAY, count: 20);
             var models = candles.ToModels();
             info(IViewModel.Print(models));
         }
-        void candleMinutes(Client uc)
+        void candleMinutes(IClient uc)
         {
             var candles = uc.ApiCandle<CandleMinute>(unit: CandleUnit.M1, count: 20);
             var models = candles.ToModels();
             info(IViewModel.Print(models));
         }
-        void orderbook(Client uc)
+        void orderbook(IClient uc)
         {
             var order = uc.ApiOrderbook().ToModel();
             info(order);
         }
-        void ticks(Client uc)
+        void ticks(IClient uc)
         {
             var ticks = uc.ApiTicks(count: 10).ToModels();
             ICalc.CalcMovingAvg(ticks, 0, ticks.Length, _set.CalcParam, m => m.UnitPrice);

@@ -9,32 +9,27 @@ using Microsoft.Extensions.Options;
 using System.Threading;
 using Microsoft.Extensions.Hosting;
 
-namespace Universe.Coin.Upbit.App
+namespace Universe.Coin.App
 {
-    class Program : ProgramBase
+    class Program// : ProgramBase
     {
         static void Main(string[] args)
         {
-            #region ---- key input listener ----
-            AddWorker<InputWorker, WorkerOptions>(
-                lifeTime: ServiceLifetime.Singleton,
-                workerFactory: sp =>
-                {
-                    var opt = sp.GetRequiredService<IOptionsMonitor<WorkerOptions>>();
-                    var logger = sp.GetRequiredService<ILogger<InputWorker>>();
-                    var iw = new InputWorker(logger, sp, opt);
-                    //iw.AddCmd(ConsoleKey.Enter, quit);
-                    iw.AddCmd(ConsoleKey.Escape, quit);
-                    return iw;
+            var pb = new ProgramBase();
 
-                    void quit(ConsoleModifiers modifiers) => sp.GetRequiredService<IHost>().StopAsync().Wait();
-                });
+            #region ---- key input listener ----
+            pb.AddWorker<InputWorker, WorkerOptions>(
+                lifeTime: ServiceLifetime.Singleton,
+                postFactory: (sp, iw) => 
+                    iw.AddCmd(ConsoleKey.Escape, m => sp.GetRequiredService<IHost>().StopAsync().Wait()));
             #endregion
 
-            AddWorker<BackTestWorker, BackTestOptions>("backtest.json", BackTestWorker.GetIds());
-            AddWorker<TraderWorker, TraderWorkerOptions>();
-            AddWorker<TickWorker, TickWorkerOptions>("tickworker.json");
-            RunHost();
+            pb.AddWorker<TraderWorker, TraderWorkerOptions>();
+            pb.AddWorker<TickWorker, TickWorkerOptions>("tickworker.json", "Upbit");
+            pb.AddWorker<BackTestWorker, BackTestOptions>("backtest.json", "1");
+            pb.AddWorker<BackTestWorker, BackTestOptions>("backtest.json", "2");
+            pb.AddWorker<TickWorker, TickWorkerOptions>("tickworker_binance.json", "Binance");
+            pb.RunHost();
         }
 
     }//class

@@ -8,6 +8,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Universe.Utility;
 
 namespace Universe.AppBase
 {
@@ -17,18 +19,19 @@ namespace Universe.AppBase
 
     public class ProgramBase
     {
-        protected static readonly Action<object?> log = Console.WriteLine;
-        static readonly List<ServiceAction> _serviceActions;
-        static readonly List<ConfigAction> _configActions;
-        static readonly List<WorkerAction> _workerActions;
+        /*static */readonly Action<object?> log = Console.WriteLine;
+        /*static */readonly List<ServiceAction> _serviceActions;
+        /*static */readonly List<ConfigAction> _configActions;
+        /*static */readonly List<WorkerAction> _workerActions;
 
-        static ProgramBase()
+        public ProgramBase()
         {
             _serviceActions = new();
             _configActions = new();
             _workerActions = new();
         }
-        protected static void RunHost()
+
+        public void RunHost()
         {
             try
             {
@@ -50,7 +53,7 @@ namespace Universe.AppBase
                 log(ex);
             }
         }
-        static IHostBuilder createHostBuilder(CancellationTokenSource cts)
+        IHostBuilder createHostBuilder(CancellationTokenSource cts)
         {
             var builder = Host.CreateDefaultBuilder();
             builder.ConfigureAppConfiguration(cb =>
@@ -68,10 +71,42 @@ namespace Universe.AppBase
             return builder;
         }//build
 
-        protected static void AddWorker<W, S>(
+        static volatile int _counter = 0;
+        static List<string> _workerIds = new();
+        static List<object?> _posts = new();
+        static List<object> _facts = new();
+        static Func<IServiceProvider, W> buildFactory<W, S>(
+            string workerId, 
+            Action<IServiceProvider, W>? postAction,
+            int index)
+            where W : WorkerBase<W, S> 
+            where S : class, IWorkerOptions
+        {
+            _workerIds.Add(workerId);
+            _posts.Add(postAction);
+
+            Func<IServiceProvider, W> func = sp =>
+            {
+                var w = UvLoader.Create<W>(typeof(W).FullName!, sp, _workerIds[index]);
+                (_posts[index] as Action<IServiceProvider, W>)?.Invoke(sp, w);
+                return w;
+            };
+            _facts.Add(func);
+
+            W factory(IServiceProvider sp)
+            {
+                var w = UvLoader.Create<W>(typeof(W).FullName!, sp, _workerIds[index]);
+                (_posts[index] as Action<IServiceProvider, W>)?.Invoke(sp, w);
+                return w;
+            }
+            return func;
+        }
+
+
+        public void AddWorker<W, S>(
             string workerConfigFile = "",
-            IList<string>? workerNames = null,
-            Func<IServiceProvider, W>? workerFactory = null,
+            string workerId = "",
+            Action<IServiceProvider, W>? postFactory = null,
             ServiceLifetime lifeTime = ServiceLifetime.Transient)
             where W : WorkerBase<W, S>
             where S : class, IWorkerOptions
@@ -80,31 +115,28 @@ namespace Universe.AppBase
             if (!string.IsNullOrWhiteSpace(workerConfigFile))
                 _configActions.Add(cb => cb.AddJsonFile(workerConfigFile, false, true));
 
-            //services
+            var factory = buildFactory<W,S>(workerId, postFactory, _counter++);
+
             _serviceActions.Add((ctx, sc) =>
             {
                 _ = lifeTime switch
                 {
-                    ServiceLifetime.Transient => sc.AddTransient<W>(),
-                    ServiceLifetime.Singleton
-                        => workerFactory == null ? sc.AddSingleton<W>() : sc.AddSingleton(workerFactory),
-                    ServiceLifetime.Scoped => sc.AddScoped<W>(),
-                    _ => sc.AddTransient<W>(),
+                    ServiceLifetime.Transient => sc.AddTransient(factory),
+                    ServiceLifetime.Singleton => sc.AddSingleton(factory),
+                    ServiceLifetime.Scoped => sc.AddScoped(factory),
+                    _ => sc.AddTransient(factory)
                 };
 
                 //options
-                if (workerNames == null)
+                if (string.IsNullOrWhiteSpace(workerId))
                     sc.AddOptions<S>(ctx.Configuration.GetSection(typeof(W).Name));
                 else
-                    foreach (var name in workerNames)
-                        sc.AddOptions<S>(name, ctx.Configuration.GetSection(name));
+                    sc.AddOptions<S>(workerId, ctx.Configuration.GetSection($"{typeof(W).Name}:{workerId}"));
             });
 
             //worker
-            _workerActions.Add((sp, token) =>
-            {
-                ((IHostedService)sp.GetRequiredService<W>()).StartAsync(token);
-            });
+            _workerActions.Add((sp, token) => sp.GetRequiredService<W>().StartAsync(token));
+            //_workerActions.Add((sp, token) => factory(sp).StartAsync(token));
         }
 
     }//class
