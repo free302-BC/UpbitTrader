@@ -30,7 +30,7 @@ namespace Universe.Coin.TradeLogic
         protected readonly KeyPair _key;
         protected readonly ILogger _logger;
         readonly JsonSerializerOptions _jsonOptions;
-        public JsonSerializerOptions JsonOptions => _jsonOptions;
+        public JsonSerializerOptions JsonOptions => _jsonOptions;//TODO: 필요?
 
         readonly string _wsUri;
         protected readonly WebClient _wc;

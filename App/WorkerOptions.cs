@@ -11,8 +11,17 @@ using Universe.Coin.TradeLogic;
 
 namespace Universe.Coin.Upbit.App
 {
-    public class WorkerOptions : TradeOptionsBase, IWorkerOptions
+    public class WorkerOptions : ITradeOptions, IWorkerOptions
     {
+        public WorkerOptions()
+        {
+            AccessKey = "";
+            SecretKey = "";
+        }
+
+        public string AccessKey { get; set; }
+        public string SecretKey { get; set; }
+
         public void Reload(IWorkerOptions source)
         {
             IWorkerOptions.checkType(this, source);

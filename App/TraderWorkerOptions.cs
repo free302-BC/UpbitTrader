@@ -9,14 +9,14 @@ using Universe.Coin.TradeLogic.Calc;
 
 namespace Universe.Coin.Upbit.App
 {
-    public class TraderOptions : WorkerOptions
+    public class TraderWorkerOptions : WorkerOptions
     {
         public bool Pausing { get; set; }
         public CalcParam CalcParam { get; set; } = new();
 
         public new IWorkerOptions Clone()
         {
-            var clone = (TraderOptions)MemberwiseClone();
+            var clone = (TraderWorkerOptions)MemberwiseClone();
             clone.CalcParam = (CalcParam)CalcParam.Clone();
 
             ((WorkerOptions)clone).Reload(this);
@@ -27,7 +27,7 @@ namespace Universe.Coin.Upbit.App
         public new void Reload(IWorkerOptions source)
         {
             base.Reload(source);
-            var src = (TraderOptions)source;
+            var src = (TraderWorkerOptions)source;
             Pausing = src.Pausing;
             CalcParam.Reload(src.CalcParam);
         }

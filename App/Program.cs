@@ -32,8 +32,8 @@ namespace Universe.Coin.Upbit.App
             #endregion
 
             AddWorker<BackTestWorker, BackTestOptions>("backtest.json", BackTestWorker.GetIds());
-            AddWorker<TraderWorker, TraderOptions>();
-            AddWorker<TickWorker, TickWorkerOptions>("backtest.json");
+            AddWorker<TraderWorker, TraderWorkerOptions>();
+            AddWorker<TickWorker, TickWorkerOptions>("tickworker.json");
             RunHost();
         }
 

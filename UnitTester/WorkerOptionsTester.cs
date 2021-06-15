@@ -52,19 +52,19 @@ namespace UnitTester
         [Fact]
         void reload_clone_TraderOptions()
         {
-            TraderOptions w = new();
+            TraderWorkerOptions w = new();
             w.AccessKey = "ak:xyz";
             w.Pausing = true;
             w.CalcParam.FactorK = 123.456m;
 
-            TraderOptions w2 = new();
+            TraderWorkerOptions w2 = new();
             w2.Reload(w);
             check(w, w2);
 
-            var w3 = (TraderOptions)w.Clone();
+            var w3 = (TraderWorkerOptions)w.Clone();
             check(w, w3);
 
-            static void check(TraderOptions exp, TraderOptions act)
+            static void check(TraderWorkerOptions exp, TraderWorkerOptions act)
             {
                 Assert.Equal(exp.AccessKey, act.AccessKey);
                 Assert.Equal(exp.Pausing, act.Pausing);

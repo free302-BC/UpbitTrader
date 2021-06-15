@@ -21,12 +21,12 @@ namespace Universe.Coin.Upbit.App
 {
     using JS = JsonSerializer;
 
-    public class TickWorker : TradeWorkerBase<TickWorker, BackTestOptions>
+    public class TickWorker : TradeWorkerBase<TickWorker, TickWorkerOptions>
     {
         public TickWorker(
             ILogger<TickWorker> logger,
             IServiceProvider sp,
-            IOptionsMonitor<BackTestOptions> set,
+            IOptionsMonitor<TickWorkerOptions> set,
             InputWorker inputWorker)
             : base(logger, sp, set, inputWorker)
         {
@@ -47,7 +47,7 @@ namespace Universe.Coin.Upbit.App
         {
             _optUpbit = new(_jsonOptions);
 
-            var type = UvLoader.Create<IWsRequest>(_upbit, "Universe.Coin.Upbit.WsResponse").GetType();
+            var type = UvLoader.Create<IWsResponse>(_upbit, "Universe.Coin.Upbit.Model.WsResponse").GetType();
             JcInterface<IWsResponse> jc = new(type);
             _optUpbit.Converters.Add(jc);
 

@@ -22,11 +22,11 @@ using Universe.Coin.TradeLogic.Calc;
 
 namespace Universe.Coin.Upbit.App
 {
-    public class TraderWorker : WorkerBase<TraderWorker, TraderOptions>
+    public class TraderWorker : WorkerBase<TraderWorker, TraderWorkerOptions>
     {
         public TraderWorker(
             ILogger<TraderWorker> logger, 
-            IOptionsMonitor<TraderOptions> set, 
+            IOptionsMonitor<TraderWorkerOptions> set, 
             IServiceProvider sp)
             : base(logger, sp, set) 
         {
