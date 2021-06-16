@@ -19,19 +19,19 @@ namespace Universe.AppBase
 
     public class ProgramBase
     {
-        /*static */readonly Action<object?> log = Console.WriteLine;
-        /*static */readonly List<ServiceAction> _serviceActions;
-        /*static */readonly List<ConfigAction> _configActions;
-        /*static */readonly List<WorkerAction> _workerActions;
+        static readonly Action<object?> log = Console.WriteLine;
+        static readonly List<ServiceAction> _serviceActions;
+        static readonly List<ConfigAction> _configActions;
+        static readonly List<WorkerAction> _workerActions;
 
-        public ProgramBase()
+        static ProgramBase()
         {
             _serviceActions = new();
             _configActions = new();
             _workerActions = new();
         }
 
-        public void RunHost()
+        public static void RunHost()
         {
             try
             {
@@ -53,7 +53,7 @@ namespace Universe.AppBase
                 log(ex);
             }
         }
-        IHostBuilder createHostBuilder(CancellationTokenSource cts)
+        static IHostBuilder createHostBuilder(CancellationTokenSource cts)
         {
             var builder = Host.CreateDefaultBuilder();
             builder.ConfigureAppConfiguration(cb =>
@@ -71,39 +71,9 @@ namespace Universe.AppBase
             return builder;
         }//build
 
-        static volatile int _counter = 0;
-        static List<string> _workerIds = new();
-        static List<object?> _posts = new();
-        static List<object> _facts = new();
-        static Func<IServiceProvider, W> buildFactory<W, S>(
-            string workerId, 
-            Action<IServiceProvider, W>? postAction,
-            int index)
-            where W : WorkerBase<W, S> 
-            where S : class, IWorkerOptions
-        {
-            _workerIds.Add(workerId);
-            _posts.Add(postAction);
 
-            Func<IServiceProvider, W> func = sp =>
-            {
-                var w = UvLoader.Create<W>(typeof(W).FullName!, sp, _workerIds[index]);
-                (_posts[index] as Action<IServiceProvider, W>)?.Invoke(sp, w);
-                return w;
-            };
-            _facts.Add(func);
-
-            W factory(IServiceProvider sp)
-            {
-                var w = UvLoader.Create<W>(typeof(W).FullName!, sp, _workerIds[index]);
-                (_posts[index] as Action<IServiceProvider, W>)?.Invoke(sp, w);
-                return w;
-            }
-            return func;
-        }
-
-
-        public void AddWorker<W, S>(
+        static Queue<string> _idQ = new();
+        static protected void AddWorker<W, S>(
             string workerConfigFile = "",
             string workerId = "",
             Action<IServiceProvider, W>? postFactory = null,
@@ -115,23 +85,28 @@ namespace Universe.AppBase
             if (!string.IsNullOrWhiteSpace(workerConfigFile))
                 _configActions.Add(cb => cb.AddJsonFile(workerConfigFile, false, true));
 
-            var factory = buildFactory<W,S>(workerId, postFactory, _counter++);
-
             _serviceActions.Add((ctx, sc) =>
             {
+                _idQ.Enqueue(workerId);
+                W factory(IServiceProvider sp)
+                {
+                    var w = ActivatorUtilities.CreateInstance<W>(sp, _idQ.Dequeue());
+                    postFactory?.Invoke(sp, w);
+                    return w;
+                }
                 _ = lifeTime switch
                 {
-                    ServiceLifetime.Transient => sc.AddTransient(factory),
                     ServiceLifetime.Singleton => sc.AddSingleton(factory),
                     ServiceLifetime.Scoped => sc.AddScoped(factory),
                     _ => sc.AddTransient(factory)
                 };
 
                 //options
-                if (string.IsNullOrWhiteSpace(workerId))
-                    sc.AddOptions<S>(ctx.Configuration.GetSection(typeof(W).Name));
-                else
-                    sc.AddOptions<S>(workerId, ctx.Configuration.GetSection($"{typeof(W).Name}:{workerId}"));
+                sc.AddOptions<S>(ctx.Configuration.GetSection(typeof(W).Name));
+                //if (string.IsNullOrWhiteSpace(workerId))
+                //    sc.AddOptions<S>(ctx.Configuration.GetSection(typeof(W).Name));
+                //else
+                //    sc.AddOptions<S>(workerId, ctx.Configuration.GetSection($"{typeof(W).Name}:{workerId}"));
             });
 
             //worker

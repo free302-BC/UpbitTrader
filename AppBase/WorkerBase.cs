@@ -35,6 +35,14 @@ namespace Universe.AppBase
             _logger = _sp.GetRequiredService<ILogger<W>>();
             var set = _sp.GetRequiredService<IOptionsMonitor<S>>();
 
+            Id = string.IsNullOrWhiteSpace(id) ? typeof(W).Name : $"{typeof(W).Name}:{id}";
+            _set = set.CurrentValue;
+            set.OnChange(s =>
+            {
+                _set.Reload(s);
+                onOptionsUpdate?.Invoke();
+            });
+
             if (string.IsNullOrWhiteSpace(id))
             {
                 Id = typeof(W).Name;
