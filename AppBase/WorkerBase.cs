@@ -66,6 +66,7 @@ namespace Universe.AppBase
         {
             return Task.Run(() =>
             {
+                Thread.CurrentThread.Name = $"{Id}";
                 info($"<{Id}> StartAsync()...");
                 work();
             }, cancellationToken)

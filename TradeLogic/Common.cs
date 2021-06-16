@@ -47,6 +47,10 @@ namespace Universe.Coin.TradeLogic
         A = -1,  //ask 매도
         B = 1  //bid 매수
     }
+
+    /// <summary>
+    /// back test 결과 - 거래 여부
+    /// </summary>
     public enum BackTestSignal
     {
         NoTrade, DoTrade

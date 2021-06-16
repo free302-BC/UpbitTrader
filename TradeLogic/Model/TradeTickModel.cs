@@ -20,6 +20,7 @@ namespace Universe.Coin.TradeLogic.Model
         public decimal MacdOsc { get; set; }
         public decimal Target { get; set; }
         public BackTestSignal BtSignal { get; set; }
+        public TimingSignal Signal { get; set; }
         public decimal Rate { get; set; }
         public decimal CumRate { get; set; }
         public decimal DrawDown { get; set; }
@@ -28,10 +29,7 @@ namespace Universe.Coin.TradeLogic.Model
 
 #pragma warning disable CS8618
         public TradeTickModel() { }
-        public TradeTickModel(ITradeTick tick) => setApiModel(tick);
-#pragma warning restore CS8618
-
-        void setApiModel(ITradeTick tick)
+        public TradeTickModel(ITradeTick tick)
         {
             Market = string.IsNullOrWhiteSpace(tick.Market) ? tick.Code : tick.Market;
             Market = Market[^3..];
@@ -50,8 +48,13 @@ namespace Universe.Coin.TradeLogic.Model
             //Serial = (tick.SequentialId / 1000 - msAtTheHour) * 1000 + (tick.SequentialId % 1000);//초당 1000개 
             //Serial = tick.SequentialId % 100000000;
         }
+#pragma warning restore CS8618
+
         public override string ToString()
             => $"[{TimeKST:HH:mm:ss.fff}] {Volume:F8} × {UnitPrice,6:F1} = {Price,7:F1}  {Dir,1} {Change,6:F1} | {Market}";
+
+        public string ToCalcString()
+                    => $"[{TimeKST:HH:mm:ss.fff}] {Price,7:F1} {Dir,1}";
 
         static TradeTickModel() => IViewModel.buildHeader(_names);
         static (string, int)[] _names =
@@ -64,7 +67,6 @@ namespace Universe.Coin.TradeLogic.Model
             ("Δ", 6),
             (nameof(Serial), 0),
         };
-
         
     }//class
 

@@ -42,9 +42,9 @@ namespace Universe.Coin.App
             //market(_client);
             //account(_client);
             //ticker(_client);
-            candleDay(_client);
-            candleMinutes(_client);
-            orderbook(_client);
+            //candleDay(_client);
+            //candleMinutes(_client);
+            //orderbook(_client);
             ticks(_client);
 
             //runAutoTrade();

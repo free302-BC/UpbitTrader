@@ -36,14 +36,14 @@ namespace Universe.Coin.App
                 
         protected override void work()
         {
-            //run_Tick_K(_client);
+            run_Tick_K(_client);
 
             _client.OnWsReceived += uc_OnReceived;
 
             var request = _client.CreateInstance<IWsRequest>();
             request.AddTrade(CurrencyId.KRW, CoinId.BTC);
             request.AddOrderbook(CurrencyId.KRW, CoinId.BTC);
-            _client.ConnectWs(request);
+            //_client.ConnectWs(request);
         }
 
         private void uc_OnReceived(string json)
