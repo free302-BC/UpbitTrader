@@ -5,8 +5,9 @@ using Universe.Coin.TradeLogic.Model;
 
 namespace Universe.Coin.TradeLogic
 {
-    public interface IClient : ITradeClientBase
+    public interface IClient : IClientBase
     {
+
         IMarketInfo[] ApiMarketInfo();
         IAccount[] ApiAccount();
 

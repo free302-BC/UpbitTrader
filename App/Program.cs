@@ -11,25 +11,23 @@ using Microsoft.Extensions.Hosting;
 
 namespace Universe.Coin.App
 {
-    class Program// : ProgramBase
+    class Program : ProgramBase
     {
         static void Main(string[] args)
         {
-            var pb = new ProgramBase();
-
             #region ---- key input listener ----
-            pb.AddWorker<InputWorker, WorkerOptions>(
+            AddWorker<InputWorker, WorkerOptions>(
                 lifeTime: ServiceLifetime.Singleton,
                 postFactory: (sp, iw) => 
                     iw.AddCmd(ConsoleKey.Escape, m => sp.GetRequiredService<IHost>().StopAsync().Wait()));
             #endregion
 
-            pb.AddWorker<TraderWorker, TraderWorkerOptions>();
-            pb.AddWorker<TickWorker, TickWorkerOptions>("tickworker.json", "Upbit");
-            pb.AddWorker<BackTestWorker, BackTestOptions>("backtest.json", "1");
-            pb.AddWorker<BackTestWorker, BackTestOptions>("backtest.json", "2");
-            pb.AddWorker<TickWorker, TickWorkerOptions>("tickworker_binance.json", "Binance");
-            pb.RunHost();
+            AddWorker<BackTestWorker, BackTestOptions>("backtest.json", "1");
+            //AddWorker<BackTestWorker, BackTestOptions>(workerId: "2");
+            AddWorker<TraderWorker, TraderWorkerOptions>();
+            AddWorker<TickWorker, TickWorkerOptions>("tickworker.json", "Upbit");
+            //AddWorker<TickWorker, TickWorkerOptions>("tickworker_binance.json", "Binance");
+            RunHost();
         }
 
     }//class

@@ -40,7 +40,7 @@ namespace Universe.Coin.App
         public BackTestWorker(IServiceProvider sp, string id = "") : base(sp, id)
         {
             _ev = new(false);
-            onOptionsUpdate += () => info($"{nameof(BackTestOptions)} updated!");
+            onOptionsUpdate += () => info($"{Id} updated!");
 
             registerHotkey();
         }

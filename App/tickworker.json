@@ -3,6 +3,7 @@
 
     "Upbit": {
       "AssemblyFile": "Universe.Coin.Upbit.dll",
+      "ClientFullName": "Universe.Coin.Upbit.Client",
       "AccessKey": "E5AEDC2AF2111C0DE0837B20147366A695CAC34FE4137F01E9B2751215561A82CAEBCB44ED343B28",
       "SecretKey": "D4CFF355ED1A7D21C4B14709400E00A1DAA9C267EF360032DAC06F06134625AED9F9F256D230181F",
       "CalcParam": {

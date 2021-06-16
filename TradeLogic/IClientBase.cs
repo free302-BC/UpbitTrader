@@ -9,7 +9,7 @@ using Universe.Coin.TradeLogic.Model;
 
 namespace Universe.Coin.TradeLogic
 {
-    public interface ITradeClientBase : IDisposable
+    public interface IClientBase : IDisposable
     {
 
         #region ---- WebSocket ----
@@ -28,7 +28,7 @@ namespace Universe.Coin.TradeLogic
 
         #region ---- Json Options ----
 
-        static ITradeClientBase()
+        static IClientBase()
         {
             _jsonOptions = new JsonSerializerOptions
             {
@@ -41,9 +41,12 @@ namespace Universe.Coin.TradeLogic
             //initJsonOption(_jsonOption);
         }
 
-        JsonSerializerOptions JsonOptions { get; }
+        //JsonSerializerOptions JsonOptions { get; }
         protected static readonly JsonSerializerOptions _jsonOptions;
-        
+
+        Type GetImplType<I>();
+        I CreateInstance<I>();
+        I Deserialize<I>(string json);
 
         #endregion
 

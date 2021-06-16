@@ -23,6 +23,19 @@ namespace Universe.Coin.Upbit
     {
         const string _wsUri = "wss://api.upbit.com/websocket/v1";
 
+        static Client()
+        {
+            addType<IWsRequest>(typeof(WsRequest));
+            addType<IWsResponse>(typeof(WsResponse));
+            addType<IAccount>(typeof(Account));
+            addType<ICandle>(typeof(CandleBase));
+            addType<IMarketInfo>(typeof(MarketInfo));
+            addType<IOrderbook>(typeof(Orderbook));
+            addType<IOrderbookUnit>(typeof(OrderbookUnit));
+            addType<ITicker>(typeof(Ticker));
+            addType<ITradeTick>(typeof(TradeTick));
+        }
+
         public Client(string accessKey, string secretKey, ILogger logger) :
             base(_wsUri, accessKey, secretKey, logger)
         { }
@@ -44,6 +57,12 @@ namespace Universe.Coin.Upbit
             //converters.Add(new WsResponseJC());                                                                                                                                   
         }
 
+        /// <summary>
+        /// api 호출에 필요한 사전작업 수행 
+        /// </summary>
+        /// <param name="api"></param>
+        /// <param name="postPath"></param>
+        /// <returns>http uri</returns>
         protected override string prepareInvoke(ApiId api, string postPath)
         {
             if (Helper.GetApi(api).ResetAuthToken) _wc.SetAuthToken(_key);

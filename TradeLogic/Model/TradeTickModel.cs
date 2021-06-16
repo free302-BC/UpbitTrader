@@ -41,7 +41,7 @@ namespace Universe.Coin.TradeLogic.Model
             Volume = tick.TradeVolume;
             Price = UnitPrice * Volume;
             Change = tick.ChangePrice / 10000m;
-            Dir = tick.AskBid[0] == 'B' ? TradeTickDir.U : TradeTickDir.D;
+            Dir = tick.AskBid[0] == 'B' ? TradeTickDir.B : TradeTickDir.A;
 
             //SequentialId에서 시간단위 이상 제거
             // == 1시간 내에서 유효한 unique serial

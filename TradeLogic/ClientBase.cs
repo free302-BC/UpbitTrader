@@ -25,12 +25,11 @@ namespace Universe.Coin.TradeLogic
     /// <summary>
     /// API client base
     /// </summary>
-    public abstract class ClientBase : ITradeClientBase
+    public abstract class ClientBase : IClientBase
     {
         protected readonly KeyPair _key;
         protected readonly ILogger _logger;
         readonly JsonSerializerOptions _jsonOptions;
-        public JsonSerializerOptions JsonOptions => _jsonOptions;//TODO: 필요?
 
         readonly string _wsUri;
         protected readonly WebClient _wc;
@@ -50,7 +49,7 @@ namespace Universe.Coin.TradeLogic
             _evPausing = new(false);
 
             init();
-            _jsonOptions = new JsonSerializerOptions(ITradeClientBase._jsonOptions);//clone
+            _jsonOptions = new JsonSerializerOptions(IClientBase._jsonOptions);//clone
             registerJsonConverters(_jsonOptions.Converters);
         }
 
@@ -66,6 +65,26 @@ namespace Universe.Coin.TradeLogic
         /// </summary>
         /// <param name="jsonOptions"></param>
         protected abstract void registerJsonConverters(in IList<JsonConverter> converters);
+
+
+        static ClientBase() => _types = new();
+        static Dictionary<Type, Type> _types;
+        protected static void addType<I>(Type implType) => _types[typeof(I)] = implType;
+
+        public Type GetImplType<I>()
+        {
+            var type = typeof(I);
+            if (!_types.ContainsKey(type))
+                throw new Exception($"'{GetType().FullName}' does not impliment '{typeof(I).FullName}'"); ;
+            return _types[typeof(I)];
+        }
+
+        public I CreateInstance<I>() => UvLoader.Create<I>(GetImplType<I>().FullName!);
+        public I Deserialize<I>(string json)
+        {
+            var model = JS.Deserialize(json, GetImplType<I>(), _jsonOptions) ?? CreateInstance<I>()!;
+            return (I)model;
+        }
 
         public void Dispose()
         {

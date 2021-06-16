@@ -42,7 +42,7 @@ namespace Universe.Coin.App
 
             _client.OnWsReceived += uc_OnReceived;
 
-            var request = UvLoader.Create<IWsRequest>(_set.AssemblyFile, "Universe.Coin.Upbit.WsRequest");
+            var request = _client.CreateInstance<IWsRequest>();
             request.AddTrade(CurrencyId.KRW, CoinId.BTC);
             request.AddOrderbook(CurrencyId.KRW, CoinId.BTC);
             _client.ConnectWs(request);
@@ -50,25 +50,19 @@ namespace Universe.Coin.App
 
         private void uc_OnReceived(string json)
         {
-            var type = UvLoader.Create<IWsResponse>(_set.AssemblyFile, "Universe.Coin.Upbit.Model.WsResponse").GetType();
-            //var @event = JS.Deserialize<IWsResponse>(json, _jsonOptions)!.Event;
-            var @event = ((IWsResponse)JS.Deserialize(json, type, _jsonOptions)!).Event;
+            var resType = _client.GetImplType<IWsResponse>();
+            var @event = ((IWsResponse)JS.Deserialize(json, resType, _jsonOptions)!).Event;
 
-            if (@event == TradeEvent.Trade)
+            IViewModel model = @event switch
             {
-                var model = JS.Deserialize<TradeTick>(json, _jsonOptions)?.ToModel() ?? new();
-                report(model, (int)model.Dir);
-            }
-            if (@event == TradeEvent.Ticker)
-            {
-                var model = JS.Deserialize<Ticker>(json, _jsonOptions)?.ToModel() ?? new();
-                report(model);
-            }
-            if (@event == TradeEvent.Order)
-            {
-                var model = JS.Deserialize<Orderbook>(json, _jsonOptions)?.ToModel() ?? new();
-                report(model);
-            }
+                TradeEvent.Trade => _client.Deserialize<ITradeTick>(json).ToModel(),
+                TradeEvent.Ticker => _client.Deserialize<ITicker>(json).ToModel(),
+                TradeEvent.Order => _client.Deserialize<IOrderbook>(json).ToModel(),
+                _ => throw new NotImplementedException(),
+            };
+
+            if(model is TradeTickModel) report(model, (int)((TradeTickModel)model).Dir);
+            else report(model);
         }
 
         void run_Tick_K(IClient uc)

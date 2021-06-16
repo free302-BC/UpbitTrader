@@ -22,19 +22,7 @@ namespace Universe.Coin.Upbit
     public partial class Client : ClientBase
     {
         const string _utcFmt = "yyyy-MM-ddTHH:mm:ssZ";
-        static long _lastCallTime;
-        static readonly Stopwatch _watch;
-
-        //-------------------- TEST ------------------------------
-        public static List<(CandleUnit, long, long)> CallTimes = new();
-        static readonly TimeCounter _timeCounter;
-        static Client()
-        {
-            _watch =  Stopwatch.StartNew();
-            _lastCallTime = 0;
-            _timeCounter = new(1000, 10);
-        }
-        //--------------------------------------------------------
+        static readonly TimeCounter _timeCounter = new(1000, 10);
 
         public C[] ApiCandle<C>(
             CurrencyId currency = CurrencyId.KRW,
@@ -75,24 +63,14 @@ namespace Universe.Coin.Upbit
                             setQueryString("to", to.ToString(_utcFmt));
                         }
                     }
-                    //if (count > 0)
-                    {
-                        var dt = _watch.ElapsedMilliseconds - _lastCallTime;
-                        CallTimes.Add((unit, _watch.ElapsedMilliseconds, dt));
-                        
-                        _lastCallTime = _watch.ElapsedMilliseconds;
-                    }
                 }
                 catch (Exception ex)
                 {
-                    CallTimes.Add((CandleUnit.None, _watch.ElapsedMilliseconds, _watch.ElapsedMilliseconds - _lastCallTime));
-
                     var sb = new StringBuilder();
                     sb.AppendLine("----------------------------------------------");
                     sb.AppendLine($"Time: {DateTime.Now:yyMMdd.HHmmss.fff}");
                     sb.AppendLine($"Message: {ex.Message}");
                     sb.AppendLine("----------------------------------------------");
-                    foreach (var time in CallTimes) sb.AppendLine(time.ToString());
                     _timeCounter.Dump(sb);
                     File.AppendAllText("candle_time_counter.txt", sb.ToString());
                 }

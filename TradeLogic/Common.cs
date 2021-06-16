@@ -44,8 +44,8 @@ namespace Universe.Coin.TradeLogic
     }
     public enum TradeTickDir : int
     {
-        D = -1,  //ask 매도
-        U = 1  //bid 매수
+        A = -1,  //ask 매도
+        B = 1  //bid 매수
     }
     public enum BackTestSignal
     {

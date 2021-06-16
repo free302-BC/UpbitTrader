@@ -22,50 +22,27 @@ namespace Universe.AppBase
         where W : WorkerBase<W, S> 
         where S : IWorkerOptions
     {
-        protected readonly ILogger _logger;
-        public string Id { get; set; }
         protected readonly IServiceProvider _sp;
+        protected readonly ILogger _logger;
+        protected readonly IConfiguration _config;
+        public string Id { get; set; }
         protected S _set;
-
-        public void Reload(S set) => _set.Reload(set);
 
         public WorkerBase(IServiceProvider sp, string id = "")
         {
             _sp = sp;
             _logger = _sp.GetRequiredService<ILogger<W>>();
+            _config = _sp.GetRequiredService<IConfiguration>();
             var set = _sp.GetRequiredService<IOptionsMonitor<S>>();
 
             Id = string.IsNullOrWhiteSpace(id) ? typeof(W).Name : $"{typeof(W).Name}:{id}";
             _set = set.CurrentValue;
+            _config.GetSection(Id).Bind(_set);
             set.OnChange(s =>
             {
-                _set.Reload(s);
+                _config.GetSection(Id).Bind(_set);
                 onOptionsUpdate?.Invoke();
             });
-
-            if (string.IsNullOrWhiteSpace(id))
-            {
-                Id = typeof(W).Name;
-                _set = set.CurrentValue;
-                set.OnChange(s => 
-                { 
-                    _set.Reload(s);
-                    onOptionsUpdate?.Invoke();
-                });
-            }
-            else
-            {
-                Id = id;
-                _set = set.Get(Id);
-                set.OnChange((s, n) =>
-                {
-                    if (n == Id)
-                    {
-                        _set.Reload(s);
-                        onOptionsUpdate?.Invoke();
-                    }
-                });
-            }
         }        
 
         protected void report(object message, int color = 0)

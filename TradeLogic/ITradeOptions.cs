@@ -12,6 +12,8 @@ namespace Universe.Coin.TradeLogic
 {
     public interface ITradeOptions
     {
+        string AssemblyFile { get; set; }
+        string ClientFullName { get; set; }
         string AccessKey { get; set; }
         string SecretKey { get; set; }
 

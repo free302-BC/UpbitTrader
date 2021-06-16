@@ -12,6 +12,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.Extensions.DependencyInjection;
 using Universe.AppBase;
 using Universe.Coin.TradeLogic;
+using Universe.Utility;
 //using Universe.Coin.Upbit;
 
 namespace Universe.Coin.App
@@ -29,8 +30,10 @@ namespace Universe.Coin.App
         {
             _inputWorker = sp.GetRequiredService<InputWorker>();
             _jsonOptions = buildJsonOptions();
-            _client = new Upbit.Client(_set.GetAccessKey(), _set.GetSecretKey(), 
-                _sp.GetRequiredService<ILogger<Upbit.Client>>());
+
+            var logger = _sp.GetRequiredService<ILogger<Upbit.Client>>();
+            _client = UvLoader.Create<IClient>(_set.AssemblyFile, _set.ClientFullName,
+                _set.GetAccessKey(), _set.GetSecretKey(), logger);
         }
 
         public void Dispose()

@@ -60,6 +60,8 @@ namespace UnitTester
         {
             public string AccessKey { get; set; }
             public string SecretKey { get; set; }
+            public string AssemblyFile { get; set; }
+            public string ClientFullName { get; set; }
         }
 
 

@@ -2,9 +2,6 @@
 
 + JsonConverter 일반화
 
-+ IOptions
-  - named option 제거
-  - unnamed option의 onChange 이벤트만 사용
 
 + TradeTick: 
  - Queue 구현 : 실시간 계속 추가, 데이터 파일에 저장
@@ -24,6 +21,9 @@
 
  --------- [ 완료 ] ---------
 
++ IOptions
+  - named option 제거
+  - unnamed option의 onChange 이벤트만 사용
 + WebSocket request class 일반화
 + ProgramBase - Add service 추가 ~ CalcParam 등? => 불필요!
 + macd 구현  
