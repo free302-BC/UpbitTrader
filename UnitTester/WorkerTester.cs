@@ -32,7 +32,7 @@ namespace UnitTester
         {
             _logger = null!;
 
-            ITradeOptions opt = new TradeOptions()
+            IClientOptions opt = new TradeOptions()
             {
                 AccessKey = _accessKey,
                 SecretKey = _secretKey
@@ -56,7 +56,7 @@ namespace UnitTester
             Debug.WriteLine(result);
         }
 
-        public class TradeOptions : ITradeOptions
+        public class TradeOptions : IClientOptions
         {
             public string AccessKey { get; set; }
             public string SecretKey { get; set; }
@@ -70,7 +70,7 @@ namespace UnitTester
             readonly Client _client;
             public TestWorker(IServiceProvider sp, string id = "") : base(sp, id)
             {
-                ITradeOptions opt = new TradeOptions()
+                IClientOptions opt = new TradeOptions()
                 {
                     AccessKey = _accessKey,
                     SecretKey = _secretKey

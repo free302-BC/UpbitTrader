@@ -25,6 +25,21 @@ namespace Universe.Coin.Upbit
 
         static Client()
         {
+            #region ---- Candle Impl ~ CandleUnit ----
+
+            _candleTypes = new()
+            {
+                { CandleUnit.DAY, typeof(CandleDay) },
+                { CandleUnit.WEEK, typeof(CandleBase) },
+                { CandleUnit.MONTH, typeof(CandleBase) },
+            };
+            var minutes = Enum.GetValues<CandleUnit>().Where(x => x >= CandleUnit.M1 && x < CandleUnit.DAY).ToArray();
+            foreach (var m in minutes) _candleTypes.Add(m, typeof(CandleMinute));
+
+            #endregion
+
+            #region ---- Interface ~ Implimenting Type ----
+
             addType<IWsRequest>(typeof(WsRequest));
             addType<IWsResponse>(typeof(WsResponse));
             addType<IAccount>(typeof(Account));
@@ -34,6 +49,8 @@ namespace Universe.Coin.Upbit
             addType<IOrderbookUnit>(typeof(OrderbookUnit));
             addType<ITicker>(typeof(Ticker));
             addType<ITradeTick>(typeof(TradeTick));
+
+            #endregion
         }
 
         public Client(string accessKey, string secretKey, ILogger logger) :
@@ -45,7 +62,6 @@ namespace Universe.Coin.Upbit
             _wc.SetAuthToken(_key);
             _wc.SetAcceptance();
             _ws.Options.KeepAliveInterval = new TimeSpan(0, 1, 30);
-
         }
 
         /// <summary>

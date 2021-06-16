@@ -23,6 +23,7 @@ namespace Universe.Coin.Upbit
     {
         const string _utcFmt = "yyyy-MM-ddTHH:mm:ssZ";
         static readonly TimeCounter _timeCounter = new(1000, 10);
+        static readonly Dictionary<CandleUnit, Type> _candleTypes;
 
         public C[] ApiCandle<C>(
             CurrencyId currency = CurrencyId.KRW,
@@ -30,10 +31,11 @@ namespace Universe.Coin.Upbit
             CandleUnit unit     = CandleUnit.DAY,
             int count           = 2,
             DateTime localTo    = default)
-            where C : ICandle, new()
+            where C : ICandle//, new()
         {
             var api = ICandle.GetApiId(unit);
             var postPath = api == ApiId.CandleMinutes ? ((int)unit).ToString() : "";
+            var implType = _candleTypes[unit];
 
             clearQueryString();
             setQueryString("market", currency, coin);
@@ -49,7 +51,7 @@ namespace Universe.Coin.Upbit
                 try
                 {
                     _timeCounter.Add();
-                    var res = InvokeApi<C>(api, postPath);
+                    var res = InvokeApi<C>(api, implType, postPath);
 
                     if (res.Length > 0)
                     {
@@ -79,23 +81,6 @@ namespace Universe.Coin.Upbit
             //if(index != result.Length) Array.Resize(ref result, index);
             return result;//.OrderBy(x => x.Timestamp).ToList();
         }
-
-        #region ---- Ticker : 현재시세 조회 ----
-
-        public ITicker ApiTicker(CurrencyId currency = CurrencyId.KRW, CoinId coin = CoinId.BTC)
-        {
-            clearQueryString();
-            setQueryString("markets", currency, coin);
-            return InvokeApi<Ticker>(ApiId.TradeTicker)?.FirstOrDefault() ?? new();
-        }
-
-        public ITicker[] ApiTicker(IEnumerable<(CurrencyId currency, CoinId coin)> markets)
-        {
-            clearQueryString();
-            foreach (var q in markets) addQueryString("markets", q.currency, q.coin);
-            return InvokeApi<Ticker>(ApiId.TradeTicker) ?? Array.Empty<Ticker>();
-        }
-        #endregion
 
     }//class
 }

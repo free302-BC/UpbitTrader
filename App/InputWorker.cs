@@ -12,7 +12,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Universe.AppBase;
 using System.Text.Json;
-using Universe.Coin.Upbit.Model;
 using System.IO;
 using System.Collections.Specialized;
 using Universe.Utility;

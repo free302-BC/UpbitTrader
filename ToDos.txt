@@ -1,18 +1,15 @@
 --------- [ 미완료 ] ---------
 
-+ JsonConverter 일반화
-
++ 체결강도
 
 + TradeTick: 
  - Queue 구현 : 실시간 계속 추가, 데이터 파일에 저장
  - 1초에 1번 macd 계산?
- - 매수 매도 신호를 모델에 저장
+ - 매수 매도 신호를 모델에 저장 ~ BackTestWorker부터
 
 + 알고리즘: 
  - 매 거래마다 K 변경 ~ MA 반영?
  - macd --> k 관계? 
-
-+ 체결: 실시간 or 모두 받기 ~ 웹소켓? https://wikidocs.net/21892
 
 + K 변경, 거래주기 변경~ 활성상태에서  --> 웹앱으로 변경, 
  - 구조 설계 필요
@@ -21,10 +18,12 @@
 
  --------- [ 완료 ] ---------
 
++ JsonConverter 일반화 ~ 불필요!
 + IOptions
   - named option 제거
   - unnamed option의 onChange 이벤트만 사용
 + WebSocket request class 일반화
++ 체결: 실시간 or 모두 받기 ~ 웹소켓? https://wikidocs.net/21892
 + ProgramBase - Add service 추가 ~ CalcParam 등? => 불필요!
 + macd 구현  
 + 알고리즘-모델 분리

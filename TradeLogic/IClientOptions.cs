@@ -10,7 +10,7 @@ using Universe.Utility;
 
 namespace Universe.Coin.TradeLogic
 {
-    public interface ITradeOptions
+    public interface IClientOptions
     {
         string AssemblyFile { get; set; }
         string ClientFullName { get; set; }

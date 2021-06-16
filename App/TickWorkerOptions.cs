@@ -13,11 +13,9 @@ namespace Universe.Coin.App
     {
         public TickWorkerOptions()
         {
-            AssemblyFile = "";
             CalcParam = new CalcParam();
         }
 
-        public string AssemblyFile { get; set; }
         public bool Pausing { get; set; }
         public ICalcParam CalcParam { get; set; }
 

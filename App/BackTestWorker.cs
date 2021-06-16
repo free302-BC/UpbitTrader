@@ -22,7 +22,8 @@ using System.Text.Unicode;
 using Universe.AppBase;
 using Universe.Coin.TradeLogic;
 using Universe.Coin.TradeLogic.Model;
-using Universe.Coin.Upbit.Model;
+using Universe.Coin.TradeLogic.Calc;
+using Universe.Utility;
 
 namespace Universe.Coin.App
 {
@@ -110,15 +111,12 @@ namespace Universe.Coin.App
         readonly ManualResetEvent _ev;
         protected override void work()
         {
-            var logger = _sp.GetRequiredService<ILogger<IClient>>();
-            var uc = new Upbit.Client(_set.AccessKey, _set.SecretKey, logger);
-
             while (true)
             {
-                if (!_set.DoFindK)
-                    run_Units_K(uc);
+                if (!_set.DoFindK) 
+                    run_Units_K(_client);
                 else
-                    run_Units_FindK(uc);
+                    run_Units_FindK(_client);
 
                 info($"<{Id}> Waiting...");
                 _ev.Reset();
@@ -229,7 +227,7 @@ namespace Universe.Coin.App
             {
                 var count = (int)(hours * 60 / (int)unit);
                 var totalCount = (int)(totalHours * 60 / (int)unit);
-                var models = uc.ApiCandle<CandleMinute>(count: totalCount, unit: unit).ToModels();
+                var models = uc.ApiCandle<ICandle>(count: totalCount, unit: unit).ToModels();
 
                 var results = new FindList();
                 sb.Append($"{unit,6}: ");
@@ -305,7 +303,7 @@ namespace Universe.Coin.App
             CandleModel[] models = _set.LoadFromFile ? load(unit) : Array.Empty<CandleModel>();
             if (models.Length < count)
             {
-                models = uc.ApiCandle<CandleMinute>(count: count, unit: unit).ToModels();
+                models = uc.ApiCandle<ICandle>(count: count, unit: unit).ToModels();
                 save(models, unit);
             }
             return models.Take(count).ToArray();
@@ -339,7 +337,7 @@ namespace Universe.Coin.App
 
         void saveKey(WorkerOptions set)
         {
-            ITradeOptions.SaveEncrptedKey(set.AccessKey, set.SecretKey, "key.txt");
+            IClientOptions.SaveEncrptedKey(set.AccessKey, set.SecretKey, "key.txt");
         }
 
 

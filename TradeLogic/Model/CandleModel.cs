@@ -30,7 +30,6 @@ namespace Universe.Coin.TradeLogic.Model
         public CandleModel() { }
         public CandleModel(ICandle candle)
         {
-            //SetApiModel(candle);
             ApiId = candle.ApiId;
             Unit = candle.CandleUnit;
             TimeKST = DateTime.Parse(candle.CandleDateTimeKst);
@@ -48,8 +47,8 @@ namespace Universe.Coin.TradeLogic.Model
         {
             (nameof(TimeKST), 11),
             (nameof(ApiId),    8),
-            (nameof(MacdOsc),  4),
             (nameof(Opening),  8),
+            ("MACD",  4),
             (nameof(Target),   8),
             (nameof(High),     8),
             (nameof(Closing),  8),

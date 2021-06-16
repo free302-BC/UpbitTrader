@@ -13,8 +13,6 @@ using Universe.AppBase;
 using Universe.Coin.TradeLogic;
 using Universe.Coin.TradeLogic.Calc;
 using Universe.Coin.TradeLogic.Model;
-
-using Universe.Coin.Upbit.Model;
 using Universe.Utility;
 
 namespace Universe.Coin.App

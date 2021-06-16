@@ -170,26 +170,30 @@ namespace Universe.Coin.TradeLogic
         #region ---- Rest API ----
 
         /// <summary>
-        /// 
+        /// 주어진 api의 uri에 접속하여 결과를 M[]로 리턴
         /// </summary>
-        /// <typeparam name="T">IApiModel</typeparam>
+        /// <typeparam name="M">IApiModel</typeparam>
         /// <param name="apiId"></param>
         /// <param name="postPath">Api URL에 추가할 경로: ex) minutes candle의 unit</param>
         /// <returns></returns>
-        public virtual T[] InvokeApi<T>(ApiId api, string postPath = "") where T : IApiModel, new()
+        public virtual M[] InvokeApi<M>(ApiId api, string postPath = "") where M : IApiModel//, new()
+        {
+            return InvokeApi<M>(api, typeof(M), postPath);
+        }
+        public virtual M[] InvokeApi<M>(ApiId api, Type implType, string postPath = "") where M : IApiModel//, new()
         {
             var httpUri = prepareInvoke(api, postPath);
 
             try
             {
                 string json = _wc.DownloadString(httpUri);
-                var models = JS.Deserialize<T[]>(json, _jsonOptions) ?? Array.Empty<T>();
+                var models = (M[])JS.Deserialize(json, implType.MakeArrayType(), _jsonOptions)!;
                 return models;
             }
             catch (WebException ex)
             {
                 _logger.LogWebException(ex);
-                return Array.Empty<T>();
+                return Array.Empty<M>();
             }
         }
 

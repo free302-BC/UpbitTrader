@@ -20,7 +20,7 @@ namespace Universe.Coin.App
     public abstract class TradeWorkerBase<W, S> 
                 : WorkerBase<W, S>, IDisposable
         where W : WorkerBase<W, S> 
-        where S : WorkerOptions, ITradeOptions
+        where S : WorkerOptions, IClientOptions
     {
         protected readonly InputWorker _inputWorker;
         protected readonly IClient _client;
@@ -31,7 +31,7 @@ namespace Universe.Coin.App
             _inputWorker = sp.GetRequiredService<InputWorker>();
             _jsonOptions = buildJsonOptions();
 
-            var logger = _sp.GetRequiredService<ILogger<Upbit.Client>>();
+            var logger = _sp.GetRequiredService<ILogger<IClient>>();
             _client = UvLoader.Create<IClient>(_set.AssemblyFile, _set.ClientFullName,
                 _set.GetAccessKey(), _set.GetSecretKey(), logger);
         }

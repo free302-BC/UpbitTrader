@@ -11,7 +11,7 @@ using Universe.Coin.TradeLogic;
 
 namespace Universe.Coin.App
 {
-    public class WorkerOptions : ITradeOptions, IWorkerOptions
+    public class WorkerOptions : IClientOptions, IWorkerOptions
     {
         public WorkerOptions()
         {

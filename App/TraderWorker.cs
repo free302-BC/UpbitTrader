@@ -12,7 +12,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Universe.AppBase;
 using System.Text.Json;
-using Universe.Coin.Upbit.Model;
 using System.IO;
 using System.Collections.Specialized;
 using Universe.Utility;
@@ -22,7 +21,7 @@ using Universe.Coin.TradeLogic.Calc;
 
 namespace Universe.Coin.App
 {
-    public class TraderWorker : WorkerBase<TraderWorker, TraderWorkerOptions>
+    public class TraderWorker : TradeWorkerBase<TraderWorker, TraderWorkerOptions>
     {
         public TraderWorker(IServiceProvider sp, string id = "") : base(sp)
         {
@@ -40,24 +39,21 @@ namespace Universe.Coin.App
 
         protected override void work()
         {
-            var logger = _sp.GetRequiredService<ILogger<IClient>>();
-            var uc = new Upbit.Client(_set.AccessKey, _set.SecretKey, logger);
+            //market(_client);
+            //account(_client);
+            //ticker(_client);
+            candleDay(_client);
+            candleMinutes(_client);
+            orderbook(_client);
+            ticks(_client);
 
-            //market(uc);
-            //account(uc);
-            ticker(uc);
-            //candleDay(uc);
-            //candleMinutes(uc);
-            //ticks(uc);
-            //orderbook(uc);
-
-            runAutoTrade(uc);
+            //runAutoTrade();
         }
 
         readonly ManualResetEvent _evPausing;
-        void runAutoTrade(IClient uc)
+        void runAutoTrade()
         {
-            var (next, sell, target) = restart(uc);
+            var (next, sell, target) = restart(_client);
 
             bool buy = false;
             var lastTicks = new List<long>();
@@ -75,7 +71,7 @@ namespace Universe.Coin.App
                 var now = DateTime.Now;
                 if (now < sell)
                 {
-                    var order = uc.ApiOrderbook().ToModel();//1st call-price
+                    var order = _client.ApiOrderbook().ToModel();//1st call-price
                     if ((now - lastBook).TotalSeconds > 1)
                     {
                         //report call-price
@@ -85,7 +81,7 @@ namespace Universe.Coin.App
                     }
 
                     //get new ticks
-                    var newTicks = uc.ApiTicks(count: numTicks).ToModels().Where(x => !lastTicks.Contains(x.Serial));
+                    var newTicks = _client.ApiTicks(count: numTicks).ToModels().Where(x => !lastTicks.Contains(x.Serial));
                     var numNewTicks = newTicks.Count();
                     if (numNewTicks > numTicks / 5) info($"numNewTicks= <{numNewTicks}>");
                     foreach (var tick in newTicks) report(tick, tick.Dir == TradeTickDir.B ? 1 : -1);
@@ -117,7 +113,7 @@ namespace Universe.Coin.App
                     var current = order.askUP;
                     if (current > target && !buy)
                     {
-                        var krw = uc.GetBalance(CurrencyId.KRW);//get balnace
+                        var krw = _client.GetBalance(CurrencyId.KRW);//get balnace
                         if (krw > 5000)
                         {
                             ;//buy 
@@ -128,7 +124,7 @@ namespace Universe.Coin.App
                 }
                 else if (sell <= now && now < next)
                 {
-                    var btc = uc.GetBalance(CoinId.BTC);//get btc
+                    var btc = _client.GetBalance(CoinId.BTC);//get btc
                     if (btc > 0.0001m)
                     {
                         ;//sell
@@ -139,13 +135,14 @@ namespace Universe.Coin.App
                 }
                 else//now >= next
                 {
-                    (next, sell, target) = restart(uc);
+                    (next, sell, target) = restart(_client);
                 }
             }//while
 
             (DateTime next, DateTime sell, decimal target) restart(IClient uc)
             {
-                var models = uc.ApiCandle<CandleDay>(unit: CandleUnit.DAY, count: 2).ToModels();
+                var models = _client.ApiCandle<ICandle>(unit: CandleUnit.DAY, count: 2).ToModels();
+
                 var start = models[1].TimeKST;
                 info($"Starting new period: {start}");
 
@@ -182,13 +179,13 @@ namespace Universe.Coin.App
         }
         void candleDay(IClient uc)
         {
-            var candles = uc.ApiCandle<CandleDay>(unit: CandleUnit.DAY, count: 20);
+            var candles = uc.ApiCandle<ICandle>(unit: CandleUnit.DAY, count: 20);
             var models = candles.ToModels();
             info(IViewModel.Print(models));
         }
         void candleMinutes(IClient uc)
         {
-            var candles = uc.ApiCandle<CandleMinute>(unit: CandleUnit.M1, count: 20);
+            var candles = uc.ApiCandle<ICandle>(unit: CandleUnit.M1, count: 20);
             var models = candles.ToModels();
             info(IViewModel.Print(models));
         }

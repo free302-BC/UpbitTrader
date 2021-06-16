@@ -21,7 +21,7 @@ namespace Universe.Coin.TradeLogic
 
         #region ---- Rest API ----
 
-        T[] InvokeApi<T>(ApiId apiId, string postPath = "") where T : IApiModel, new();
+        T[] InvokeApi<T>(ApiId apiId, string postPath = "") where T : IApiModel;
 
         #endregion
 
@@ -34,7 +34,9 @@ namespace Universe.Coin.TradeLogic
             {
                 IncludeFields = true,
                 WriteIndented = true,
-                PropertyNameCaseInsensitive = false
+                PropertyNameCaseInsensitive = false,
+                NumberHandling = JsonNumberHandling.AllowReadingFromString 
+                | JsonNumberHandling.AllowNamedFloatingPointLiterals
             };
             _jsonOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
             _jsonOptions.Encoder = JavaScriptEncoder.Create(UnicodeRanges.BasicLatin, UnicodeRanges.HangulSyllables);
