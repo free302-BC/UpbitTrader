@@ -14,57 +14,6 @@ namespace Universe.Coin.TradeLogic.Calc
     /// </summary>
     public interface ICalcTradeTick
     {
-        #region ---- Profit Rate ----
-
-        /// <summary>
-        /// 주어진 ICalcParam을 이용하여 Profit Rate를 계산
-        /// </summary>
-        /// <param name="models"></param>
-        /// <param name="param"></param>
-        public static void CalcProfitRate(M[] models, ICalcParam param)
-            => CalcProfitRate(models, 0, models.Length, param);
-
-        /// <summary>
-        /// 주어진 ICalcParam을 이용하여 [offset..count]구간의 Profit Rate를 계산
-        /// </summary>
-        /// <param name="models"></param>
-        /// <param name="offset"></param>
-        /// <param name="count"></param>
-        /// <param name="param"></param>
-        public static void CalcProfitRate(M[] models, int offset, int count, ICalcParam param)
-        {
-            CalcProfitRate(models[offset], offset > 0
-                ? models[offset - 1]
-                : M.Empty, param);
-
-            for (int i = 1; i < count; i++)
-            {
-                var j = offset + i;
-                if (j >= models.Length) break;
-                CalcProfitRate(models[j], models[j - 1], param);
-            }
-        }
-
-        /// <summary>
-        /// 주어진 K factor에 따라 model의 Profit Rate를 계산
-        /// </summary>
-        /// <param name="model"></param>
-        /// <param name="prev"></param>
-        /// <param name="param"></param>
-        public static void CalcProfitRate(M model, M prev, ICalcParam param)
-        {
-
-        }
-        #endregion
-
-
-        #region ---- MACD OSC ----
-        public static void CalcMacdOsc(M[] models, ICalcParam param)
-        {
-            ICalc.CalcMacdOsc(models, 0, models.Length, param, m => m.UnitPrice);
-        }
-        #endregion
-
 
         #region ---- Moving Average ----
 
@@ -84,6 +33,87 @@ namespace Universe.Coin.TradeLogic.Calc
             ICalc.CalcMovingAvg(models, offset, count, param, m => m.UnitPrice);
         }
         #endregion
+
+
+        #region ---- MACD OSC ----
+        public static void CalcMacdOsc(M[] models, ICalcParam param)
+        {
+            ICalc.CalcMacdOsc(models, 0, models.Length, param, m => m.UnitPrice);
+        }
+        #endregion
+
+
+        #region ---- Profit Rate ----
+
+        /// <summary>
+        /// 주어진 ICalcParam을 이용하여 Profit Rate를 계산
+        /// </summary>
+        /// <param name="models"></param>
+        /// <param name="param"></param>
+        public static void CalcProfitRate(M[] models, ICalcParam param)
+            => CalcProfitRate(models, 0, models.Length, param);
+
+        /// <summary>
+        /// 주어진 ICalcParam을 이용하여 [offset..count]구간의 Profit Rate를 계산
+        /// </summary>
+        /// <param name="models"></param>
+        /// <param name="offset"></param>
+        /// <param name="count"></param>
+        /// <param name="param"></param>
+        public static void CalcProfitRate(M[] models, int offset, int count, ICalcParam param)
+        {
+            calcSignal(models[offset], offset > 0 ? models[offset - 1] : M.Empty, param);
+
+            for (int i = 1; i < count; i++)
+            {
+                var j = offset + i;
+                if (j >= models.Length) break;
+                calcSignal(models[j], models[j - 1], param);
+            }
+
+            var buy = models.FirstOrDefault(x => x.Signal == TimingSignal.DoBuy);
+            if (buy is null) return;
+            var sell = models.FirstOrDefault(x => x.Signal == TimingSignal.DoSell);
+            if (sell is null) ;
+
+        }
+
+        /// <summary>
+        /// MACD에 따라 TimingSignal 계산
+        /// </summary>
+        /// <param name="model"></param>
+        /// <param name="prev"></param>
+        /// <param name="param"></param>
+        static void calcSignal(M model, M prev, ICalcParam param)
+        {
+            //chekc buy | sell | nop
+            var signal = TimingSignal.None;
+            if (prev.MacdOsc > param.BuyMacd) signal = TimingSignal.DoBuy;
+            if (prev.MacdOsc < param.SellMacd) signal = TimingSignal.DoSell;
+
+            model.Signal = prev.Signal switch
+            {
+                TimingSignal.None or TimingSignal.DoSell
+                    => signal == TimingSignal.DoBuy ? signal : TimingSignal.None,
+                _ => signal == TimingSignal.DoSell ? signal : TimingSignal.Hold,
+            };
+            //
+            model.TradeDone = model.Signal == TimingSignal.Hold || model.Signal == TimingSignal.DoSell;
+
+            //
+            if (model.TradeDone)
+            {
+                model.Rate = model.UnitPrice / prev.UnitPrice;
+                if (model.Signal == TimingSignal.DoBuy || model.Signal == TimingSignal.DoSell)
+                    model.Rate -= M.FeeRate;
+                model.Rate = Math.Round(model.Rate, 4);
+            }
+        }
+
+
+        #endregion
+
+
 
 
         #region ---- Cumulated Profit Rate & DrawDown ----

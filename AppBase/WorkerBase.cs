@@ -43,7 +43,10 @@ namespace Universe.AppBase
                 _config.GetSection(Id).Bind(_set);
                 onOptionsUpdate?.Invoke();
             });
-        }        
+        }
+
+
+        #region ---- Log & Report ----
 
         protected void report(object message, int color = 0)
         {
@@ -62,18 +65,27 @@ namespace Universe.AppBase
         protected void log(object? message) => _logger.LogError($"{message}");
         protected void log(object? msg1, object? msg2) => _logger.LogError($"{msg1}{Environment.NewLine}{msg2}");
 
+        #endregion
+
+
         public Task StartAsync(CancellationToken cancellationToken)
         {
             return Task.Run(() =>
             {
                 Thread.CurrentThread.Name = $"{Id}";
                 info($"<{Id}> StartAsync()...");
-                work();
+                doWork();
             }, cancellationToken)
+
             .ContinueWith(
-                t => log($"{nameof(WorkerBase<W, S>)}.{nameof(StartAsync)}():", t.Exception),
+                t => log($"{Id}.{nameof(StartAsync)}():", t.Exception),
                 TaskContinuationOptions.OnlyOnFaulted)
-            .ContinueWith(t => info($"<{Id}> done."));
+
+            .ContinueWith(t => 
+            { 
+                info($"<{Id}> done.");
+                //workDone();
+            });
         }
         public Task StopAsync(CancellationToken cancellationToken)
         {
@@ -81,8 +93,9 @@ namespace Universe.AppBase
             return Task.CompletedTask;
         }
 
-        protected abstract void work();
+        protected abstract void doWork();
         protected event Action? onOptionsUpdate;
+        //protected abstract void workDone();
 
     }//class
 }

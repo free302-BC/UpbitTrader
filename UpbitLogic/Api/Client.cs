@@ -63,16 +63,7 @@ namespace Universe.Coin.Upbit
             _wc.SetAcceptance();
             _ws.Options.KeepAliveInterval = new TimeSpan(0, 1, 30);
         }
-
-        /// <summary>
-        /// TradeLogic의 interface를 구현하는 모델의 json converter 등록
-        /// </summary>
-        /// <param name="converters"></param>
-        protected override void registerJsonConverters(in IList<JsonConverter> converters)
-        {
-            //converters.Add(new WsResponseJC());                                                                                                                                   
-        }
-
+        
         /// <summary>
         /// api 호출에 필요한 사전작업 수행 
         /// </summary>

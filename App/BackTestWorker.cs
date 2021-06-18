@@ -109,7 +109,7 @@ namespace Universe.Coin.App
         static (int trades, decimal rate, decimal mdd) cast(BtRes res) => res;
 
         readonly ManualResetEvent _ev;
-        protected override void work()
+        protected override void doWork()
         {
             while (true)
             {
@@ -122,7 +122,6 @@ namespace Universe.Coin.App
                 _ev.Reset();
                 _ev.WaitOne();
             }
-
         }
 
         /// <summary>

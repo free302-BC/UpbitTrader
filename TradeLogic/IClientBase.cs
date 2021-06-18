@@ -13,7 +13,7 @@ namespace Universe.Coin.TradeLogic
     {
 
         #region ---- WebSocket ----
-        void ConnectWs(IWsRequest request);
+        Task ConnectWsAsync(IWsRequest request);
         event Action<string>? OnWsReceived;
         void Pause(bool doPause);
         #endregion

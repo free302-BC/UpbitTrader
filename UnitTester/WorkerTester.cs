@@ -82,7 +82,7 @@ namespace UnitTester
             new void info(object message) => Debug.WriteLine($"{message}");
             new void info(object message1, object message2) => Debug.WriteLine($"{message1}\n{message2}");
 
-            protected override void work()
+            protected override void doWork()
             {
                 MovingAvg_Speed_Test();
 

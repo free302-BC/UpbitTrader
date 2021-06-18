@@ -22,7 +22,7 @@ namespace Universe.Coin.App
         where W : WorkerBase<W, S> 
         where S : WorkerOptions, IClientOptions
     {
-        protected readonly InputWorker _inputWorker;
+        readonly InputWorker _inputWorker;
         protected readonly IClient _client;
         protected readonly JsonSerializerOptions _jsonOptions;
 
@@ -44,6 +44,10 @@ namespace Universe.Coin.App
         protected void registerHotkey(ConsoleKey key, InputWorker.Listener handler)
         {
             _inputWorker.AddCmd(key, handler);
+        }
+        protected void unregisterHotkey(ConsoleKey key, InputWorker.Listener handler)
+        {
+            _inputWorker.RemoveCmd(key, handler);
         }
 
         static JsonSerializerOptions buildJsonOptions()

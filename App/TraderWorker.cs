@@ -37,7 +37,7 @@ namespace Universe.Coin.App
             });
         }
 
-        protected override void work()
+        protected override void doWork()
         {
             //market(_client);
             //account(_client);

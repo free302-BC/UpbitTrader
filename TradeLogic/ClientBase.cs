@@ -50,22 +50,21 @@ namespace Universe.Coin.TradeLogic
 
             init();
             _jsonOptions = new JsonSerializerOptions(IClientBase._jsonOptions);//clone
-            registerJsonConverters(_jsonOptions.Converters);
         }
+        public void Dispose()
+        {
+            _wc?.Dispose();
+            _ws?.Dispose();
+            _cts?.Dispose();
+            _evPausing?.Dispose();
+        }
+
 
         /// <summary>
         /// 추가적인 객체 초기화 코드
         /// WebClient header, websocket keep-alive-time
         /// </summary>
         protected abstract void init();
-
-        /// <summary>
-        /// InvokeApi()에서 사용되는 JsonSerializerOptions 설정
-        /// IApiModel 을 구현하는 모든 클래스의 JsonConverter를 등록해야 함.
-        /// </summary>
-        /// <param name="jsonOptions"></param>
-        protected abstract void registerJsonConverters(in IList<JsonConverter> converters);
-
 
         static ClientBase() => _types = new();
         static Dictionary<Type, Type> _types;
@@ -78,20 +77,11 @@ namespace Universe.Coin.TradeLogic
                 throw new Exception($"'{GetType().FullName}' does not impliment '{typeof(I).FullName}'"); ;
             return _types[typeof(I)];
         }
-
         public I CreateInstance<I>() => UvLoader.Create<I>(GetImplType<I>().FullName!);
         public I Deserialize<I>(string json)
         {
             var model = JS.Deserialize(json, GetImplType<I>(), _jsonOptions) ?? CreateInstance<I>()!;
             return (I)model;
-        }
-
-        public void Dispose()
-        {
-            _wc?.Dispose();
-            _ws?.Dispose();
-            _cts?.Dispose();
-            _evPausing?.Dispose();
         }
 
 
@@ -115,26 +105,20 @@ namespace Universe.Coin.TradeLogic
 
 
         /// <summary>
-        /// 
+        /// Connect and receive
         /// </summary>
-        public void ConnectWs(IWsRequest request)
+        public async Task ConnectWsAsync(IWsRequest request)
         {
-            connectAsync();
-            Task.Run(wsReceiver)
-                .ContinueWith(t =>
-                {
-                    _logger.LogError($"WsRecever finished.");
-                    _logger.LogError(t.Exception?.Message); 
-                } 
-                //,TaskContinuationOptions.OnlyOnFaulted
-                );
-            sendWsRequest();
+            await connect();
+            await sendWsRequest();
+            await wsReceiver();
+            //return Task.CompletedTask;
 
-            void connectAsync()
+            Task connect()
             {
-                _ws.ConnectAsync(new Uri(_wsUri), _cts.Token)
+                return _ws.ConnectAsync(new Uri(_wsUri), _cts.Token)
                     .ContinueWith(t => _logger.LogInformation($"Websocket connected: {_wsUri}"),
-                        TaskContinuationOptions.OnlyOnRanToCompletion).Wait();
+                        TaskContinuationOptions.OnlyOnRanToCompletion);//.Wait();
             }
             ValueTask sendWsRequest()
             {
@@ -144,9 +128,8 @@ namespace Universe.Coin.TradeLogic
                 return _ws.SendAsync(rm, WebSocketMessageType.Binary, true, _cts.Token);
             }
 
-            void wsReceiver()
+            async Task wsReceiver()
             {
-                Thread.CurrentThread.Name = "WsRecever";
                 _logger.LogInformation("Entering websocket receiving...");
 
                 var array = new byte[1024 * 1024];
@@ -154,9 +137,9 @@ namespace Universe.Coin.TradeLogic
 
                 while (_ws.State == WebSocketState.Open)
                 {
-                    _evPausing.WaitOne();
+                    await _evPausing.WaitOneAsync();
 
-                    var res = _ws.ReceiveAsync(buffer, _cts.Token).Result;
+                    var res = await _ws.ReceiveAsync(buffer, _cts.Token);
                     var json = Encoding.UTF8.GetString(array, 0, res.Count);
                     OnWsReceived?.Invoke(json);
                 }

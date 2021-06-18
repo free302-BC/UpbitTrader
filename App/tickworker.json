@@ -16,6 +16,8 @@
           "Slow": 16,
           "Signal": 5
         },
+        "BuyMacd": 0.4,
+        "SellMacd": 0.1,
 
         "ApplyStopLoss": false
       }

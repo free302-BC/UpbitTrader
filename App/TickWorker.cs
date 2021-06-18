@@ -18,6 +18,7 @@ using Universe.Utility;
 namespace Universe.Coin.App
 {
     using JS = JsonSerializer;
+    using M = TradeTickModel;
 
     public class TickWorker : TradeWorkerBase<TickWorker, TickWorkerOptions>
     {
@@ -26,56 +27,101 @@ namespace Universe.Coin.App
             updateClient();
             onOptionsUpdate += updateClient;
             registerHotkey(ConsoleKey.F9, m => updateClient());
-
             void updateClient()
             {
                 info($"[{Id}] Pausing= {_set.Pausing = !_set.Pausing}");
                 _client.Pause(_set.Pausing);
             }
-        }
-                
-        protected override void work()
-        {
-            run_Tick_K(_client);
 
-            _client.OnWsReceived += uc_OnReceived;
-
-            var request = _client.CreateInstance<IWsRequest>();
-            request.AddTrade(CurrencyId.KRW, CoinId.BTC);
-            request.AddOrderbook(CurrencyId.KRW, CoinId.BTC);
-            //_client.ConnectWs(request);
-        }
-
-        private void uc_OnReceived(string json)
-        {
-            var resType = _client.GetImplType<IWsResponse>();
-            var @event = ((IWsResponse)JS.Deserialize(json, resType, _jsonOptions)!).Event;
-
-            IViewModel model = @event switch
+            registerHotkey(ConsoleKey.Spacebar, m => run_Tick_K());
+            registerHotkey(ConsoleKey.F1, m => changeBuy(-0.1m));
+            registerHotkey(ConsoleKey.F2, m => changeBuy(+0.1m));
+            registerHotkey(ConsoleKey.F3, m => changeSell(-0.1m));
+            registerHotkey(ConsoleKey.F4, m => changeSell(+0.1m));
+            void changeBuy(decimal delta)
             {
-                TradeEvent.Trade => _client.Deserialize<ITradeTick>(json).ToModel(),
-                TradeEvent.Ticker => _client.Deserialize<ITicker>(json).ToModel(),
-                TradeEvent.Order => _client.Deserialize<IOrderbook>(json).ToModel(),
-                _ => throw new NotImplementedException(),
-            };
-
-            if(model is TradeTickModel) report(model, (int)((TradeTickModel)model).Dir);
-            else report(model);
+                _set.CalcParam.BuyMacd += delta;
+                run_Tick_K();
+            }
+            void changeSell(decimal delta)
+            {
+                _set.CalcParam.SellMacd += delta;
+                run_Tick_K();
+            }
         }
 
-        void run_Tick_K(IClient uc)
+        protected override void doWork()
+        {
+            run_Tick_K();
+            //runWebSocket();
+
+            async void runWebSocket()
+            {
+                try
+                {
+                    _client.OnWsReceived += onWsReceived;
+
+                    var request = _client.CreateInstance<IWsRequest>();
+                    request.AddTrade(CurrencyId.KRW, CoinId.BTC);
+                    request.AddOrderbook(CurrencyId.KRW, CoinId.BTC);
+                    await _client.ConnectWsAsync(request);
+                }
+                finally
+                {
+                    _client.OnWsReceived -= onWsReceived;
+                }
+            }
+            void onWsReceived(string json)
+            {
+                var resType = _client.GetImplType<IWsResponse>();
+                var @event = ((IWsResponse)JS.Deserialize(json, resType, _jsonOptions)!).Event;
+
+                IViewModel model = @event switch
+                {
+                    TradeEvent.Trade => _client.Deserialize<ITradeTick>(json).ToModel(),
+                    TradeEvent.Ticker => _client.Deserialize<ITicker>(json).ToModel(),
+                    TradeEvent.Order => _client.Deserialize<IOrderbook>(json).ToModel(),
+                    _ => throw new NotImplementedException(),
+                };
+
+                if (model is TradeTickModel) report(model, (int)((TradeTickModel)model).Dir);
+                else report(model);
+            }
+        }
+
+
+        void run_Tick_K()
         {
             var param = _set.CalcParam;
-            var ticks = uc.ApiTicks(count: 10).ToModels();
+            var sb = new StringBuilder();
+            sb.AppendLine($"---- buy= {param.BuyMacd}, sell= {param.SellMacd} ----");
+
+            var ticks = _client.ApiTicks(count: 500).ToModels();
             ICalcTradeTick.CalcMovingAvg(ticks, param);
             ICalcTradeTick.CalcMacdOsc(ticks, param);
-            //ICalcTradeTick.CalcProfitRate(ticks, param);
-            //ICalcTradeTick.CalcCumRate(ticks);
+
+            ICalcTradeTick.CalcProfitRate(ticks, param);
+            var fpr = (ICalcTradeTick.CalcCumRate(ticks) - 1) * 100;
             //ICalcTradeTick.CalcDrawDown(ticks);
 
-            info(IViewModel.Print(ticks));
+            save(ticks);
+            var printTicks = ticks.Where(x => x.Signal == TimingSignal.DoBuy || x.Signal == TimingSignal.DoSell);
+            print(sb, printTicks, $"final profit rate: {fpr,6:F2}%");
         }
-
+        static void save(M[] models)
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine(M.CalcHeader);
+            foreach (var m in models) sb.AppendLine(m.ToCalcString());
+            File.WriteAllText("tick_test.txt", sb.ToString());
+        }
+        void print(StringBuilder sb, IEnumerable<M> models, string epilog = "")
+        {
+            foreach (var m in models) sb.AppendLine(m.ToCalcString());
+            sb.AppendLine("----------------------------------------");
+            sb.AppendLine(epilog);
+            info(sb);
+        }
 
     }//class
 }

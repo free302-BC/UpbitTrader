@@ -48,18 +48,12 @@ namespace Universe.Coin.TradeLogic
         B = 1  //bid 매수
     }
 
-    /// <summary>
-    /// back test 결과 - 거래 여부
-    /// </summary>
-    public enum BackTestSignal
-    {
-        NoTrade, DoTrade
-    }
     public enum TimingSignal
     {
         None,
-        Sell,   //매도 신호
-        Buy     //매수 신호
+        DoBuy,  //매수 신호
+        Hold,   //매수 상태 유지
+        DoSell, //매도 신호
     }
 
     public enum CandleUnit

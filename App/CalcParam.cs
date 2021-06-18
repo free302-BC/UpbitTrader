@@ -16,6 +16,9 @@ namespace Universe.Coin.App
         public WindowFunction WindowFunction { get; set; }
         public bool ApplyStopLoss { get; set; }
         public MacdParam MacdParam { get; set; }
+        public decimal BuyMacd { get; set; }
+        public decimal SellMacd { get; set; }
+
         public ICalcParam Clone()
         {
             var clone = (CalcParam)MemberwiseClone();
@@ -29,6 +32,8 @@ namespace Universe.Coin.App
             WindowFunction = param.WindowFunction;
             ApplyStopLoss = param.ApplyStopLoss;
             MacdParam = param.MacdParam;
+            BuyMacd = param.BuyMacd;
+            SellMacd = param.SellMacd;
         }
     }
 }

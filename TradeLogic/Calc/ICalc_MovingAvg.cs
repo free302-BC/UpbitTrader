@@ -16,6 +16,8 @@ namespace Universe.Coin.TradeLogic.Calc
     {
         /// <summary>
         /// ICalcModel[]에 대한 moving average 계산
+        /// 가변 Window Size 기법으로 Moving Average 구함
+        /// 데이터 갯수가 부족할 경우 ~ 그 갯수==Window Size
         /// </summary>
         /// <typeparam name="VM"></typeparam>
         /// <param name="models"></param>

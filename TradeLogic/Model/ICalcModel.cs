@@ -14,8 +14,10 @@ namespace Universe.Coin.TradeLogic.Model
         //계산용
         decimal MovingAvg { get; set; }
         decimal MacdOsc { get; set; }
+
         decimal Target { get; set; }
-        BackTestSignal BtSignal { get; set; }
+        TimingSignal Signal { get; set; }
+        bool TradeDone { get; set; }
 
         decimal Rate { get; set; }
         decimal CumRate { get; set; }

@@ -32,7 +32,7 @@ namespace Universe.Coin.App
 
         readonly EventDic _listeners;
         
-        public void AddCmd(ConsoleKey key, Listener cmd, ConsoleModifiers modifiers = 0)
+        public void AddCmd(ConsoleKey key, Listener cmd)
         {
             lock (_lock)
             {
@@ -40,11 +40,21 @@ namespace Universe.Coin.App
                 else _listeners[key] = cmd;
             }
         }
-        
-        public new void info(object? message) => base.info(message);
+        public void RemoveCmd(ConsoleKey key, Listener cmd)
+        {
+            lock (_lock)
+            {
+                if (_listeners.ContainsKey(key))
+                {
+                    var result = _listeners[key] - cmd;
+                    if (result is null) _listeners.Remove(key);
+                    else _listeners[key] = result;
+                }
+            }
+        }
 
         object _lock = new object();
-        protected override void work()
+        protected override void doWork()
         {
             while (true)
             {
@@ -60,6 +70,7 @@ namespace Universe.Coin.App
                 //Thread.Sleep(100);
             }
         }
+        //protected override void workDone(){}
 
 
     }//class
