@@ -47,30 +47,25 @@ namespace Universe.Coin.TradeLogic.Calc
             var ma = new decimal[values.Length];
             for (int i = 0; i < values.Length; i++)//i ~ models index
             {
-                int size = Math.Min(i + 1, windowSize);//i ~ models index
-                var weights = winFuncs[size];
-
-                var sum = 0m;
-                var j0 = i - (size - 1);//start index of MA data
-                for (int j = 0; j < size; j++) sum += weights[j] * values[j0 + j];
-                ma[i] = Math.Round(sum / size, 2);//TODO: 
+                ma[i] = calcMovingAvg(values, winFuncs[Math.Min(i + 1, windowSize)], i);
             }
             return ma;
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        static decimal calcMovingAvg(decimal[] values, int windowSize, WindowFunction windowFunction, int index)
+        /// <summary>
+        /// values의 index번째 원소에 대응하는 MA를 weights를 이용하여 계산
+        /// </summary>
+        /// <param name="values"></param>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        static decimal calcMovingAvg(decimal[] values, decimal[] weights, int index)
         {
-            var winFuncs = _winFuncs[windowFunction];
-            int size = Math.Min(index + 1, windowSize);//i ~ current model index
-            var weights = winFuncs[size];
+            var len = weights.Length;
+            var j0 = index - (len - 1);//start index of effective data(used to calcualte)
 
-            var j0 = index - (size - 1);//start index of effective data(used to calcualte)
+            var src = new ArraySegment<decimal>(values, j0, len);
+            var ma = Math.Round(weights.Zip(src, (w, s) => w * s).Average(), 2);
 
-            var sum = 0m;
-            for (int j = 0; j < size; j++)//j ~ weights index
-                sum += weights[j] * values[j0 + j];
-            var ma = Math.Round(sum / size, 2);//TODO: 
             return ma;
         }
 

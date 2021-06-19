@@ -116,6 +116,10 @@ namespace UnitTester
             if (_q.Any()) while (dt > _duration) _q.Dequeue();
             return _q.ToArray();
         }
+        public M[] Last(int count)
+        {
+            return _q.TakeLast(count).ToArray();
+        }
     }//class
 
 }
