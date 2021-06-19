@@ -34,14 +34,14 @@ namespace Universe.Coin.TradeLogic.Calc
         }
 
         private static (decimal[] ma8, decimal[] ma16, decimal[] macd, decimal[] signal, decimal[] osc)
-            calcMacd(decimal[] models, int[] windowSizes)
+            calcMacd(decimal[] values, int[] windowSizes)
         {
             var wf = WindowFunction.Gaussian;
             //int[] windowSizes = { 8, 16, 5 };
             decimal[][] avgs = new decimal[2][];
 
             for (int i = 0; i < 2; i++)
-                avgs[i] = calcMovingAvg(models, windowSizes[i], wf);
+                avgs[i] = calcMovingAvg(values, windowSizes[i], wf);
 
             var macd = avgs[0].Zip(avgs[1], (x, y) => x - y).ToArray();
             var signal = calcMovingAvg(macd, windowSizes[2], wf);
@@ -49,6 +49,27 @@ namespace Universe.Coin.TradeLogic.Calc
 
             return (avgs[0], avgs[1], macd, signal, osc);
         }
+
+        private static (decimal ma8, decimal ma16, decimal macd, decimal signal, decimal osc)
+            calcMacd(decimal[] values, int[] windowSizes, int index)
+        {
+            var wf = WindowFunction.Gaussian;
+            var winFuncs = _winFuncs[WindowFunction.Gaussian];
+
+            decimal[] avgs = new decimal[2];
+            avgs[0] = calcMovingAvg(values, winFuncs[Math.Min(index + 1, windowSizes[0])], index);
+            avgs[1] = calcMovingAvg(values, winFuncs[Math.Min(index + 1, windowSizes[1])], index);
+
+            var macd = avgs[0] - avgs[1];            
+
+            //ma of macd : macd array필요...
+            var signal = calcMovingAvg(macd, winFuncs[Math.Min(index + 1, windowSizes[1])], index);
+            var osc = macd.Zip(signal, (m, s) => m - s).ToArray();
+
+            return (avgs[0], avgs[1], macd, signal, osc);
+        }
+
+
 
         #region ---- TEST ----
 

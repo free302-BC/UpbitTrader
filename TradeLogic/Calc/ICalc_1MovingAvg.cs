@@ -58,7 +58,7 @@ namespace Universe.Coin.TradeLogic.Calc
         /// <param name="values"></param>
         /// <param name="index"></param>
         /// <returns></returns>
-        static decimal calcMovingAvg(decimal[] values, decimal[] weights, int index)
+        private static decimal calcMovingAvg(decimal[] values, decimal[] weights, int index)
         {
             var len = weights.Length;
             var j0 = index - (len - 1);//start index of effective data(used to calcualte)
