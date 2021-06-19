@@ -6,36 +6,35 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Universe.Coin.TradeLogic
+namespace Universe.Utility
 {
     /// <summary>
     /// 주어진 시간동안 카운터의 갯수를 주어진 한계로 유지 
     /// </summary>
     public class TimeCounter
     {
+        readonly int _duration;//아이템을 유지할 시간
+        readonly int _capacity;//유지할 아이템의 최대갯수
+        readonly Stopwatch _watch;
         public TimeCounter(int duration_ms, int maxCount)
         {
-            Duration = duration_ms;
-            MaxCount = maxCount;
+            _duration = duration_ms;
+            _capacity = maxCount;
             len = 2 * maxCount;
             buffer = new long[len];
 
-            watch = Stopwatch.StartNew();
-            buffer[0] = watch.ElapsedMilliseconds;
+            _watch = Stopwatch.StartNew();
+            buffer[0] = _watch.ElapsedMilliseconds;
             i0 = i1 = 0;
             count = 1;
         }
 
-        public readonly int Duration;
-        public readonly int MaxCount;
+        readonly long[] buffer;//내부버퍼
+        readonly int len;//내부버퍼 길이 = 2 * _maxCount
 
-        int len;
-        int i0, i1;//index of first, last time
-        readonly long[] buffer;
-        readonly Stopwatch watch;
-
-        int count;// => 1 + (10 + i1 - i0) % MaxCount;
-        long dt => buffer[i1] - buffer[i0];
+        int i0, i1;//유효아이템의 시작, 끝 인덱스
+        int count;//현재 유효 아이템 갯수
+        long dt => buffer[i1] - buffer[i0];//첫 아이템과 끝 아이템의 시각차
 
         /// <summary>
         /// 카운트 증가하고 필요시 대기 후 리턴
@@ -43,14 +42,14 @@ namespace Universe.Coin.TradeLogic
         public void Add()
         {
             //카운트가 찼을 경우 대기
-            if (count >= MaxCount && dt < Duration) Thread.Sleep(Duration - (int)dt);
+            if (count >= _capacity && dt < _duration) Thread.Sleep(_duration - (int)dt);
 
             //카운트 증가, 시간 기록
-            buffer[i1 = (i1 + 1) % len] = watch.ElapsedMilliseconds;
+            buffer[i1 = (i1 + 1) % len] = _watch.ElapsedMilliseconds;
             count++;
 
             //오래된 데이터 삭제
-            while (dt > Duration)
+            while (dt > _duration)
             {
                 i0 = (i0 + 1) % len;
                 count--;

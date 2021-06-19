@@ -21,7 +21,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AppBase", "AppBase\AppBase.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTester", "UnitTester\UnitTester.csproj", "{55BDA278-0045-4C5B-94B1-6EF219E0650D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeLogic", "TradeLogic\TradeLogic.csproj", "{215B1E13-DD80-4AA8-8D94-C3ADB8DB89BB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TradeLogic", "TradeLogic\TradeLogic.csproj", "{215B1E13-DD80-4AA8-8D94-C3ADB8DB89BB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tester", "Tester\Tester.csproj", "{E28A4ED6-1957-4B72-A535-E36333C9EB13}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -53,6 +55,10 @@ Global
 		{215B1E13-DD80-4AA8-8D94-C3ADB8DB89BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{215B1E13-DD80-4AA8-8D94-C3ADB8DB89BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{215B1E13-DD80-4AA8-8D94-C3ADB8DB89BB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E28A4ED6-1957-4B72-A535-E36333C9EB13}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E28A4ED6-1957-4B72-A535-E36333C9EB13}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E28A4ED6-1957-4B72-A535-E36333C9EB13}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E28A4ED6-1957-4B72-A535-E36333C9EB13}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

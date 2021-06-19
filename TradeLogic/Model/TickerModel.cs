@@ -7,16 +7,27 @@ using Universe.Coin.TradeLogic.Model;
 
 namespace Universe.Coin.TradeLogic.Model
 {
-    public class TickerModel : IViewModel
+    public class TickerModel : ICalcModel
     {
         //입력
-        string Market;
-        DateTime TimeKST;
-        decimal Opening, High, Low, Closing, Delta;
-        TickerDir Dir;
+        public string Market;
+        public DateTime TimeKST;
+        public decimal Opening, High, Low, Closing, Delta;
+        public TickerDir Dir;
 
         //계산용
+        public long Timestamp { get; set; }
+        public decimal MovingAvg { get; set; }
+        public decimal MacdOsc { get; set; }
+        public decimal Target { get; set; }
+        public bool TradeDone { get; set; }
+        public TimingSignal Signal { get; set; }
+        public decimal Rate { get; set; } = 1.0m;
+        public decimal CumRate { get; set; } = 1.0m;
+        public decimal DrawDown { get; set; }
 
+        public const decimal FeeRate = 0.0005m;
+        public static readonly TickerModel Empty = new();
 
         public TickerModel() => Market = "";
 
@@ -25,7 +36,7 @@ namespace Universe.Coin.TradeLogic.Model
             Market = string.IsNullOrWhiteSpace(ticker.Market) ? ticker.Code : ticker.Market;
             Market = Market[^3..];
 
-            //TimeKST = parse(ticker.TradeDateKst, ticker.TradeTimeKst);
+            Timestamp = ticker.Timestamp;
             TimeKST = DateTimeOffset.FromUnixTimeMilliseconds(ticker.Timestamp).LocalDateTime;
 
             Opening = Math.Round(ticker.OpeningPrice / 10000.0m, 1);
@@ -45,6 +56,10 @@ namespace Universe.Coin.TradeLogic.Model
 
         public override string ToString()
             => $"[{TimeKST:HH:mm:ss.fff}] {Opening,8:F1} {High,8:F1} {Low,8:F1} {Closing,8:F1} : {Delta,8:F1} {Dir} | {Market,8}";
+
+        public string ToCalcString()
+            => $"[{TimeKST:HH:mm:ss.fff}]\t{Closing,6:F1}\t{Dir,3}\t{MacdOsc,7:F2}\t{Signal,7}\t{Rate,8:F4}\t{CumRate,8:F4}";
+        public string CalcHeader => $"[TimeKST]\tClosing\tDir\tMacd\tSignal\tRate\tCumRate";
 
         static readonly (string name, int wdith)[] _names =
         {

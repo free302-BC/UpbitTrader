@@ -40,7 +40,8 @@ namespace Universe.Coin.TradeLogic.Calc
             for (int i = 0; i < count; i++)
             {
                 int j = offset + i;
-                models[j] = Math.Round(cumRate *= models[j], 4);
+                cumRate = Math.Round(cumRate * models[j], 5);
+                models[j] = Math.Round(cumRate, 4);
             }
             return Math.Round(cumRate, 4);
         }

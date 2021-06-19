@@ -7,12 +7,12 @@ using Universe.Coin.TradeLogic.Model;
 
 namespace Universe.Coin.TradeLogic.Calc
 {
-    using M = TradeTickModel;
+    using M = TickerModel;
 
     /// <summary>
     /// ICandle 모델에 대한 계산 알고리즘 구현
     /// </summary>
-    public interface ICalcTradeTick
+    public interface ICalcTicker
     {
 
         #region ---- Moving Average ----
@@ -30,7 +30,7 @@ namespace Universe.Coin.TradeLogic.Calc
         }
         public static void CalcMovingAvg(M[] models, int offset, int count, ICalcParam param)
         {
-            ICalc.CalcMovingAvg(models, offset, count, param, m => m.UnitPrice);
+            ICalc.CalcMovingAvg(models, offset, count, param, m => m.Closing);
         }
         #endregion
 
@@ -38,7 +38,7 @@ namespace Universe.Coin.TradeLogic.Calc
         #region ---- MACD OSC ----
         public static void CalcMacdOsc(M[] models, ICalcParam param)
         {
-            ICalc.CalcMacdOsc(models, 0, models.Length, param, m => m.UnitPrice);
+            ICalc.CalcMacdOsc(models, 0, models.Length, param, m => m.Closing);
         }
         #endregion
 
@@ -62,6 +62,8 @@ namespace Universe.Coin.TradeLogic.Calc
         /// <param name="param"></param>
         public static void CalcProfitRate(M[] models, int offset, int count, ICalcParam param)
         {
+            if (offset >= models.Length) return;
+
             calcSignal(models[offset], offset > 0 ? models[offset - 1] : M.Empty, param);
 
             for (int i = 1; i < count; i++)
@@ -97,7 +99,7 @@ namespace Universe.Coin.TradeLogic.Calc
             //
             if (model.TradeDone)
             {
-                model.Rate = model.UnitPrice / prev.UnitPrice;
+                model.Rate = model.Closing / prev.Closing;
                 if (model.Signal == TimingSignal.DoBuy || model.Signal == TimingSignal.DoSell)
                     model.Rate -= M.FeeRate;
                 model.Rate = Math.Round(model.Rate, 4);
@@ -106,8 +108,6 @@ namespace Universe.Coin.TradeLogic.Calc
 
 
         #endregion
-
-
 
 
         #region ---- Cumulated Profit Rate & DrawDown ----

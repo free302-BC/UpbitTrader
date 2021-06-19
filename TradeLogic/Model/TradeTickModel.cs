@@ -16,6 +16,7 @@ namespace Universe.Coin.TradeLogic.Model
         public TradeTickDir Dir;
 
         //계산용
+        public long Timestamp { get; set; }
         public decimal MovingAvg { get; set; }
         public decimal MacdOsc { get; set; }
         public decimal Target { get; set; }
@@ -35,7 +36,9 @@ namespace Universe.Coin.TradeLogic.Model
             Market = string.IsNullOrWhiteSpace(tick.Market) ? tick.Code : tick.Market;
             Market = Market[^3..];
 
+            Timestamp = tick.Timestamp;
             TimeKST = DateTimeOffset.FromUnixTimeMilliseconds(tick.Timestamp).LocalDateTime;
+
             UnitPrice = tick.TradePrice / 10000m;
             Volume = tick.TradeVolume;
             Price = UnitPrice * Volume;
@@ -56,8 +59,7 @@ namespace Universe.Coin.TradeLogic.Model
 
         public string ToCalcString()
             => $"[{TimeKST:HH:mm:ss.fff}]\t{UnitPrice,6:F1}\t{Dir,3}\t{MacdOsc,7:F2}\t{Signal,7}\t{Rate,8:F4}\t{CumRate,8:F4}";
-        public static string CalcHeader
-            = $"[TimeKST]\tUnitPrice\tDir\tMacdOsc\tSignal\tRate\tCumRate";
+        public string CalcHeader => $"[TimeKST]\tPrice\tDir\tMacd\tSignal\tRate\tCumRate";
 
         static TradeTickModel() => IViewModel.buildHeader(_names);
         static (string, int)[] _names =

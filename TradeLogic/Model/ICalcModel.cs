@@ -12,6 +12,7 @@ namespace Universe.Coin.TradeLogic.Model
     public interface ICalcModel : IViewModel
     {
         //계산용
+        long Timestamp { get; set; }
         decimal MovingAvg { get; set; }
         decimal MacdOsc { get; set; }
 
@@ -23,6 +24,7 @@ namespace Universe.Coin.TradeLogic.Model
         decimal CumRate { get; set; }
         decimal DrawDown { get; set; }
 
-        const decimal FeeRate = 0.0005m * 2m;
+        string CalcHeader { get; }
+        string ToCalcString();
     }
 }

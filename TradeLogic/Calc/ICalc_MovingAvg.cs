@@ -63,6 +63,12 @@ namespace Universe.Coin.TradeLogic.Calc
             return ma;
         }
 
+        static decimal calcMovingAvgLast(decimal[] values, int windowSize, WindowFunction windowFunction)
+        {
+            calcMovingAvg(values, values.Length - 1, 1, windowSize, windowFunction);
+        }
+
+
 
         #region ---- TEST ----
 
