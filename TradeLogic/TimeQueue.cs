@@ -15,6 +15,7 @@ namespace Universe.Utility
     {
         void Add(M model);
         void Clear();
+        M[] Last(int count);
         M[] ToArray();
         string ToString();
         string ToTimeString();
@@ -67,5 +68,12 @@ namespace Universe.Utility
             if (_tq.Any()) dequeue();                
             return _mq.ToArray();
         }
+
+        public M[] Last(int count)
+        {
+            return _mq.TakeLast(count).ToArray();
+        }
+
+
     }//class
 }

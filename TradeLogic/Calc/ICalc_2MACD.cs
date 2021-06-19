@@ -20,31 +20,31 @@ namespace Universe.Coin.TradeLogic.Calc
         /// <param name="count"></param>
         /// <param name="param"></param>
         /// <param name="getter"></param>
-        static void CalcMacdOsc<VM>(VM[] models, int offset, int count, ICalcParam param, Func<VM, decimal> getter)
+        static void CalcMacdOsc<VM>(VM[] models, ICalcParam param, Func<VM, decimal> getter)
             where VM : ICalcModel
         {
             var values = models.Select(v => getter(v)).ToArray();
-            var osc = calcMacdOsc(values, offset, count, param.MacdParam);
+            var osc = calcMacdOsc(values, param.MacdParam);
             for (int i = 0; i < osc.Length; i++) models[i].MacdOsc = osc[i];
         }
 
-        private static decimal[] calcMacdOsc(decimal[] values, int offset, int count, int[] windowSizes)
+        private static decimal[] calcMacdOsc(decimal[] values, int[] windowSizes)
         {
-            return calcMacd(values, offset, count, windowSizes).osc;
+            return calcMacd(values, windowSizes).osc;
         }
 
         private static (decimal[] ma8, decimal[] ma16, decimal[] macd, decimal[] signal, decimal[] osc)
-            calcMacd(decimal[] models, int offset, int count, int[] windowSizes)
+            calcMacd(decimal[] models, int[] windowSizes)
         {
             var wf = WindowFunction.Gaussian;
             //int[] windowSizes = { 8, 16, 5 };
             decimal[][] avgs = new decimal[2][];
 
             for (int i = 0; i < 2; i++)
-                avgs[i] = calcMovingAvg(models, offset, count, windowSizes[i], wf);
+                avgs[i] = calcMovingAvg(models, windowSizes[i], wf);
 
             var macd = avgs[0].Zip(avgs[1], (x, y) => x - y).ToArray();
-            var signal = calcMovingAvg(macd, 0, macd.Length, windowSizes[2], wf);
+            var signal = calcMovingAvg(macd, windowSizes[2], wf);
             var osc = macd.Zip(signal, (m, s) => m - s).ToArray();
 
             return (avgs[0], avgs[1], macd, signal, osc);
@@ -65,7 +65,7 @@ namespace Universe.Coin.TradeLogic.Calc
         public static void MacdTest()
         {
             int[] windowSizes = { 8, 16, 5 };
-            var ma = calcMacd(_src, 0, _src.Length, windowSizes);
+            var ma = calcMacd(_src, windowSizes);
             save();
 
             void save()

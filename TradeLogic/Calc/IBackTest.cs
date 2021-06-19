@@ -10,16 +10,16 @@ namespace Universe.Coin.TradeLogic.Calc
     public interface IBackTest
     {
         static (int trades, decimal rate, decimal mdd) 
-            BackTest(CandleModel[] models,  int offset, int count, ICalcParam param)
+            BackTest(CandleModel[] models, ICalcParam param)
         {
             if (param.WindowFunction != WindowFunction.None) 
-                ICalcCandle.CalcMovingAvg(models, offset, count, param);
+                ICalcCandle.CalcMovingAvg(models, param);
 
-            ICalcCandle.CalcProfitRate(models, offset, count, param);
-            var trades = models.Take(count).Count(x => x.TradeDone);
+            ICalcCandle.CalcProfitRate(models, param);
+            var trades = models.Count(x => x.TradeDone);
 
-            var rate = ICalcCandle.CalcCumRate(models, offset, count);
-            var mdd = ICalcCandle.CalcDrawDown(models, offset, count);
+            var rate = ICalcCandle.CalcCumRate(models);
+            var mdd = ICalcCandle.CalcDrawDown(models);
             return (trades, rate, mdd);
         }
     }

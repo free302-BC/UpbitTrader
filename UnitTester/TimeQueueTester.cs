@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Universe.Coin.TradeLogic;
 using Universe.Coin.TradeLogic.Model;
+using Universe.Utility;
 using Xunit;
 
 namespace UnitTester

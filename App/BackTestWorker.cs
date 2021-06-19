@@ -146,7 +146,7 @@ namespace Universe.Coin.App
                 var count = (int)(hours * 60 / (int)unit);
                 var models = prepareModels(uc, unit, count);
 
-                var x = IBackTest.BackTest(models, 0, count, _set.CalcParam);
+                var x = IBackTest.BackTest(models, _set.CalcParam);
                 results.Add((unit, count, x));
                 sb.AppendLine($"{count,6} {unit,6}: {k,6:F2} {x.rate,8:F4} {x.mdd,6:F2}%");
             }
@@ -185,7 +185,7 @@ namespace Universe.Coin.App
                 var count = (int)(hours * 60 / (int)unit);
                 var models = prepareModels(uc, unit, count);
 
-                var x = IFindK.FindK(models, 0, count, _set.CalcParam);
+                var x = IFindK.FindK(models, _set.CalcParam);
                 results.Add((unit, count, x));
                 sb.AppendLine($"{count,6} {unit,6}: {x.k,6:F2} {x.rate,8:F4} {x.mdd,6:F2}%");
             }
@@ -202,78 +202,12 @@ namespace Universe.Coin.App
         }
 
 
-        /// <summary>
-        /// 주어진 시간을 3시간 구간으로 나누어 각 구간별 최적 k를 찾아서 backtest 수행
-        /// 각3시간 구간별 최적 k를 찾았을 경우 ~ 변동 k에 대한 이론적 최대 이익
-        /// </summary>
-        /// <param name="uc"></param>
-        void run_Units_FindK_3Hours(IClient uc)
-        {
-            var units = new[]
-            { /*CandleUnit.U240, */CandleUnit.M60, CandleUnit.M30, CandleUnit.M15, CandleUnit.M10, CandleUnit.M3, CandleUnit.M1 };
-
-            var totalHours = _set.Hours;
-            var hours = 3m;
-            var numTest = (int)(totalHours / hours);
-
-            info($"Entering {nameof(run_Units_FindK_3Hours)}()...");
-            var sb = new StringBuilder();
-            sb.AppendLine($"-----------[ {(int)(hours / 24)}d {hours % 24}h ]------------");
-
-            var kDic = new Dictionary<CandleUnit, FindList>();//
-            var summary = new List<(CandleUnit unit, BigInteger rate)>();
-            foreach (var unit in units)
-            {
-                var count = (int)(hours * 60 / (int)unit);
-                var totalCount = (int)(totalHours * 60 / (int)unit);
-                var models = uc.ApiCandle<ICandle>(count: totalCount, unit: unit).ToModels();
-
-                var results = new FindList();
-                sb.Append($"{unit,6}: ");
-
-                for (int i = 0; i < numTest; i++)
-                {
-                    //var currents = new ArraySegment<CandleModel>(models, count * i, count);
-                    var x = IFindK.FindK(models, count * i, count, _set.CalcParam);
-                    results.Add(x);
-                    //sb.Append($"{(x.rate - 1) * 100,6:N2} ");
-                }
-                kDic.Add(unit, results);
-
-                //sb.AppendLine("-------------------------------------------");
-                // 누적 구하기 ~ 중복 문제 주의
-                //var cumRate0 = results.Aggregate(1m, (p, x) => p * x.rate);//decimal overflow error ~ 10^40 order
-                var cumRateInteger = results.Aggregate(BigInteger.One, (p, x) => p * (int)(10000 * x.rate));
-                var cumRate = cumRateInteger / BigInteger.Pow(10000, results.Count - 1) - 10000;// %% := % * 100 (%를 정수로 표현)
-                sb.AppendLine($"| {cumRate,6}%%");
-                //sb.AppendLine("-------------------------------------------");
-                summary.Add((unit, cumRate));
-            }
-            var maxRate = summary.Max(x => x.rate);
-            var max = summary.First(x => x.rate == maxRate);
-            sb.AppendLine("-------------------------------------------");
-            sb.AppendLine($"{max.unit,6}: {max.rate}%%");
-            info(sb);
-
-            //
-            sb.Clear();
-            foreach (var u in kDic.Keys) sb.Append($"{u,12} ");
-            sb.AppendLine();
-            for (int i = 0; i < numTest; i++)
-            {
-                foreach (var key in kDic.Keys) sb.Append($"{kDic[key][i].k,4:F1} {kDic[key][i].rate,6}% ");
-                sb.AppendLine();
-            }
-            info(sb);
-        }
-
-
         #region ---- BackTest ----
 
         void runBackTest(IClient uc, CandleUnit unit, int count, StringBuilder? sb = null)
         {
             var models = prepareModels(uc, unit, count);
-            var (numTrades, finalRate, mdd) = IBackTest.BackTest(models, 0, count, _set.CalcParam);
+            var (numTrades, finalRate, mdd) = IBackTest.BackTest(models, _set.CalcParam);
 
             bool doPrint = sb == null;
             sb = sb ?? new StringBuilder();

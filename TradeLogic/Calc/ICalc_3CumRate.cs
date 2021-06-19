@@ -20,8 +20,7 @@ namespace Universe.Coin.TradeLogic.Calc
         /// <param name="count"></param>
         /// <param name="getter"></param>
         /// <returns></returns>
-        static decimal CalcCumRate<VM>(VM[] models, int offset, int count, Func<VM, decimal> getter)
-            where VM : ICalcModel
+        static decimal CalcCumRate<VM>(VM[] models, Func<VM, decimal> getter) where VM : ICalcModel
         {
             //-------------------------------------------------------------------------
             // TODO: 호출자가 이 결과를 모아 누적계산시: seed는 중복 계산된다.
@@ -29,17 +28,17 @@ namespace Universe.Coin.TradeLogic.Calc
             //-------------------------------------------------------------------------
 
             var values = models.Select(v => getter(v)).ToArray();
-            var cumRate = calcCumRate(values, offset, count);
+            var cumRate = calcCumRate(values);
             for (int i = 0; i < values.Length; i++) models[i].CumRate = values[i];
             return cumRate;
         }
 
-        private static decimal calcCumRate(decimal[] models, int offset, int count)
+        private static decimal calcCumRate(decimal[] models)
         {
             var cumRate = 1.0m;
-            for (int i = 0; i < count; i++)
+            for (int i = 0; i < models.Length; i++)
             {
-                int j = offset + i;
+                int j = i;
                 cumRate = Math.Round(cumRate * models[j], 5);
                 models[j] = Math.Round(cumRate, 4);
             }
@@ -56,7 +55,7 @@ namespace Universe.Coin.TradeLogic.Calc
         /// <param name="getter"></param>
         /// <param name="setter"></param>
         /// <returns></returns>
-        static decimal CalcDrawDown<VM>(VM[] models, int offset, int count, Func<VM, decimal> getter)
+        static decimal CalcDrawDown<VM>(VM[] models, Func<VM, decimal> getter)
             where VM : ICalcModel
         {
             //-------------------------------------------------------------------------
@@ -64,17 +63,17 @@ namespace Universe.Coin.TradeLogic.Calc
             // 현재영역의 mdd는 의미가 없음 ~ 전체 구간에서 다시 구해야 함.
             //-------------------------------------------------------------------------
             var values = models.Select(v => getter(v)).ToArray();
-            var mdd = CalcDrawDown(values, offset, count);
+            var mdd = CalcDrawDown(values);
             for (int i = 0; i < values.Length; i++) models[i].DrawDown = values[i];
             return mdd;
         }
 
-        static decimal CalcDrawDown(decimal[] models, int offset, int count)
+        static decimal CalcDrawDown(decimal[] models)
         {
             var max = decimal.MinValue;
-            for (int i = 0; i < count; i++)
+            for (int i = 0; i < models.Length; i++)
             {
-                int j = offset + i;
+                int j = i;
                 max = max > models[j] ? max : models[j];
                 models[j] = max > models[j] ? Math.Round(100 * (max - models[j]) / max, 2) : 0m;
             }

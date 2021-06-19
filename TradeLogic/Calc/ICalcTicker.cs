@@ -26,11 +26,7 @@ namespace Universe.Coin.TradeLogic.Calc
         /// <param name="winFunc"></param>
         public static void CalcMovingAvg(M[] models, ICalcParam param)
         {
-            CalcMovingAvg(models, 0, models.Length, param);
-        }
-        public static void CalcMovingAvg(M[] models, int offset, int count, ICalcParam param)
-        {
-            ICalc.CalcMovingAvg(models, offset, count, param, m => m.Closing);
+            ICalc.CalcMovingAvg(models, param, m => m.Closing);
         }
         #endregion
 
@@ -38,7 +34,7 @@ namespace Universe.Coin.TradeLogic.Calc
         #region ---- MACD OSC ----
         public static void CalcMacdOsc(M[] models, ICalcParam param)
         {
-            ICalc.CalcMacdOsc(models, 0, models.Length, param, m => m.Closing);
+            ICalc.CalcMacdOsc(models, param, m => m.Closing);
         }
         #endregion
 
@@ -112,15 +108,10 @@ namespace Universe.Coin.TradeLogic.Calc
 
         #region ---- Cumulated Profit Rate & DrawDown ----
         public static decimal CalcCumRate(M[] models)
-            => CalcCumRate(models, 0, models.Length);
-
-        public static decimal CalcCumRate(M[] models, int offset, int count)
-            => ICalc.CalcCumRate(models, offset, count, m => m.Rate);
+            => ICalc.CalcCumRate(models, m => m.Rate);
 
         public static decimal CalcDrawDown(M[] models)
-            => CalcDrawDown(models, 0, models.Length);
-        public static decimal CalcDrawDown(M[] models, int offset, int count)
-            => ICalc.CalcDrawDown(models, offset, count, m => m.CumRate);
+            => ICalc.CalcDrawDown(models, m => m.CumRate);
 
         #endregion
 

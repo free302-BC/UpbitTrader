@@ -20,23 +20,20 @@ namespace Universe.Coin.TradeLogic.Calc
         /// <param name="count"></param>
         /// <param name="param"></param>
         /// <param name="getter"></param>
-        static void Normalize<VM>(VM[] models, int offset, int count,
-            Func<VM, decimal> getter,
-            Action<VM, decimal> setter)
+        static void Normalize<VM>(VM[] models, Func<VM, decimal> getter, Action<VM, decimal> setter)
             where VM : IModel
         {
             var values = models.Select(v => getter(v)).ToArray();
-            normalize(values, offset, count);
+            normalize(values);
             for (int i = 0; i < values.Length; i++) setter(models[i], values[i]);
         }
 
-        private static void normalize(decimal[] models, int offset, int count)
+        private static void normalize(decimal[] models)
         {
-            var sub = models.Skip(offset).Take(count);
-            var avg = sub.Average();
-            var sd = (decimal)Math.Sqrt((double)sub.Average(x => (x - avg) * (x - avg)));
+            var avg = models.Average();
+            var sd = (decimal)Math.Sqrt((double)models.Average(x => (x - avg) * (x - avg)));
 
-            for (int i = 0; i < count; i++) models[offset + i] = (models[offset + i] - avg) / sd;
+            for (int i = 0; i < models.Length; i++) models[i] = (models[i] - avg) / sd;
         }
 
         #region ---- TEST ----
@@ -44,9 +41,9 @@ namespace Universe.Coin.TradeLogic.Calc
         public static void NormalizedTest()
         {
             var n_src = _src.ToArray();
-            normalize(n_src, 0, n_src.Length);
-            var n_ma = calcMovingAvg(n_src, 0, n_src.Length, 5, WindowFunction.Linear);
-            var n_osc = calcMacdOsc(n_src, 0, n_src.Length, new[] { 8, 16, 5 });
+            normalize(n_src);
+            var n_ma = calcMovingAvg(n_src, 5, WindowFunction.Linear);
+            var n_osc = calcMacdOsc(n_src, new[] { 8, 16, 5 });
 
             var sb = new StringBuilder();
             sb.AppendLine($"src\tn-src\tn-ma\tn-osc");

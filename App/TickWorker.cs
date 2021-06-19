@@ -103,7 +103,7 @@ namespace Universe.Coin.App
             var sb = new StringBuilder();
             sb.AppendLine($"---- [Ticker] buy= {param.BuyMacd}, sell= {param.SellMacd} ----");
 
-            var tickers = _tickerQ.ToArray();
+            var tickers = _tickerQ.Last(param.WindowSize);
 
             ICalcTicker.CalcMovingAvg(tickers, param);
             ICalcTicker.CalcMacdOsc(tickers, param);
