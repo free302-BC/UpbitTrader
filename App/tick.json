@@ -1,5 +1,5 @@
 {
-  "TickerWorker": {
+  "TickWorker": {
 
     "Upbit": {
       "AssemblyFile": "Universe.Coin.Upbit.dll",

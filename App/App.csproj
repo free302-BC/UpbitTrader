@@ -47,7 +47,7 @@
     <None Update="autotrading.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="ticker.json">
+    <None Update="tick.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="backtest.json">

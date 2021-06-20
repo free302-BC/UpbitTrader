@@ -28,7 +28,6 @@ namespace Universe.Coin.TradeLogic.Model
         public decimal CumRate { get; set; } = 1.0m;
         public decimal DrawDown { get; set; }
 
-        public const decimal FeeRate = 0.0005m;
         public static readonly TradeTickModel Empty = new();
 
 #pragma warning disable CS8618
@@ -62,7 +61,7 @@ namespace Universe.Coin.TradeLogic.Model
             => $"[{TimeKST:HH:mm:ss.fff}] {Volume:F8} × {UnitPrice,6:F1} = {Price,7:F1}  {Dir,1} {Change,6:F1} | {Market}";
 
         public string ToCalcString()
-            => $"[{TimeKST:HH:mm:ss.fff}]\t{UnitPrice,6:F1}\t{Dir,3}\t{MacdOsc,7:F2}\t{Signal,7}\t{Rate,8:F4}\t{CumRate,8:F4}";
+            => $"[{TimeKST:HH:mm:ss.fff}]{Value,8:F1}{MovingAvg,8:F1}{Dir,8}{MacdOsc,8:F2}{Signal,5} |{Rate,8:F4}{CumRate,8:F4}";
         public string CalcHeader => $"[TimeKST]\tPrice\tDir\tMacd\tSignal\tRate\tCumRate";
 
         static TradeTickModel() => IViewModel.buildHeader(_names);

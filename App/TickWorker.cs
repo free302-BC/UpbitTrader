@@ -19,12 +19,14 @@ namespace Universe.Coin.App
 {
     using JS = JsonSerializer;
 
-    public class TickerWorker : TradeWorkerBase<TickerWorker, TickerWorkerOptions>
+    public class TickWorker : TradeWorkerBase<TickWorker, TickWorkerOptions>
     {
         readonly TimeModelQueue<TickerModel> _tickerQ;
-        public TickerWorker(IServiceProvider sp, string id = "") : base(sp, id)
+        readonly TimeModelQueue<ICalcModel> _tickQ;
+        public TickWorker(IServiceProvider sp, string id = "") : base(sp, id)
         {
             _tickerQ = new(600);
+            _tickQ = new(600);
 
             updateClient();
             onOptionsUpdate += updateClient;
@@ -64,8 +66,7 @@ namespace Universe.Coin.App
             {
                 try
                 {
-                    //_client.OnWsReceived += onWsReceived;
-                    _client.OnWsReceived += addTicker;
+                    _client.OnWsReceived += onWsReceived;
 
                     var request = _client.CreateInstance<IWsRequest>();
                     //request.AddTrade(CurrencyId.KRW, CoinId.BTC);
@@ -76,46 +77,51 @@ namespace Universe.Coin.App
                 finally
                 {
                     _client.OnWsReceived -= onWsReceived;
-                    _client.OnWsReceived -= addTicker;
                 }
-            }
-            void onWsReceived(string json)
+            }            
+        }
+        void onWsReceived(string json)
+        {
+            var resType = _client.GetImplType<IWsResponse>();
+            var @event = ((IWsResponse)JS.Deserialize(json, resType, _jsonOptions)!).Event;
+
+            ICalcModel model = @event switch
             {
-                var resType = _client.GetImplType<IWsResponse>();
-                var @event = ((IWsResponse)JS.Deserialize(json, resType, _jsonOptions)!).Event;
+                TradeEvent.Trade => _client.Deserialize<ITradeTick>(json).ToModel(),
+                TradeEvent.Ticker => _client.Deserialize<ITicker>(json).ToModel(),
+                //TradeEvent.Order => _client.Deserialize<IOrderbook>(json).ToModel(),
+                _ => throw new NotImplementedException(),
+            };
 
-                IViewModel model = @event switch
-                {
-                    TradeEvent.Trade => _client.Deserialize<ITradeTick>(json).ToModel(),
-                    TradeEvent.Ticker => _client.Deserialize<ITicker>(json).ToModel(),
-                    TradeEvent.Order => _client.Deserialize<IOrderbook>(json).ToModel(),
-                    _ => throw new NotImplementedException(),
-                };
+            //if (model is TradeTickModel) report(model, (int)((TradeTickModel)model).Dir);
+            //else report(model);
 
-                if (model is TradeTickModel) report(model, (int)((TradeTickModel)model).Dir);
-                else report(model);
-            }
+            if (@event == TradeEvent.Trade) _tradeCounter++;
+            else if (@event == TradeEvent.Ticker) _tickerCounter++;
+
+            _tickQ.Add(model);
+            run(model);
         }
 
         volatile int _maxWindowSize = 0;
-        void addTicker(string json)
+        volatile int _tradeCounter = 0;
+        volatile int _tickerCounter = 0;
+        void run(ICalcModel model)
         {
-            var model = _client.Deserialize<ITicker>(json).ToModel();
-            _tickerQ.Add(model);
-
             var param = _set.CalcParam;
-            var tickers = _tickerQ.Last(_maxWindowSize);
-            if (tickers.Length == 0) return;
+            var models = _tickQ.Last(_maxWindowSize);
+            if (models.Length == 0) return;
 
-            ICalc.CalcMovingAvg(tickers, param, tickers.Length - 1);
-            ICalc.CalcMacd(tickers, param, tickers.Length - 1);
-            TickerCalc.I.CalcProfitRate(tickers, param, tickers.Length - 1);
-            ICalc.CalcCumRate(tickers, tickers.Length - 1);
+            ICalc.CalcMovingAvg(models, param, models.Length - 1);
+            ICalc.CalcMacd(models, param, models.Length - 1);
+            TickerCalc.I.CalcProfitRate(models, param, models.Length - 1);
+            ICalc.CalcCumRate(models, models.Length - 1);
             //ICalcTradeTick.CalcDrawDown(ticks);
 
-            report(model.ToCalcString(), (int)model.Signal);
-            File.WriteAllText("ticker_ws.txt", model.ToCalcString());
+            report($"{model.ToCalcString()} | ({_tradeCounter}, {_tickerCounter})", (int)model.Signal);
+            //File.WriteAllText("ticker_ws.txt", model.ToCalcString());
         }
+
         void run_Tick()
         {
             var param = _set.CalcParam;
