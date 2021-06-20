@@ -15,7 +15,7 @@ namespace UnitTester
         void logic_table()
         {
             var models = ((TimingSignal[])Enum.GetValues(typeof(TimingSignal))).Select(x => (M)x).ToArray();
-            var signals = new TimingSignal[] { TimingSignal.None, TimingSignal.DoBuy, TimingSignal.DoSell };
+            var signals = new TimingSignal[] { TimingSignal.N, TimingSignal.Buy, TimingSignal.Sell };
 
             foreach (var prev in models)
                 foreach (var signal in signals)
@@ -29,33 +29,33 @@ namespace UnitTester
         {
             return prev.Signal switch
             {
-                TimingSignal.None or TimingSignal.DoSell
-                    => signal == TimingSignal.DoBuy ? signal : TimingSignal.None,
-                _ => signal == TimingSignal.DoSell ? signal : TimingSignal.Hold,
+                TimingSignal.N or TimingSignal.Sell
+                    => signal == TimingSignal.Buy ? signal : TimingSignal.N,
+                _ => signal == TimingSignal.Sell ? signal : TimingSignal.Hold,
             };
         }
         static TimingSignal f2(M prev, TimingSignal signal)
         {
-            M model = TimingSignal.None;
-            if (prev.Signal == TimingSignal.None)
+            M model = TimingSignal.N;
+            if (prev.Signal == TimingSignal.N)
             {
-                if (signal == TimingSignal.DoBuy) model = signal;//dobuy
-                else model = TimingSignal.None;
+                if (signal == TimingSignal.Buy) model = signal;//dobuy
+                else model = TimingSignal.N;
             }
-            if (prev.Signal == TimingSignal.DoBuy)
+            if (prev.Signal == TimingSignal.Buy)
             {
-                if (signal != TimingSignal.DoSell) model = TimingSignal.Hold;
+                if (signal != TimingSignal.Sell) model = TimingSignal.Hold;
                 else model = signal;//dosell
             }
             if (prev.Signal == TimingSignal.Hold)
             {
-                if (signal != TimingSignal.DoSell) model = TimingSignal.Hold;
+                if (signal != TimingSignal.Sell) model = TimingSignal.Hold;
                 else model = signal;//dosell
             }
-            if (prev.Signal == TimingSignal.DoSell)
+            if (prev.Signal == TimingSignal.Sell)
             {
-                if (signal == TimingSignal.DoBuy) model = signal;//dobuy
-                else model = TimingSignal.None;
+                if (signal == TimingSignal.Buy) model = signal;//dobuy
+                else model = TimingSignal.N;
             }
             return model.Signal;
         }

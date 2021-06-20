@@ -16,8 +16,10 @@ namespace Universe.Coin.TradeLogic.Model
         public TickerDir Dir;
 
         //계산용
+        public decimal Value { get; set; }
         public long Timestamp { get; set; }
         public decimal MovingAvg { get; set; }
+        public decimal Macd { get; set; }
         public decimal MacdOsc { get; set; }
         public decimal Target { get; set; }
         public bool TradeDone { get; set; }
@@ -52,14 +54,16 @@ namespace Universe.Coin.TradeLogic.Model
                 'F' => TickerDir.F,
                 _ => throw new NotImplementedException()
             };
+
+            Value = Closing;
         }
 
         public override string ToString()
             => $"[{TimeKST:HH:mm:ss.fff}] {Opening,8:F1} {High,8:F1} {Low,8:F1} {Closing,8:F1} : {Delta,8:F1} {Dir} | {Market,8}";
 
         public string ToCalcString()
-            => $"[{TimeKST:HH:mm:ss.fff}]\t{Closing,6:F1}\t{Dir,3}\t{MacdOsc,7:F2}\t{Signal,7}\t{Rate,8:F4}\t{CumRate,8:F4}";
-        public string CalcHeader => $"[TimeKST]\tClosing\tDir\tMacd\tSignal\tRate\tCumRate";
+            => $"[{TimeKST:HH:mm:ss.fff}]{Closing,8:F1}{MovingAvg,8:F1}{Macd,8:F2}{MacdOsc,8:F2}{Signal,4} |{Rate,8:F4}{CumRate,8:F4}";
+        public string CalcHeader => $"[TimeKST]\tPrice\tDir\tMacd\tSignal\tRate\tCumRate";
 
         static readonly (string name, int wdith)[] _names =
         {

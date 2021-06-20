@@ -15,8 +15,10 @@ namespace Universe.Coin.TradeLogic.Model
         public decimal Opening, High, Low, Closing, Delta;
 
         //계산용
-        public long Timestamp {get;set;}        
+        public decimal Value { get; set; }
+        public long Timestamp { get; set; }
         public decimal MovingAvg { get; set; }
+        public decimal Macd { get; set; }
         public decimal MacdOsc { get; set; }
         public decimal Target { get; set; }
         public bool TradeDone { get; set; }
@@ -43,6 +45,8 @@ namespace Universe.Coin.TradeLogic.Model
             Low = Math.Round(candle.LowPrice / 10000.0m, 1);
             Closing = Math.Round(candle.TradePrice / 10000.0m, 1);
             Delta = High - Low;
+
+            Value = Closing;
         }
         public override string ToString()
             => $"{TimeKST:yyMMdd.HHmm} {ICandle.GetApiName(ApiId, Unit),8} {Opening,8:F1} {MacdOsc,4:F2}"
@@ -65,7 +69,7 @@ namespace Universe.Coin.TradeLogic.Model
             (nameof(CumRate),  8),
             (nameof(DrawDown), 8)
         };
-        
+
         static CandleModel() => IViewModel.buildHeader(_names);
 
     }//class
@@ -75,7 +79,7 @@ namespace Universe.Coin.TradeLogic.Model
         public static CandleModel[] ToModels(this IEnumerable<ICandle> models)
            => models.Select(x => new CandleModel(x)).Reverse().ToArray();
         public static CandleModel ToModel(this ICandle model) => new CandleModel(model);
-    }   
+    }
 
 
 }

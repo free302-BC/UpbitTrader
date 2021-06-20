@@ -197,7 +197,7 @@ namespace Universe.Coin.App
         void ticks(IClient uc)
         {
             var ticks = uc.ApiTicks(count: 10).ToModels();
-            ICalc.CalcMovingAvg(ticks, _set.CalcParam, m => m.UnitPrice);
+            ICalcTradeTick.CalcMovingAvg(ticks, _set.CalcParam);
             info(IViewModel.Print(ticks));
         }
     }//class

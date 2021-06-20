@@ -1,5 +1,5 @@
 --------- [ 미완료 ] ---------
-
++ ICalc: getter 제거, ICalcMode에 Value 추가
 
 + 체결강도
 + 매수 매도 신호를 모델에 저장 ~ BackTestWorker부터

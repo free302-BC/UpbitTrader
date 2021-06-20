@@ -14,9 +14,9 @@ namespace UnitTester
         [Fact]
         void test()
         {
-            ICalc.MovingAvgTest();
+            //ICalc.MovingAvgTest();
             ICalc.MacdTest();
-            ICalc.NormalizedTest();
+            //ICalc.NormalizedTest();
         }
 
     }

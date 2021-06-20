@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using Universe.Coin.TradeLogic.Model;
@@ -24,18 +25,27 @@ namespace Universe.Coin.TradeLogic.Calc
         /// <param name="models"></param>
         /// <param name="windowSize"></param>
         /// <param name="winFunc"></param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void CalcMovingAvg(M[] models, ICalcParam param)
-        {
-            ICalc.CalcMovingAvg(models, param, m => m.Closing);
-        }
+            => ICalc.CalcMovingAvg(models, param);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void CalcMovingAvg(M[] models, ICalcParam param, int index)
+            => ICalc.CalcMovingAvg(models, param, index);
+
         #endregion
 
 
         #region ---- MACD OSC ----
-        public static void CalcMacdOsc(M[] models, ICalcParam param)
-        {
-            ICalc.CalcMacdOsc(models, param, m => m.Closing);
-        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void CalcMacd(M[] models, ICalcParam param)
+            => ICalc.CalcMacd(models, param);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void CalcMacd(M[] models, ICalcParam param, int index)
+            => ICalc.CalcMacd(models, param, index);
+
         #endregion
 
 
@@ -47,28 +57,19 @@ namespace Universe.Coin.TradeLogic.Calc
         /// <param name="models"></param>
         /// <param name="param"></param>
         public static void CalcProfitRate(M[] models, ICalcParam param)
-            => CalcProfitRate(models, 0, models.Length, param);
-
-        /// <summary>
-        /// 주어진 ICalcParam을 이용하여 [offset..count]구간의 Profit Rate를 계산
-        /// </summary>
-        /// <param name="models"></param>
-        /// <param name="offset"></param>
-        /// <param name="count"></param>
-        /// <param name="param"></param>
-        public static void CalcProfitRate(M[] models, int offset, int count, ICalcParam param)
         {
-            if (offset >= models.Length) return;
-
-            calcSignal(models[offset], offset > 0 ? models[offset - 1] : M.Empty, param);
-
-            for (int i = 1; i < count; i++)
-            {
-                var j = offset + i;
-                if (j >= models.Length) break;
-                calcSignal(models[j], models[j - 1], param);
-            }
+            calcSignal(models[0], M.Empty, param);
+            for (int i = 1; i < models.Length; i++)
+                calcSignal(models[i], models[i - 1], param);
         }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void CalcProfitRate(M[] models, ICalcParam param, int index)
+        {
+            if (index <= 0) return;
+            calcSignal(models[index], models[index - 1], param);
+        }
+
 
         /// <summary>
         /// MACD에 따라 TimingSignal 계산
@@ -79,24 +80,24 @@ namespace Universe.Coin.TradeLogic.Calc
         static void calcSignal(M model, M prev, ICalcParam param)
         {
             //chekc buy | sell | nop
-            var signal = TimingSignal.None;
-            if (prev.MacdOsc > param.BuyMacd) signal = TimingSignal.DoBuy;
-            if (prev.MacdOsc < param.SellMacd) signal = TimingSignal.DoSell;
+            var signal = TimingSignal.N;
+            if (prev.MacdOsc > param.BuyMacd) signal = TimingSignal.Buy;
+            if (prev.MacdOsc < param.SellMacd) signal = TimingSignal.Sell;
 
             model.Signal = prev.Signal switch
             {
-                TimingSignal.None or TimingSignal.DoSell
-                    => signal == TimingSignal.DoBuy ? signal : TimingSignal.None,
-                _ => signal == TimingSignal.DoSell ? signal : TimingSignal.Hold,
+                TimingSignal.N or TimingSignal.Sell
+                    => signal == TimingSignal.Buy ? signal : TimingSignal.N,
+                _ => signal == TimingSignal.Sell ? signal : TimingSignal.Hold,
             };
             //
-            model.TradeDone = model.Signal == TimingSignal.Hold || model.Signal == TimingSignal.DoSell;
+            model.TradeDone = model.Signal == TimingSignal.Hold || model.Signal == TimingSignal.Sell;
 
             //
             if (model.TradeDone)
             {
                 model.Rate = model.Closing / prev.Closing;
-                if (model.Signal == TimingSignal.DoBuy || model.Signal == TimingSignal.DoSell)
+                if (model.Signal == TimingSignal.Buy || model.Signal == TimingSignal.Sell)
                     model.Rate -= M.FeeRate;
                 model.Rate = Math.Round(model.Rate, 4);
             }
@@ -107,11 +108,18 @@ namespace Universe.Coin.TradeLogic.Calc
 
 
         #region ---- Cumulated Profit Rate & DrawDown ----
-        public static decimal CalcCumRate(M[] models)
-            => ICalc.CalcCumRate(models, m => m.Rate);
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static decimal CalcCumRate(M[] models)
+            => ICalc.CalcCumRate(models);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void CalcCumRate(M[] models, int index) 
+            => ICalc.CalcCumRate(models, index);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static decimal CalcDrawDown(M[] models)
-            => ICalc.CalcDrawDown(models, m => m.CumRate);
+            => ICalc.CalcDrawDown(models);
 
         #endregion
 

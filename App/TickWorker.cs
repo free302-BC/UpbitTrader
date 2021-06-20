@@ -28,14 +28,16 @@ namespace Universe.Coin.App
 
             updateClient();
             onOptionsUpdate += updateClient;
+
             registerHotkey(ConsoleKey.F9, m => updateClient());
             void updateClient()
             {
                 info($"[{Id}] Pausing= {_set.Pausing = !_set.Pausing}");
+                _maxWindowSize = Math.Max(_set.CalcParam.WindowSize, ((int[])_set.CalcParam.MacdParam).Max());
                 _client.Pause(_set.Pausing);
             }
 
-            registerHotkey(ConsoleKey.Spacebar, m => run_Ticker());
+            registerHotkey(ConsoleKey.Spacebar, m => changeBuy(0));
             registerHotkey(ConsoleKey.F1, m => changeBuy(-0.1m));
             registerHotkey(ConsoleKey.F2, m => changeBuy(+0.1m));
             registerHotkey(ConsoleKey.F3, m => changeSell(-0.1m));
@@ -43,12 +45,14 @@ namespace Universe.Coin.App
             void changeBuy(decimal delta)
             {
                 _set.CalcParam.BuyMacd += delta;
-                run_Ticker();
+                info($"Buy={_set.CalcParam.BuyMacd}, Sell={_set.CalcParam.SellMacd}, MacdParam={_set.CalcParam.MacdParam}");
+                //addTicker();
             }
             void changeSell(decimal delta)
             {
                 _set.CalcParam.SellMacd += delta;
-                run_Ticker();
+                info($"Buy={_set.CalcParam.BuyMacd}, Sell={_set.CalcParam.SellMacd}, MacdParam={_set.CalcParam.MacdParam}");
+                //addTicker();
             }
         }
 
@@ -61,7 +65,7 @@ namespace Universe.Coin.App
                 try
                 {
                     //_client.OnWsReceived += onWsReceived;
-                    _client.OnWsReceived += onWsReceivedTicker;
+                    _client.OnWsReceived += addTicker;
 
                     var request = _client.CreateInstance<IWsRequest>();
                     //request.AddTrade(CurrencyId.KRW, CoinId.BTC);
@@ -72,7 +76,7 @@ namespace Universe.Coin.App
                 finally
                 {
                     _client.OnWsReceived -= onWsReceived;
-                    _client.OnWsReceived -= onWsReceivedTicker;
+                    _client.OnWsReceived -= addTicker;
                 }
             }
             void onWsReceived(string json)
@@ -91,30 +95,26 @@ namespace Universe.Coin.App
                 if (model is TradeTickModel) report(model, (int)((TradeTickModel)model).Dir);
                 else report(model);
             }
-            void onWsReceivedTicker(string json)
-            {
-                _tickerQ.Add(_client.Deserialize<ITicker>(json).ToModel());
-            }
         }
 
-        void run_Ticker()
+        volatile int _maxWindowSize = 0;
+        void addTicker(string json)
         {
+            var model = _client.Deserialize<ITicker>(json).ToModel();
+            _tickerQ.Add(model);
+
             var param = _set.CalcParam;
-            var sb = new StringBuilder();
-            sb.AppendLine($"---- [Ticker] buy= {param.BuyMacd}, sell= {param.SellMacd} ----");
+            var tickers = _tickerQ.Last(_maxWindowSize);
+            if (tickers.Length == 0) return;
 
-            var tickers = _tickerQ.Last(param.WindowSize);
-
-            ICalcTicker.CalcMovingAvg(tickers, param);
-            ICalcTicker.CalcMacdOsc(tickers, param);
-
-            ICalcTicker.CalcProfitRate(tickers, param);
-            var fpr = (ICalcTicker.CalcCumRate(tickers) - 1) * 100;
+            ICalcTicker.CalcMovingAvg(tickers, param, tickers.Length - 1);
+            ICalcTicker.CalcMacd(tickers, param, tickers.Length - 1);
+            ICalcTicker.CalcProfitRate(tickers, param, tickers.Length - 1);
+            ICalcTicker.CalcCumRate(tickers, tickers.Length - 1);
             //ICalcTradeTick.CalcDrawDown(ticks);
 
-            save(tickers);
-            var printTicks = tickers.Where(x => x.Signal == TimingSignal.DoBuy || x.Signal == TimingSignal.DoSell);
-            print(sb, printTicks, $"final profit rate: {fpr,6:F2}%");
+            report(model.ToCalcString(), (int)model.Signal);
+            File.WriteAllText("ticker_ws.txt", model.ToCalcString());
         }
         void run_Tick()
         {
@@ -132,7 +132,7 @@ namespace Universe.Coin.App
             //ICalcTradeTick.CalcDrawDown(ticks);
 
             save(ticks);
-            var printTicks = ticks.Where(x => x.Signal == TimingSignal.DoBuy || x.Signal == TimingSignal.DoSell);
+            var printTicks = ticks.Where(x => x.Signal == TimingSignal.Buy || x.Signal == TimingSignal.Sell);
             print(sb, printTicks, $"final profit rate: {fpr,6:F2}%");
         }
         static void save(ICalcModel[] models)

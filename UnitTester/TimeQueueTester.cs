@@ -46,8 +46,10 @@ namespace UnitTester
         record M : ICalcModel
         {
             public M(long ts) => Timestamp = ts;
+            public decimal Value { get; set; }
             public long Timestamp { get; set; }
             public decimal MovingAvg { get; set; }
+            public decimal Macd { get; set; }
             public decimal MacdOsc { get; set; }
             public decimal Target { get; set; }
             public TimingSignal Signal { get; set; }
@@ -57,6 +59,7 @@ namespace UnitTester
             public decimal DrawDown { get; set; }
 
             public string CalcHeader => throw new NotImplementedException();
+
 
             public string ToCalcString()
             {

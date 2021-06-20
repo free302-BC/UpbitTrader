@@ -24,22 +24,32 @@ namespace Universe.Coin.TradeLogic.Calc
         /// <param name="models"></param>
         /// <param name="param"></param>
         /// <param name="getter"></param>
-        static void CalcMovingAvg<VM>(VM[] models, ICalcParam param, Func<VM, decimal> getter)
+        static void CalcMovingAvg<VM>(VM[] models, ICalcParam param)
             where VM : ICalcModel
         {
             if (param.WindowFunction == WindowFunction.None) return;
 
-            var values = models.Select(v => getter(v)).ToArray();
-            var avgs = calcMovingAvg(values, param.WindowSize, param.WindowFunction);
+            var values = models.Select(v => v.Value).ToArray();
+            var avgs = CalcMovingAvg(values, param.WindowSize, param.WindowFunction);
             for (int i = 0; i < avgs.Length; i++) models[i].MovingAvg = avgs[i];
         }
+
+        static void CalcMovingAvg<VM>(VM[] models, ICalcParam param, int index)
+            where VM : ICalcModel
+        {
+            var winFuncs = _winFuncs[param.WindowFunction];
+            var values = models.Select(v => v.Value).ToArray();
+            var ma = CalcMovingAvg(values, winFuncs[Math.Min(index + 1, param.WindowSize)], index);
+            models[index].MovingAvg = ma;
+        }
+
 
         /// <summary>
         /// 가변 Window Size 기법으로 Moving Average 구함
         /// 데이터 갯수가 부족할 경우 ~ 그 갯수==Window Size
         /// </summary>
         /// <returns></returns>
-        private static decimal[] calcMovingAvg(decimal[] values, int windowSize, WindowFunction windowFunction)
+        static decimal[] CalcMovingAvg(decimal[] values, int windowSize, WindowFunction windowFunction)
         {
             var winFuncs = _winFuncs[windowFunction];
 
@@ -47,7 +57,7 @@ namespace Universe.Coin.TradeLogic.Calc
             var ma = new decimal[values.Length];
             for (int i = 0; i < values.Length; i++)//i ~ models index
             {
-                ma[i] = calcMovingAvg(values, winFuncs[Math.Min(i + 1, windowSize)], i);
+                ma[i] = CalcMovingAvg(values, winFuncs[Math.Min(i + 1, windowSize)], i);
             }
             return ma;
         }
@@ -58,7 +68,7 @@ namespace Universe.Coin.TradeLogic.Calc
         /// <param name="values"></param>
         /// <param name="index"></param>
         /// <returns></returns>
-        private static decimal calcMovingAvg(decimal[] values, decimal[] weights, int index)
+        static decimal CalcMovingAvg(decimal[] values, decimal[] weights, int index)
         {
             var len = weights.Length;
             var j0 = index - (len - 1);//start index of effective data(used to calcualte)
@@ -75,7 +85,7 @@ namespace Universe.Coin.TradeLogic.Calc
 
         public static void MovingAvgTest()
         {
-            var ma = calcMovingAvg(_src, 5, WindowFunction.Linear);
+            var ma = CalcMovingAvg(_src, 5, WindowFunction.Linear);
             save(_src, ma, "moving_average_2.txt");
 
             static void save(decimal[] values, decimal[] ma, string fileName)

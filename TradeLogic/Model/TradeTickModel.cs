@@ -16,8 +16,10 @@ namespace Universe.Coin.TradeLogic.Model
         public TradeTickDir Dir;
 
         //계산용
+        public decimal Value { get; set; }
         public long Timestamp { get; set; }
         public decimal MovingAvg { get; set; }
+        public decimal Macd { get; set; }
         public decimal MacdOsc { get; set; }
         public decimal Target { get; set; }
         public bool TradeDone { get; set; }
@@ -51,6 +53,8 @@ namespace Universe.Coin.TradeLogic.Model
             Serial = tick.SequentialId / 1000 - msAtTheHour + (tick.SequentialId % 1000);//초당 1000개 
             //Serial = (tick.SequentialId / 1000 - msAtTheHour) * 1000 + (tick.SequentialId % 1000);//초당 1000개 
             //Serial = tick.SequentialId % 100000000;
+
+            Value = UnitPrice;
         }
 #pragma warning restore CS8618
 
@@ -72,7 +76,7 @@ namespace Universe.Coin.TradeLogic.Model
             ("Δ", 6),
             (nameof(Serial), 0),
         };
-        
+
     }//class
 
     public static class _TradeTickModel

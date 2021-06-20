@@ -1,5 +1,6 @@
 ﻿using System;
 using UnitTester;
+using Universe.Coin.TradeLogic.Calc;
 
 namespace Tester
 {
@@ -7,7 +8,8 @@ namespace Tester
     {
         static void Main(string[] args)
         {
-            TimeQueueTester.timeQ_calcModel();
+            ICalc.MacdTest();
+            //TimeQueueTester.timeQ_calcModel();
         }
     }
 }

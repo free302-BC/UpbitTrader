@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using Universe.Coin.TradeLogic.Model;
@@ -52,10 +53,9 @@ namespace Universe.Coin.TradeLogic.Calc
 
 
         #region ---- MACD OSC ----
-        public static void CalcMacdOsc(M[] models, ICalcParam param)
-        {
-            ICalc.CalcMacdOsc(models, param, m => m.Closing);
-        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void CalcMacdOsc(M[] models, ICalcParam param) 
+            => ICalc.CalcMacd(models, param);
         #endregion
 
 
@@ -65,20 +65,21 @@ namespace Universe.Coin.TradeLogic.Calc
         /// 가변 Window Size 기법으로 Moving Average 구함
         /// 데이터 갯수가 부족할 경우 ~ 그 갯수==Window Size
         /// </summary>
-        public static void CalcMovingAvg(M[] models, ICalcParam param)
-        {
-            ICalc.CalcMovingAvg(models, param, m => m.Closing);
-        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void CalcMovingAvg(M[] models, ICalcParam param) 
+            => ICalc.CalcMovingAvg(models, param);
         #endregion
 
 
         #region ---- Cumulated Profit Rate & DrawDown ----
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static decimal CalcCumRate(M[] models) 
-            => ICalc.CalcCumRate(models, m => m.Rate);
+            => ICalc.CalcCumRate(models);
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static decimal CalcDrawDown(M[] models) 
-            => ICalc.CalcDrawDown(models, m => m.CumRate);
+            => ICalc.CalcDrawDown(models);
 
         #endregion
 

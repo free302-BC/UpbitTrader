@@ -42,8 +42,8 @@ namespace Universe.Coin.TradeLogic.Calc
         {
             var n_src = _src.ToArray();
             normalize(n_src);
-            var n_ma = calcMovingAvg(n_src, 5, WindowFunction.Linear);
-            var n_osc = calcMacdOsc(n_src, new[] { 8, 16, 5 });
+            var n_ma = CalcMovingAvg(n_src, 5, WindowFunction.Linear);
+            var n_osc = CalcMacd(n_src, new[] { 8, 16, 5 }).osc;
 
             var sb = new StringBuilder();
             sb.AppendLine($"src\tn-src\tn-ma\tn-osc");

@@ -12,8 +12,11 @@ namespace Universe.Coin.TradeLogic.Model
     public interface ICalcModel : IViewModel
     {
         //계산용
+        decimal Value { get; set; }//ma, macd 계산용 필드
+
         long Timestamp { get; set; }
         decimal MovingAvg { get; set; }
+        decimal Macd { get; set; }
         decimal MacdOsc { get; set; }
 
         decimal Target { get; set; }

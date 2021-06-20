@@ -50,10 +50,10 @@ namespace Universe.Coin.TradeLogic
 
     public enum TimingSignal
     {
-        None,
-        DoBuy,  //매수 신호
-        Hold,   //매수 상태 유지
-        DoSell, //매도 신호
+        N,
+        Buy = -1,  //매수 신호
+        Hold = -2,   //매수 상태 유지
+        Sell = +1, //매도 신호
     }
 
     public enum CandleUnit
