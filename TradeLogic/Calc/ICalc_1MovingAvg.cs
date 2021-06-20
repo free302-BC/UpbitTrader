@@ -23,7 +23,6 @@ namespace Universe.Coin.TradeLogic.Calc
         /// <typeparam name="VM"></typeparam>
         /// <param name="models"></param>
         /// <param name="param"></param>
-        /// <param name="getter"></param>
         static void CalcMovingAvg<VM>(VM[] models, ICalcParam param)
             where VM : ICalcModel
         {

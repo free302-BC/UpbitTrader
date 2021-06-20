@@ -268,7 +268,7 @@ namespace Universe.Coin.App
 
         #region ---- TEST ----
 
-        void saveKey(WorkerOptions set)
+        void saveKey(TradeWorkerOptions set)
         {
             IClientOptions.SaveEncrptedKey(set.AccessKey, set.SecretKey, "key.txt");
         }

@@ -12,16 +12,16 @@ namespace UnitTester
     {
         [Fact] void reload_clone_WorkerOptions()
         {
-            WorkerOptions w = new();
+            TradeWorkerOptions w = new();
             w.AccessKey = "ak:xyz";
             w.SecretKey = "sk:stu";
 
-            WorkerOptions w2 = new();
+            TradeWorkerOptions w2 = new();
             w2.Reload(w);
             Assert.Equal(w2.AccessKey, w.AccessKey);
             Assert.Equal(w2.SecretKey, w.SecretKey);
 
-            var w3 = (WorkerOptions)w.Clone();
+            var w3 = (TradeWorkerOptions)w.Clone();
             Assert.Equal(w3.AccessKey, w.AccessKey);
             Assert.Equal(w3.SecretKey, w.SecretKey);
         }
@@ -52,19 +52,19 @@ namespace UnitTester
         [Fact]
         void reload_clone_TraderOptions()
         {
-            TraderWorkerOptions w = new();
+            AutoTradingWorkerOptions w = new();
             w.AccessKey = "ak:xyz";
             w.Pausing = true;
             w.CalcParam.FactorK = 123.456m;
 
-            TraderWorkerOptions w2 = new();
+            AutoTradingWorkerOptions w2 = new();
             w2.Reload(w);
             check(w, w2);
 
-            var w3 = (TraderWorkerOptions)w.Clone();
+            var w3 = (AutoTradingWorkerOptions)w.Clone();
             check(w, w3);
 
-            static void check(TraderWorkerOptions exp, TraderWorkerOptions act)
+            static void check(AutoTradingWorkerOptions exp, AutoTradingWorkerOptions act)
             {
                 Assert.Equal(exp.AccessKey, act.AccessKey);
                 Assert.Equal(exp.Pausing, act.Pausing);

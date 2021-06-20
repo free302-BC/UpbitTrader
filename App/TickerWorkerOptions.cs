@@ -9,9 +9,9 @@ using Universe.Coin.TradeLogic.Calc;
 
 namespace Universe.Coin.App
 {
-    public class TickWorkerOptions : WorkerOptions
+    public class TickerWorkerOptions : TradeWorkerOptions
     {
-        public TickWorkerOptions()
+        public TickerWorkerOptions()
         {
             CalcParam = new CalcParam();
         }
@@ -22,14 +22,14 @@ namespace Universe.Coin.App
         public new void Reload(IWorkerOptions source)
         {
             base.Reload(source);
-            var src = (TickWorkerOptions)source;
+            var src = (TickerWorkerOptions)source;
             AssemblyFile = src.AssemblyFile;
             Pausing = src.Pausing;
             CalcParam.Reload(src.CalcParam);
         }
         public new IWorkerOptions Clone()
         {
-            var clone = (TickWorkerOptions)MemberwiseClone();            
+            var clone = (TickerWorkerOptions)MemberwiseClone();            
 
             clone.CalcParam = CalcParam.Clone();
 

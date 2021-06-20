@@ -15,17 +15,17 @@ namespace Universe.Coin.App
         static void Main(string[] args)
         {
             #region ---- key input listener ----
-            AddWorker<InputWorker, WorkerOptions>(
+            AddWorker<InputWorker, TradeWorkerOptions>(
                 lifeTime: ServiceLifetime.Singleton,
                 postFactory: (sp, iw) => 
                     iw.AddCmd(ConsoleKey.Escape, m => sp.GetRequiredService<IHost>().StopAsync().Wait()));
             #endregion
 
-            //AddWorker<BackTestWorker, BackTestOptions>("backtest.json", "1");
+            AddWorker<BackTestWorker, BackTestOptions>("backtest.json", "1");
             //AddWorker<BackTestWorker, BackTestOptions>(workerId: "2");
-            //AddWorker<TraderWorker, TraderWorkerOptions>();
-            AddWorker<TickWorker, TickWorkerOptions>("tickworker.json", "Upbit");
-            //AddWorker<TickWorker, TickWorkerOptions>("tickworker_binance.json", "Binance");
+            //AddWorker<AutoTradingWorker, AutoTradingWorkerOptions>("autotrading.json");
+            //AddWorker<TickerWorker, TickerWorkerOptions>("ticker.json", "Upbit");
+            //AddWorker<TickerWorker, TickerWorkerOptions>(workerId: "Binance");
             RunHost();
         }
 

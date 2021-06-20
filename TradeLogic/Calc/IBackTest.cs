@@ -13,13 +13,13 @@ namespace Universe.Coin.TradeLogic.Calc
             BackTest(CandleModel[] models, ICalcParam param)
         {
             if (param.WindowFunction != WindowFunction.None) 
-                ICalcCandle.CalcMovingAvg(models, param);
+                ICalc.CalcMovingAvg(models, param);
 
-            ICalcCandle.CalcProfitRate(models, param);
+            CandleCalc.I.CalcProfitRate(models, param);
             var trades = models.Count(x => x.TradeDone);
 
-            var rate = ICalcCandle.CalcCumRate(models);
-            var mdd = ICalcCandle.CalcDrawDown(models);
+            var rate = ICalc.CalcCumRate(models);
+            var mdd = ICalc.CalcDrawDown(models);
             return (trades, rate, mdd);
         }
     }

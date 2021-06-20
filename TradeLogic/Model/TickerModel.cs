@@ -28,7 +28,6 @@ namespace Universe.Coin.TradeLogic.Model
         public decimal CumRate { get; set; } = 1.0m;
         public decimal DrawDown { get; set; }
 
-        public const decimal FeeRate = 0.0005m;
         public static readonly TickerModel Empty = new();
 
         public TickerModel() => Market = "";
@@ -62,7 +61,7 @@ namespace Universe.Coin.TradeLogic.Model
             => $"[{TimeKST:HH:mm:ss.fff}] {Opening,8:F1} {High,8:F1} {Low,8:F1} {Closing,8:F1} : {Delta,8:F1} {Dir} | {Market,8}";
 
         public string ToCalcString()
-            => $"[{TimeKST:HH:mm:ss.fff}]{Closing,8:F1}{MovingAvg,8:F1}{Macd,8:F2}{MacdOsc,8:F2}{Signal,4} |{Rate,8:F4}{CumRate,8:F4}";
+            => $"[{TimeKST:HH:mm:ss.fff}]{Closing,8:F1}{MovingAvg,8:F1}{Macd,8:F2}{MacdOsc,8:F2}{Signal,5} |{Rate,8:F4}{CumRate,8:F4}";
         public string CalcHeader => $"[TimeKST]\tPrice\tDir\tMacd\tSignal\tRate\tCumRate";
 
         static readonly (string name, int wdith)[] _names =

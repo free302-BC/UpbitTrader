@@ -20,7 +20,7 @@ namespace Universe.Coin.App
 {
     using EventDic = Dictionary<ConsoleKey, InputWorker.Listener>;
 
-    public class InputWorker : WorkerBase<InputWorker, WorkerOptions>
+    public class InputWorker : WorkerBase<InputWorker, TradeWorkerOptions>
     {
         public delegate void Listener(ConsoleModifiers modifiers);
 

@@ -44,7 +44,7 @@ namespace UnitTester
         [Fact]
         public void Run()
         {
-            AddWorker<TestWorker, WorkerOptions>();
+            AddWorker<TestWorker, TradeWorkerOptions>();
             RunHost();
         }
 
@@ -65,7 +65,7 @@ namespace UnitTester
         }
 
 
-        public class TestWorker : WorkerBase<TestWorker, WorkerOptions>
+        public class TestWorker : WorkerBase<TestWorker, TradeWorkerOptions>
         {
             readonly Client _client;
             public TestWorker(IServiceProvider sp, string id = "") : base(sp, id)
@@ -104,22 +104,22 @@ namespace UnitTester
 
                 w.Restart();
                 param.WindowFunction = WindowFunction.None;
-                ICalcCandle.CalcMovingAvg(models, param);
+                ICalc.CalcMovingAvg(models, param);
                 info($"{param.WindowFunction,20}:Δt= {w.ElapsedMilliseconds}ms", $"{models[0]}");
 
                 w.Restart();
                 param.WindowFunction = WindowFunction.Identical;
-                ICalcCandle.CalcMovingAvg(models, param);
+                ICalc.CalcMovingAvg(models, param);
                 info($"{param.WindowFunction,20}:Δt= {w.ElapsedMilliseconds}ms", $"{models[0]}");
 
                 param.WindowFunction = WindowFunction.Linear;
                 w.Restart();
-                ICalcCandle.CalcMovingAvg(models, param);
+                ICalc.CalcMovingAvg(models, param);
                 info($"{param.WindowFunction,20}Δt= {w.ElapsedMilliseconds}ms", $"{models[0]}");
 
                 param.WindowFunction = WindowFunction.Gaussian;
                 w.Restart();
-                ICalcCandle.CalcMovingAvg(models, param);
+                ICalc.CalcMovingAvg(models, param);
                 info($"{param.WindowFunction,20}:Δt= {w.ElapsedMilliseconds}ms", $"{models[0]}");
             }
 

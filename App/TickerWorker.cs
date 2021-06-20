@@ -19,10 +19,10 @@ namespace Universe.Coin.App
 {
     using JS = JsonSerializer;
 
-    public class TickWorker : TradeWorkerBase<TickWorker, TickWorkerOptions>
+    public class TickerWorker : TradeWorkerBase<TickerWorker, TickerWorkerOptions>
     {
         readonly TimeModelQueue<TickerModel> _tickerQ;
-        public TickWorker(IServiceProvider sp, string id = "") : base(sp, id)
+        public TickerWorker(IServiceProvider sp, string id = "") : base(sp, id)
         {
             _tickerQ = new(600);
 
@@ -107,10 +107,10 @@ namespace Universe.Coin.App
             var tickers = _tickerQ.Last(_maxWindowSize);
             if (tickers.Length == 0) return;
 
-            ICalcTicker.CalcMovingAvg(tickers, param, tickers.Length - 1);
-            ICalcTicker.CalcMacd(tickers, param, tickers.Length - 1);
-            ICalcTicker.CalcProfitRate(tickers, param, tickers.Length - 1);
-            ICalcTicker.CalcCumRate(tickers, tickers.Length - 1);
+            ICalc.CalcMovingAvg(tickers, param, tickers.Length - 1);
+            ICalc.CalcMacd(tickers, param, tickers.Length - 1);
+            TickerCalc.I.CalcProfitRate(tickers, param, tickers.Length - 1);
+            ICalc.CalcCumRate(tickers, tickers.Length - 1);
             //ICalcTradeTick.CalcDrawDown(ticks);
 
             report(model.ToCalcString(), (int)model.Signal);
@@ -124,11 +124,11 @@ namespace Universe.Coin.App
 
             var ticks = _client.ApiTicks(count: 500).ToModels();
 
-            ICalcTradeTick.CalcMovingAvg(ticks, param);
-            ICalcTradeTick.CalcMacdOsc(ticks, param);
+            ICalc.CalcMovingAvg(ticks, param);
+            ICalc.CalcMacd(ticks, param);
 
-            ICalcTradeTick.CalcProfitRate(ticks, param);
-            var fpr = (ICalcTradeTick.CalcCumRate(ticks) - 1) * 100;
+            TickerCalc.I.CalcProfitRate(ticks, param);
+            var fpr = (ICalc.CalcCumRate(ticks) - 1) * 100;
             //ICalcTradeTick.CalcDrawDown(ticks);
 
             save(ticks);

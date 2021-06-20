@@ -11,9 +11,9 @@ using Universe.Coin.TradeLogic;
 
 namespace Universe.Coin.App
 {
-    public class WorkerOptions : IClientOptions, IWorkerOptions
+    public class TradeWorkerOptions : IClientOptions, IWorkerOptions
     {
-        public WorkerOptions()
+        public TradeWorkerOptions()
         {
             AssemblyFile = "";
             ClientFullName = "";
@@ -28,7 +28,7 @@ namespace Universe.Coin.App
         public void Reload(IWorkerOptions source)
         {
             IWorkerOptions.checkType(this, source);
-            var src = (WorkerOptions)source;
+            var src = (TradeWorkerOptions)source;
             AssemblyFile = src.AssemblyFile;
             AccessKey = src.AccessKey;
             SecretKey = src.SecretKey;
@@ -36,7 +36,7 @@ namespace Universe.Coin.App
 
         public IWorkerOptions Clone()
         {
-            var dest = new WorkerOptions();
+            var dest = new TradeWorkerOptions();
             dest.AssemblyFile = AssemblyFile;
             dest.AccessKey = AccessKey;
             dest.SecretKey = SecretKey;

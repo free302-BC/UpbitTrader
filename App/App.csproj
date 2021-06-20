@@ -44,7 +44,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="tickworker.json">
+    <None Update="autotrading.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="ticker.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="backtest.json">

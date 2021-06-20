@@ -20,7 +20,7 @@ namespace Universe.Coin.App
     public abstract class TradeWorkerBase<W, S> 
                 : WorkerBase<W, S>, IDisposable
         where W : WorkerBase<W, S> 
-        where S : WorkerOptions, IClientOptions
+        where S : TradeWorkerOptions, IClientOptions
     {
         readonly InputWorker _inputWorker;
         protected readonly IClient _client;

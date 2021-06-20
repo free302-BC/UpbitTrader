@@ -23,11 +23,10 @@ namespace Universe.Coin.TradeLogic.Model
         public decimal Target { get; set; }
         public bool TradeDone { get; set; }
         public TimingSignal Signal { get; set; }
-        public decimal Rate { get; set; }
-        public decimal CumRate { get; set; }
+        public decimal Rate { get; set; } = 1m;
+        public decimal CumRate { get; set; } = 1m;
         public decimal DrawDown { get; set; }
 
-        public const decimal FeeRate = 0.0005m * 2m;
         public static readonly CandleModel Empty = new() { Delta = 99999m };
 
         public CandleModel() { }

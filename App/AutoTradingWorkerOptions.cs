@@ -9,17 +9,17 @@ using Universe.Coin.TradeLogic.Calc;
 
 namespace Universe.Coin.App
 {
-    public class TraderWorkerOptions : WorkerOptions
+    public class AutoTradingWorkerOptions : TradeWorkerOptions
     {
         public bool Pausing { get; set; }
         public CalcParam CalcParam { get; set; } = new();
 
         public new IWorkerOptions Clone()
         {
-            var clone = (TraderWorkerOptions)MemberwiseClone();
+            var clone = (AutoTradingWorkerOptions)MemberwiseClone();
             clone.CalcParam = (CalcParam)CalcParam.Clone();
 
-            ((WorkerOptions)clone).Reload(this);
+            ((TradeWorkerOptions)clone).Reload(this);
 
             return clone;
         }
@@ -27,7 +27,7 @@ namespace Universe.Coin.App
         public new void Reload(IWorkerOptions source)
         {
             base.Reload(source);
-            var src = (TraderWorkerOptions)source;
+            var src = (AutoTradingWorkerOptions)source;
             Pausing = src.Pausing;
             CalcParam.Reload(src.CalcParam);
         }

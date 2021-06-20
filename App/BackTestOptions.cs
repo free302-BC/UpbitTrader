@@ -9,7 +9,7 @@ using Universe.Coin.TradeLogic.Calc;
 
 namespace Universe.Coin.App
 {
-    public class BackTestOptions : WorkerOptions
+    public class BackTestOptions : TradeWorkerOptions
     {
         public bool DoFindK { get; set; }
         public decimal Hours { get; set; }
@@ -37,7 +37,7 @@ namespace Universe.Coin.App
             var clone = (BackTestOptions)MemberwiseClone();
             clone.CalcParam = (CalcParam)CalcParam.Clone();
 
-            ((WorkerOptions)clone).Reload(this);
+            ((TradeWorkerOptions)clone).Reload(this);
 
             return clone;
         }

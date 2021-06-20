@@ -72,7 +72,7 @@ namespace Universe.AppBase
         }//build
 
 
-        static Queue<string> _idQ = new();
+        static Queue<string> _idQ = new();//등록된 id를 저장
         static protected void AddWorker<W, S>(
             string workerConfigFile = "",
             string workerId = "",

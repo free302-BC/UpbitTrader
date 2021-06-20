@@ -21,9 +21,9 @@ using Universe.Coin.TradeLogic.Calc;
 
 namespace Universe.Coin.App
 {
-    public class TraderWorker : TradeWorkerBase<TraderWorker, TraderWorkerOptions>
+    public class AutoTradingWorker : TradeWorkerBase<AutoTradingWorker, AutoTradingWorkerOptions>
     {
-        public TraderWorker(IServiceProvider sp, string id = "") : base(sp)
+        public AutoTradingWorker(IServiceProvider sp, string id = "") : base(sp)
         {
             _evPausing = new(false);
             onOptionsUpdate += () => { if (!_set.Pausing) _evPausing.Set(); };
@@ -45,9 +45,9 @@ namespace Universe.Coin.App
             //candleDay(_client);
             //candleMinutes(_client);
             //orderbook(_client);
-            ticks(_client);
+            //ticks(_client);
 
-            //runAutoTrade();
+            runAutoTrade();
         }
 
         readonly ManualResetEvent _evPausing;
@@ -197,7 +197,7 @@ namespace Universe.Coin.App
         void ticks(IClient uc)
         {
             var ticks = uc.ApiTicks(count: 10).ToModels();
-            ICalcTradeTick.CalcMovingAvg(ticks, _set.CalcParam);
+            ICalc.CalcMovingAvg(ticks, _set.CalcParam);
             info(IViewModel.Print(ticks));
         }
     }//class
