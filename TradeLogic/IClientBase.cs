@@ -21,12 +21,14 @@ namespace Universe.Coin.TradeLogic
 
         #region ---- Rest API ----
 
-        T[] InvokeApi<T>(ApiId apiId, string postPath = "") where T : IApiModel;
+        (ApiResultCode code, T[] data) InvokeApi<T>(ApiId apiId, string postPath = "") where T : IApiModel;
+
+        (ApiResultCode code, M[] data) InvokeApi<M>(ApiId api, Type implType, string postPath = "") where M : IApiModel;
 
         #endregion
 
 
-        #region ---- Json Options ----
+            #region ---- Json Options ----
 
         static IClientBase()
         {

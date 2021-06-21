@@ -18,7 +18,7 @@ using Universe.Coin.TradeLogic.Model;
 
 namespace Universe.Coin.Upbit
 {
-    public static class Extensions
+    public static class WebClientExtensions
     {
         public static void SetAuthToken(this WebClient wc, KeyPair key)
             => wc.Headers["Authorization"] = "Bearer " + Helper.BuildAuthToken(key);
@@ -26,6 +26,11 @@ namespace Universe.Coin.Upbit
         public static void SetAcceptance(this WebClient wc)
             => wc.Headers["Accept"] = "application/json";
 
+        public static void SetAcceptEncoding(this WebClient wc)
+                => wc.Headers["Accept-Encoding"] = "gzip";
+
+        public static void ClearAcceptEncoding(this WebClient wc)
+                => wc.Headers.Remove("Accept-Encoding");
 
     }//class
 }

@@ -12,7 +12,7 @@ namespace Universe.Coin.App
     public class BackTestOptions : TradeWorkerOptions
     {
         public bool DoFindK { get; set; }
-        public decimal Hours { get; set; }
+        public int Hours { get; set; }
         public bool LoadFromFile { get; set; }
         public bool PrintCandle { get; set; }
         public bool Pausing { get; set; }

@@ -52,7 +52,7 @@ namespace Universe.Coin.TradeLogic.Model
             + $" {Target,8:F1} {High,8:F1} {Closing,8:F1} {Rate,8:F4} {CumRate,8:F4} {DrawDown,8:F2}";
 
         public string ToCalcString()
-            => $"[{TimeKST:HH:mm:ss.fff}]\t{Closing,6:F1}\t{MacdOsc,7:F2}\t{Signal,7}\t{Rate,8:F4}\t{CumRate,8:F4}";
+            => $"[{TimeKST:HH:mm:ss.fff}]{Value,8:F1}{MacdOsc,8:F2}{Signal,7}{Rate,8:F4}{CumRate,8:F4}";
         public string CalcHeader => $"[TimeKST]\tClosing\tMacd\tSignal\tRate\tCumRate";
 
         static readonly (string, int)[] _names =

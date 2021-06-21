@@ -61,6 +61,7 @@ namespace Universe.Coin.Upbit
         {
             _wc.SetAuthToken(_key);
             _wc.SetAcceptance();
+            _wc.SetAcceptEncoding();
             _ws.Options.KeepAliveInterval = new TimeSpan(0, 1, 30);
         }
         
@@ -82,7 +83,7 @@ namespace Universe.Coin.Upbit
             => addQueryString(name, Helper.GetMarketId(currency, coin));
 
 
-        public IMarketInfo[] ApiMarketInfo() => InvokeApi<MarketInfo>(ApiId.MarketInfoAll);
+        public IMarketInfo[] ApiMarketInfo() => InvokeApi<MarketInfo>(ApiId.MarketInfoAll).data;
 
         public string ApiTest(IApiParam param) => param.ToString()!;
 

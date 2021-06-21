@@ -24,6 +24,25 @@ namespace Universe.Coin.TradeLogic.Calc
         /// <param name="param"></param>
         void ICalc.CalcSignal(ICalcModel model, ICalcModel prev, ICalcParam param)
         {
+            calcSignal_K_MA(model, prev, param);
+        }
+
+        void calcSignal_K_MA(ICalcModel model, ICalcModel prev, ICalcParam param)
+        {
+            var k = param.FactorK;
+            var m = (CandleModel)model;
+
+            model.Target = Math.Round(m.Opening + ((CandleModel)prev).Delta * k, 2);
+
+            var doTrade = param.WindowFunction == WindowFunction.None
+                ? (m.High > model.Target)
+                : (m.High > model.Target && m.Opening >= prev.MovingAvg);
+
+            model.TradeDone = doTrade;
+            model.Rate = doTrade ? Math.Round(model.Value / model.Target - _FeeRate, 4) : 1.0000m;
+        }
+        void calcSignal_Macd(ICalcModel model, ICalcModel prev, ICalcParam param)
+        {
             var k = param.FactorK;
             var m = (CandleModel)model;
 

@@ -21,11 +21,9 @@ namespace Universe.Coin.App
 
     public class TickWorker : TradeWorkerBase<TickWorker, TickWorkerOptions>
     {
-        readonly TimeModelQueue<TickerModel> _tickerQ;
         readonly TimeModelQueue<ICalcModel> _tickQ;
         public TickWorker(IServiceProvider sp, string id = "") : base(sp, id)
         {
-            _tickerQ = new(600);
             _tickQ = new(600);
 
             updateClient();
@@ -56,6 +54,9 @@ namespace Universe.Coin.App
                 info($"Buy={_set.CalcParam.BuyMacd}, Sell={_set.CalcParam.SellMacd}, MacdParam={_set.CalcParam.MacdParam}");
                 //addTicker();
             }
+
+            info("\r\nPress <F5> to excute run_Tick()\r\n");
+            registerHotkey(ConsoleKey.F5, m => run_Tick());
         }
 
         protected override void doWork()
@@ -128,7 +129,7 @@ namespace Universe.Coin.App
             var sb = new StringBuilder();
             sb.AppendLine($"---- buy= {param.BuyMacd}, sell= {param.SellMacd} ----");
 
-            var ticks = _client.ApiTicks(count: 500).ToModels();
+            var ticks = _client.ApiTicks(count: 200000).ToModels();
 
             ICalc.CalcMovingAvg(ticks, param);
             ICalc.CalcMacd(ticks, param);

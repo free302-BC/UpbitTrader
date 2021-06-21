@@ -2,37 +2,20 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Net;
-using System.Web;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using System.Text.Json;
 using System.IO;
-using System.Collections.Specialized;
-using System.Diagnostics;
-using System.Numerics;
-using System.Text.Encodings.Web;
-using System.Text.Unicode;
-using Universe.AppBase;
 using Universe.Coin.TradeLogic;
 using Universe.Coin.TradeLogic.Model;
 using Universe.Coin.TradeLogic.Calc;
-using Universe.Utility;
 
 namespace Universe.Coin.App
 {
-    using FindRes = ValueTuple<int, decimal, decimal, decimal>;//(trades, k, rate, mdd)
-    using FindList = List<(int trades, decimal k, decimal rate, decimal mdd)>;
-    using FindList2 = List<(CandleUnit unit, int count, (int trades, decimal k, decimal rate, decimal mdd) res)>;
-
     using BtRes = ValueTuple<int, decimal, decimal>;//(trades, rate, mdd)
     using BtList = List<(CandleUnit unit, int count, (int trades, decimal rate, decimal mdd) res)>;
+    using FindRes = ValueTuple<int, decimal, decimal, decimal>;//(trades, k, rate, mdd)
+    using FindList = List<(CandleUnit unit, int count, (int trades, decimal k, decimal rate, decimal mdd) res)>;
 
     public class BackTestWorker : TradeWorkerBase<BackTestWorker, BackTestOptions>
     {
@@ -48,7 +31,6 @@ namespace Universe.Coin.App
         void registerHotkey()
         {
             registerHotkey(ConsoleKey.Spacebar, m => _ev.Set());
-            registerHotkey(ConsoleKey.Enter, m => _ev.Set());
             registerHotkey(ConsoleKey.F1, m =>
             {
                 _set.DoFindK = !_set.DoFindK;
@@ -99,8 +81,8 @@ namespace Universe.Coin.App
 
         public new void Dispose()
         {
-            base.Dispose();
             _ev?.Dispose();
+            base.Dispose();
         }
 
         #endregion
@@ -130,16 +112,18 @@ namespace Universe.Coin.App
         /// <param name="uc"></param>
         void run_Units_K(IClient uc)
         {
-            var units = new[]
-            { CandleUnit.M240, CandleUnit.M60, CandleUnit.M30, CandleUnit.M15, CandleUnit.M10, CandleUnit.M3, CandleUnit.M1 };
             var results = new BtList();
             var sb = new StringBuilder();
+
+            var units = new[] { 
+                CandleUnit.M240, CandleUnit.M60, CandleUnit.M30, CandleUnit.M15, 
+                CandleUnit.M10, CandleUnit.M3, CandleUnit.M1 };
             var hours = _set.Hours;
             var k = _set.CalcParam.FactorK;
             var ma = (_set.CalcParam.WindowFunction, _set.CalcParam.WindowSize);
 
             info($"Entering {nameof(run_Units_K)}()...");
-            sb.AppendLine($"-----------[ {(int)(hours / 24)}d {hours % 24}h : k={k:F1} ma={ma} ]------------");
+            sb.AppendLine($"-----------[ {new TimeSpan(hours, 0, 0)} : k={k:F1} ma={ma} ]------------");
 
             foreach (var unit in units)
             {
@@ -172,7 +156,7 @@ namespace Universe.Coin.App
         {
             var units = new[]
             { CandleUnit.M240, CandleUnit.M60, CandleUnit.M30, CandleUnit.M15, CandleUnit.M10, CandleUnit.M3, CandleUnit.M1 };
-            var results = new FindList2();
+            var results = new FindList();
             var sb = new StringBuilder();
             var hours = _set.Hours;
             var ma = (_set.CalcParam.WindowFunction, _set.CalcParam.WindowSize);

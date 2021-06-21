@@ -159,24 +159,28 @@ namespace Universe.Coin.TradeLogic
         /// <param name="apiId"></param>
         /// <param name="postPath">Api URL에 추가할 경로: ex) minutes candle의 unit</param>
         /// <returns></returns>
-        public virtual M[] InvokeApi<M>(ApiId api, string postPath = "") where M : IApiModel//, new()
+        public virtual (ApiResultCode code, M[] data) InvokeApi<M>(ApiId api, string postPath = "")
+            where M : IApiModel//, new()
         {
             return InvokeApi<M>(api, typeof(M), postPath);
         }
-        public virtual M[] InvokeApi<M>(ApiId api, Type implType, string postPath = "") where M : IApiModel//, new()
+        public virtual (ApiResultCode code, M[] data) InvokeApi<M>(ApiId api, Type implType, string postPath = "")
+            where M : IApiModel//, new()
         {
             var httpUri = prepareInvoke(api, postPath);
 
             try
             {
-                string json = _wc.DownloadString(httpUri);
+                var raw = _wc.DownloadData(httpUri);
+                var enc = _wc.ResponseHeaders?["Content-Encoding"] ?? "?";
+                string json = enc[0] == 'g' ? Compression.Unzip(raw).ToUtf8String() : raw.ToUtf8String();
                 var models = (M[])JS.Deserialize(json, implType.MakeArrayType(), _jsonOptions)!;
-                return models;
+                return (models.Length == 0 ? ApiResultCode.OkEmpty : ApiResultCode.Ok, models);
             }
             catch (WebException ex)
             {
                 _logger.LogWebException(ex);
-                return Array.Empty<M>();
+                return (ApiResultCode.TooMany, Array.Empty<M>());
             }
         }
 
@@ -193,7 +197,9 @@ namespace Universe.Coin.TradeLogic
         protected void setQueryString(string name, string value) => _wc.QueryString[name] = value;
         protected void addQueryString(string name, string value) => _wc.QueryString.Add(name, value);
         protected void setQueryString(string name, int count) => _wc.QueryString[name] = count.ToString();
-                
+
+
+
 
         #endregion
 

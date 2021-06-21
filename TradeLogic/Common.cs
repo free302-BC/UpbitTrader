@@ -14,8 +14,6 @@ namespace Universe.Coin.TradeLogic
         Order,  //주문 orderbook
         Trade   //체결
     }
-
-    public enum HttpMethod { GET, POST, DELETE }
     
     /// <summary>
     /// 매수시 결제에 사용되는 화폐
@@ -61,7 +59,20 @@ namespace Universe.Coin.TradeLogic
         None = 0, M1 = 1, M3 = 3, M5 = 5, M15 = 15, M10 = 10, M30 = 30, M60 = 60, M240 = 240,
         DAY = 1440, WEEK = 10080, MONTH = 302400
     }
+    public enum WindowFunction : int
+    {
+        None, Identical, Linear, Gaussian
+    }
 
+    public enum ApiResultCode
+    {
+        Ok = 0,             //정상결과, 1개 이상의 아이템
+        OkEmpty = 1,        //정상결과, 0개 아이템
+        TooMany = -1,       //비정상, 너무 빠른 요청
+        UnknowError = -2    //그외의 에러
+    }
+
+    public enum HttpMethod { GET, POST, DELETE }
     public enum ApiId
     {
         None = 0,
@@ -88,9 +99,5 @@ namespace Universe.Coin.TradeLogic
         public static implicit operator KeyPair((string access, string secret) key) => new KeyPair(key.access, key.secret);
     }
 
-    public enum WindowFunction : int
-    {
-        None, Identical, Linear, Gaussian
-    }
 
 }

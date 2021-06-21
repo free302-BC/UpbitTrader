@@ -16,7 +16,8 @@ namespace Universe.Coin.TradeLogic
         IOrderbook ApiOrderbook(CurrencyId currency = CurrencyId.KRW, CoinId coin = CoinId.BTC);
         ITicker ApiTicker(CurrencyId currency = CurrencyId.KRW, CoinId coin = CoinId.BTC);
         ITicker[] ApiTicker(IEnumerable<(CurrencyId currency, CoinId coin)> markets);
-        ITradeTick[] ApiTicks(CurrencyId currency = CurrencyId.KRW, CoinId coin = CoinId.BTC, int count = 1);
+        ITradeTick[] ApiTicks(CurrencyId currency = CurrencyId.KRW, CoinId coin = CoinId.BTC, 
+            int count = 1, DateTime localTo = default);
         
         decimal GetBalance(CoinId coin);
         decimal GetBalance(CurrencyId currency);

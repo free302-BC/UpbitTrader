@@ -28,14 +28,14 @@ namespace Universe.Coin.Upbit
         {
             clearQueryString();
             setQueryString("markets", currency, coin);
-            return InvokeApi<Ticker>(ApiId.TradeTicker)?.FirstOrDefault() ?? new();
+            return InvokeApi<Ticker>(ApiId.TradeTicker).data?.FirstOrDefault() ?? new();
         }
 
         public ITicker[] ApiTicker(IEnumerable<(CurrencyId currency, CoinId coin)> markets)
         {
             clearQueryString();
             foreach (var q in markets) addQueryString("markets", q.currency, q.coin);
-            return InvokeApi<Ticker>(ApiId.TradeTicker) ?? Array.Empty<Ticker>();
+            return InvokeApi<Ticker>(ApiId.TradeTicker).data;// ?? Array.Empty<Ticker>();
         }
         #endregion
 
