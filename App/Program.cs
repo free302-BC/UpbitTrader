@@ -15,8 +15,8 @@ namespace Universe.Coin.App
         static void Main(string[] args)
         {
             #region ---- key input listener ----
-            AddWorker<InputWorker, TradeWorkerOptions>(
-                lifeTime: ServiceLifetime.Singleton,
+            AddService<ICommandProvider, InputWorker>(
+                start: true,
                 postFactory: (sp, iw) => 
                     iw.AddCmd(ConsoleKey.Escape, m => sp.GetRequiredService<IHost>().StopAsync().Wait()));
             #endregion

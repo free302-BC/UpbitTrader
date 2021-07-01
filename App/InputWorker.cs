@@ -18,21 +18,21 @@ using Universe.Utility;
 
 namespace Universe.Coin.App
 {
-    using EventDic = Dictionary<ConsoleKey, InputWorker.Listener>;
+    using EventDic = Dictionary<ConsoleKey, CommandListener>;
 
-    public class InputWorker : WorkerBase<InputWorker, TradeWorkerOptions>
+    public class InputWorker : WorkerBase<InputWorker, TradeWorkerOptions>, ICommandProvider
     {
-        public delegate void Listener(ConsoleModifiers modifiers);
 
-        public InputWorker(IServiceProvider sp, string id = "") : base(sp, id)
+        public InputWorker(IServiceProvider sp) : base(sp, "")
         {
             _listeners = new();
             _lock = new();
         }
 
         readonly EventDic _listeners;
-        
-        public void AddCmd(ConsoleKey key, Listener cmd)
+        readonly object _lock;
+
+        public void AddCmd(ConsoleKey key, CommandListener cmd)
         {
             lock (_lock)
             {
@@ -40,7 +40,7 @@ namespace Universe.Coin.App
                 else _listeners[key] = cmd;
             }
         }
-        public void RemoveCmd(ConsoleKey key, Listener cmd)
+        public void RemoveCmd(ConsoleKey key, CommandListener cmd)
         {
             lock (_lock)
             {
@@ -53,7 +53,6 @@ namespace Universe.Coin.App
             }
         }
 
-        object _lock = new object();
         protected override void doWork()
         {
             while (true)
@@ -61,10 +60,10 @@ namespace Universe.Coin.App
                 var ki = Console.ReadKey(true);
                 //info($"Invoking {ki.Key} cmd...");
 
-                Listener? cmd = null;
+                CommandListener? cmd = null;
                 lock (_lock)
                 {
-                    if(_listeners.ContainsKey(ki.Key)) cmd = _listeners[ki.Key];
+                    if (_listeners.ContainsKey(ki.Key)) cmd = _listeners[ki.Key];
                 }
                 cmd?.Invoke(ki.Modifiers);
                 //Thread.Sleep(100);

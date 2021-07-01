@@ -6,7 +6,7 @@
     <TargetFramework>net5.0-windows</TargetFramework>
     <UseWindowsForms>true</UseWindowsForms>
     <RootNamespace>Universe.Coin.App</RootNamespace>
-    <AssemblyName>Universe.Coin.App</AssemblyName>
+    <AssemblyName>Universe.Coin.AppGui</AssemblyName>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -41,8 +41,18 @@
 
   <ItemGroup>
     <ProjectReference Include="..\AppBase\AppBase.csproj" />
+    <ProjectReference Include="..\App\App.csproj" />
     <ProjectReference Include="..\TradeLogic\TradeLogic.csproj" />
     <ProjectReference Include="..\UpbitLogic\UpbitLogic.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="tick.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   
   

@@ -73,11 +73,21 @@ namespace Universe.AppBase
 
 
         static Queue<string> _idQ = new();//등록된 id를 저장
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="W">service type</typeparam>
+        /// <typeparam name="S">option type</typeparam>
+        /// <param name="workerConfigFile"></param>
+        /// <param name="workerId"></param>
+        /// <param name="postFactory">instance 생성후 수행할 액션</param>
+        /// <param name="lifeTime"></param>
         static protected void AddWorker<W, S>(
             string workerConfigFile = "",
             string workerId = "",
             Action<IServiceProvider, W>? postFactory = null,
-            ServiceLifetime lifeTime = ServiceLifetime.Transient)
+            ServiceLifetime lifeTime = ServiceLifetime.Singleton)
             where W : WorkerBase<W, S>
             where S : class, IWorkerOptions
         {
@@ -103,15 +113,30 @@ namespace Universe.AppBase
 
                 //options
                 sc.AddOptions<S>(ctx.Configuration.GetSection(typeof(W).Name));
-                //if (string.IsNullOrWhiteSpace(workerId))
-                //    sc.AddOptions<S>(ctx.Configuration.GetSection(typeof(W).Name));
-                //else
-                //    sc.AddOptions<S>(workerId, ctx.Configuration.GetSection($"{typeof(W).Name}:{workerId}"));
             });
 
             //worker
-            _workerActions.Add((sp, token) => sp.GetRequiredService<W>().StartAsync(token));
-            //_workerActions.Add((sp, token) => factory(sp).StartAsync(token));
+            _workerActions.Add((sp, token) => ((IHostedService)sp.GetRequiredService<W>()).StartAsync(token));
+        }
+
+        static protected void AddService<S, W>(bool start, Action<IServiceProvider, W>? postFactory = null)
+            where S : class
+            where W : class, S
+        {
+            _serviceActions.Add((ctx, sc) =>
+            {
+                W factory(IServiceProvider sp)
+                {
+                    var w = ActivatorUtilities.CreateInstance<W>(sp);
+                    postFactory?.Invoke(sp, w);
+                    return w;
+                }
+                sc.AddSingleton<S>(factory);
+            });
+
+            //worker
+            if (start)
+                _workerActions.Add((sp, token) => ((IHostedService)sp.GetRequiredService<S>()).StartAsync(token));
         }
 
     }//class

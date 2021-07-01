@@ -22,13 +22,13 @@ namespace Universe.Coin.App
         where W : WorkerBase<W, S> 
         where S : TradeWorkerOptions, IClientOptions
     {
-        readonly InputWorker _inputWorker;
+        readonly ICommandProvider _cmdProvider;
         protected readonly IClient _client;
         protected readonly JsonSerializerOptions _jsonOptions;
 
         protected TradeWorkerBase(IServiceProvider sp, string id = "") : base(sp, id)
         {
-            _inputWorker = sp.GetRequiredService<InputWorker>();
+            _cmdProvider = sp.GetRequiredService<ICommandProvider>();
             _jsonOptions = buildJsonOptions();
 
             var logger = _sp.GetRequiredService<ILogger<IClient>>();
@@ -41,13 +41,13 @@ namespace Universe.Coin.App
             _client?.Dispose();
         }
 
-        protected void registerHotkey(ConsoleKey key, InputWorker.Listener handler)
+        protected void registerHotkey(ConsoleKey key, CommandListener handler)
         {
-            _inputWorker.AddCmd(key, handler);
+            _cmdProvider.AddCmd(key, handler);
         }
-        protected void unregisterHotkey(ConsoleKey key, InputWorker.Listener handler)
+        protected void unregisterHotkey(ConsoleKey key, CommandListener handler)
         {
-            _inputWorker.RemoveCmd(key, handler);
+            _cmdProvider.RemoveCmd(key, handler);
         }
 
         static JsonSerializerOptions buildJsonOptions()

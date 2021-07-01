@@ -1,12 +1,17 @@
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Universe.AppBase;
 
-namespace GuiApp
+namespace Universe.Coin.App
 {
-    static class Program
+    using EventDic = Dictionary<ConsoleKey, CommandListener>;
+
+    class Program : ProgramBase, ICommandProvider
     {
         /// <summary>
         ///  The main entry point for the application.
@@ -18,9 +23,45 @@ namespace GuiApp
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            var form = new Form();
+            AddService<ICommandProvider, Program>(false);
+            AddWorker<TickWorker, TickWorkerOptions>("tick.json", "Upbit");
 
+            Task.Run(RunHost);
+
+            var form = new Form();
+            form.Size = new System.Drawing.Size(800, 600);
             Application.Run(form);
+        }
+
+        
+        readonly EventDic _listeners;
+        readonly object _lock;
+
+        public Program()
+        {
+            _listeners = new();
+            _lock = new();
+        }
+
+        public void AddCmd(ConsoleKey key, CommandListener cmd)
+        {
+            lock (_lock)
+            {
+                if (_listeners.ContainsKey(key)) _listeners[key] += cmd;
+                else _listeners[key] = cmd;
+            }
+        }
+        public void RemoveCmd(ConsoleKey key, CommandListener cmd)
+        {
+            lock (_lock)
+            {
+                if (_listeners.ContainsKey(key))
+                {
+                    var result = _listeners[key] - cmd;
+                    if (result is null) _listeners.Remove(key);
+                    else _listeners[key] = result;
+                }
+            }
         }
 
 
