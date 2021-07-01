@@ -1,0 +1,54 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Version>1.0</Version>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net5.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <RootNamespace>Universe.Coin.App</RootNamespace>
+    <AssemblyName>Universe.Coin.App</AssemblyName>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <LangVersion>9.0</LangVersion>
+    <Nullable>enable</Nullable>
+    <WarningsAsErrors>CS8600;CS8602;CS8603;CS8625;CS8604</WarningsAsErrors>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <Company>UniverseSoft</Company>
+    <Product>Universe.Coin</Product>
+    <Authors>UniverseSoft</Authors>
+    <Description>Coin Trading Library for Upbit</Description>
+    <Copyright>Copyright (c) 2021 UniverseSoft</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+  </PropertyGroup>
+
+  <UsingTask TaskName="GetCurrentBuildVersion" AssemblyFile="..\Universe.BuildVersion.dll" />
+  <Target Name="UpdateVersion" BeforeTargets="BeforeBuild">
+    <GetCurrentBuildVersion BaseVersion="$(Version)">
+      <Output TaskParameter="Version" PropertyName="FileVersion" />
+      <Output TaskParameter="Version" PropertyName="AssemblyVersion" />
+    </GetCurrentBuildVersion>
+  </Target>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="6.0.0-preview.4.21253.7" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0-preview.4.21253.7" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.0-preview.4.21253.7" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="6.0.0-preview.4.21253.7" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AppBase\AppBase.csproj" />
+    <ProjectReference Include="..\TradeLogic\TradeLogic.csproj" />
+    <ProjectReference Include="..\UpbitLogic\UpbitLogic.csproj" />
+  </ItemGroup>
+  
+  
+  
+  
+  
+  
+  
+</Project>
