@@ -10,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Universe.AppBase;
+using Universe.AppBase.Logging;
 using Universe.Coin.TradeLogic;
 using Universe.Coin.TradeLogic.Calc;
 using Universe.Coin.TradeLogic.Model;
@@ -24,6 +25,7 @@ namespace Universe.Coin.App
         readonly TimeModelQueue<ICalcModel> _tickQ;
         public TickWorker(IServiceProvider sp, string id = "") : base(sp, id)
         {
+            _logger.Test("--- TEST ----");
             _tickQ = new(600);
 
             updateClient();

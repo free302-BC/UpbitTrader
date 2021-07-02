@@ -7,6 +7,7 @@ using Universe.AppBase;
 using Microsoft.Extensions.Options;
 using System.Threading;
 using Microsoft.Extensions.Hosting;
+using Universe.AppBase.Logging;
 
 namespace Universe.Coin.App
 {
@@ -14,6 +15,7 @@ namespace Universe.Coin.App
     {
         static void Main(string[] args)
         {
+
             #region ---- key input listener ----
             AddService<ICommandProvider, InputWorker>(
                 start: true,

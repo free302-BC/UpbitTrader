@@ -10,7 +10,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Universe.AppBase
 {
-    public static class Extensions
+    public static class IServiceCollectionExtensions
     {
         //ct.Services.Configure<S>(s => ct.Config.GetSection(key).Bind(s));//이렇게 하면 change event 발생 안함
         public static IServiceCollection AddOptions<S>(this IServiceCollection sc,

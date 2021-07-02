@@ -139,6 +139,21 @@ namespace Universe.AppBase
                 _workerActions.Add((sp, token) => ((IHostedService)sp.GetRequiredService<S>()).StartAsync(token));
         }
 
+        static protected void AddService<S, W>(bool start, W instance)
+            where S : class
+            where W : class, S
+        {
+            _serviceActions.Add((ctx, sc) =>
+            {
+                sc.AddSingleton<S>(instance);
+            });
+
+            //worker
+            if (start)
+                _workerActions.Add((sp, token) => ((IHostedService)sp.GetRequiredService<S>()).StartAsync(token));
+        }
+
+
     }//class
 }
 
