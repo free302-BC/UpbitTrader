@@ -10,6 +10,8 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Universe.Utility;
+using Serilog;
+using System.IO;
 
 namespace Universe.AppBase
 {
@@ -29,6 +31,16 @@ namespace Universe.AppBase
             _serviceActions = new();
             _configActions = new();
             _workerActions = new();
+
+            Log.Logger = new LoggerConfiguration()
+                .Enrich.FromLogContext()
+                .WriteTo.Console()
+                .WriteTo.File(
+                    Path.Combine("logs", "serilog.log"),
+                    Serilog.Events.LogEventLevel.Information,
+                    encoding: Encoding.UTF8,
+                    outputTemplate: "[{Timestamp:yyyy-MM-dd HH:mm:ss.fff}] [{Level:u3}] {Message:lj}{NewLine}{Exception}")
+                .CreateLogger();
         }
 
         public static void RunHost()
@@ -56,6 +68,8 @@ namespace Universe.AppBase
         static IHostBuilder createHostBuilder(CancellationTokenSource cts)
         {
             var builder = Host.CreateDefaultBuilder();
+            //builder.UseSerilog();
+
             builder.ConfigureAppConfiguration(cb =>
             {
                 foreach (var action in _configActions) action(cb);

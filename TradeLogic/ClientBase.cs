@@ -34,7 +34,6 @@ namespace Universe.Coin.TradeLogic
         readonly string _wsUri;
         protected readonly WebClient _wc;
         protected readonly ClientWebSocket _ws;
-        readonly CancellationTokenSource _cts;
 
         public ClientBase(string wsUri, string accessKey, string secretKey, ILogger logger)
         {
@@ -45,7 +44,6 @@ namespace Universe.Coin.TradeLogic
             _wc = new();
             _ws = new();
 
-            _cts = new();
             _evPausing = new(false);
 
             init();
@@ -55,7 +53,6 @@ namespace Universe.Coin.TradeLogic
         {
             _wc?.Dispose();
             _ws?.Dispose();
-            _cts?.Dispose();
             _evPausing?.Dispose();
         }
 
@@ -107,7 +104,7 @@ namespace Universe.Coin.TradeLogic
         /// <summary>
         /// Connect and receive
         /// </summary>
-        public async Task ConnectWsAsync(IWsRequest request)
+        public async Task ConnectWsAsync(IWsRequest request, CancellationToken stoppingToken)
         {
             await connect();
             await sendWsRequest();
@@ -116,7 +113,7 @@ namespace Universe.Coin.TradeLogic
 
             Task connect()
             {
-                return _ws.ConnectAsync(new Uri(_wsUri), _cts.Token)
+                return _ws.ConnectAsync(new Uri(_wsUri), stoppingToken)
                     .ContinueWith(t => _logger.LogInformation($"Websocket connected: {_wsUri}"),
                         TaskContinuationOptions.OnlyOnRanToCompletion);//.Wait();
             }
@@ -125,7 +122,7 @@ namespace Universe.Coin.TradeLogic
                 _logger.LogInformation($"Websocket sending request...");
                 var json = request.ToJsonBytes();
                 var rm = new ReadOnlyMemory<byte>(json, 0, json.Length);
-                return _ws.SendAsync(rm, WebSocketMessageType.Binary, true, _cts.Token);
+                return _ws.SendAsync(rm, WebSocketMessageType.Binary, true, stoppingToken);
             }
 
             async Task wsReceiver()
@@ -135,11 +132,11 @@ namespace Universe.Coin.TradeLogic
                 var array = new byte[1024 * 1024];
                 Memory<byte> buffer = new(array);
 
-                while (_ws.State == WebSocketState.Open)
+                while (_ws.State == WebSocketState.Open && !stoppingToken.IsCancellationRequested)
                 {
                     await _evPausing.WaitOneAsync();
 
-                    var res = await _ws.ReceiveAsync(buffer, _cts.Token);
+                    var res = await _ws.ReceiveAsync(buffer, stoppingToken);
                     var json = Encoding.UTF8.GetString(array, 0, res.Count);
                     OnWsReceived?.Invoke(json);
                 }

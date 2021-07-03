@@ -53,9 +53,9 @@ namespace Universe.Coin.App
             }
         }
 
-        protected override void doWork()
+        protected override Task doWork(CancellationToken stoppingToken)
         {
-            while (true)
+            while (!stoppingToken.IsCancellationRequested)
             {
                 var ki = Console.ReadKey(true);
                 //info($"Invoking {ki.Key} cmd...");
@@ -68,6 +68,7 @@ namespace Universe.Coin.App
                 cmd?.Invoke(ki.Modifiers);
                 //Thread.Sleep(100);
             }
+            return Task.CompletedTask;
         }
         //protected override void workDone(){}
 

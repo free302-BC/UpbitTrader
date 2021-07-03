@@ -1,17 +1,17 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <CodeSnippets xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
 
-  <!-- Logging Extensions : Add Logging Action  -->
+  <!-- Logging Extensions : Add Logging Action with 1 parameter  -->
   <CodeSnippet Format="1.0.0">
     <Header>
-      <Title>Logging: Add Action</Title>
+      <Title>Logging: Action 1</Title>
     </Header>
     <Snippet>
       <Code Language="CSharp">
         <![CDATA[   
       // $EventName$($T1$ $T1Param$)
       static readonly Action<ILogger, $T1$, Exception?> _$EventName$
-      = LoggerMessage.Define<$T1$>(LogLevel.Information, new EventId($EID$, nameof($EventName$)), "$T1Param$ = '{$T1Param$}'");
+      = newInfo<$T1$>($EID$, nameof($EventName$), "{$T1Param$}");
       public static void $EventName$(this ILogger logger, $T1$ $T1Param$) 
             => _$EventName$(logger, $T1Param$, null);
       ]]>
@@ -37,6 +37,56 @@
           <ToolTip>Choose Event ID</ToolTip>
           <Default>1</Default>
         </Literal>        
+      </Declarations>
+    </Snippet>
+  </CodeSnippet>
+
+  <!-- Logging Extensions : Add Logging Action with 2 parameter  -->
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>Logging: Action 2</Title>
+    </Header>
+    <Snippet>
+      <Code Language="CSharp">
+        <![CDATA[   
+      // $EventName$($T1$ $T1Param$, $T2$ $T2Param$)
+      static readonly Action<ILogger, $T1$, $T2$, Exception?> _$EventName$
+      = newInfo<$T1$, $T2$>($EID$, nameof($EventName$), "{$T1Param$}, {$T2Param$}");
+      public static void $EventName$(this ILogger logger, $T1$ $T1Param$, $T2$ $T2Param$) 
+            => _$EventName$(logger, $T1Param$, $T2Param$,null);
+      ]]>
+      </Code>
+      <Declarations>
+        <Literal>
+          <ID>T1</ID>
+          <ToolTip>Choose Type Parameter</ToolTip>
+          <Default>string</Default>
+        </Literal>
+        <Literal>
+          <ID>T1Param</ID>
+          <ToolTip>Choose Parameter Name</ToolTip>
+          <Default>t1</Default>
+        </Literal>
+        <Literal>
+          <ID>T2</ID>
+          <ToolTip>Choose Type Parameter</ToolTip>
+          <Default>string</Default>
+        </Literal>
+        <Literal>
+          <ID>T2Param</ID>
+          <ToolTip>Choose Parameter Name</ToolTip>
+          <Default>t2</Default>
+        </Literal>
+        <Literal>
+          <ID>EventName</ID>
+          <ToolTip>Choose Field Name</ToolTip>
+          <Default>t1Requested</Default>
+        </Literal>
+        <Literal>
+          <ID>EID</ID>
+          <ToolTip>Choose Event ID</ToolTip>
+          <Default>1</Default>
+        </Literal>
       </Declarations>
     </Snippet>
   </CodeSnippet>

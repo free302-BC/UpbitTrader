@@ -37,7 +37,7 @@ namespace Universe.Coin.App
             });
         }
 
-        protected override void doWork()
+        protected override Task doWork(CancellationToken stoppingToken)
         {
             //market(_client);
             //account(_client);
@@ -48,6 +48,8 @@ namespace Universe.Coin.App
             //ticks(_client);
 
             runAutoTrade();
+
+            return Task.CompletedTask;
         }
 
         readonly ManualResetEvent _evPausing;

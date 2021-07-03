@@ -17,9 +17,5 @@ namespace Universe.Coin.TradeLogic
         public TimeModelQueue(int duration_sec) : base(duration_sec) { }
         public override void Add(M m) => Add(m, m.Timestamp);
 
-
-
-
-
     }
 }

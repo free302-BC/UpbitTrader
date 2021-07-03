@@ -3,6 +3,7 @@ using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Unicode;
+using System.Threading;
 using System.Threading.Tasks;
 using Universe.Coin.TradeLogic;
 using Universe.Coin.TradeLogic.Model;
@@ -13,7 +14,7 @@ namespace Universe.Coin.TradeLogic
     {
 
         #region ---- WebSocket ----
-        Task ConnectWsAsync(IWsRequest request);
+        Task ConnectWsAsync(IWsRequest request, CancellationToken stoppingToken);
         event Action<string>? OnWsReceived;
         void Pause(bool doPause);
         #endregion

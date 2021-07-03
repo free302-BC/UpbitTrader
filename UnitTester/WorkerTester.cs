@@ -82,11 +82,11 @@ namespace UnitTester
             new void info(object message) => Debug.WriteLine($"{message}");
             new void info(object message1, object message2) => Debug.WriteLine($"{message1}\n{message2}");
 
-            protected override void doWork()
+            protected override Task doWork(CancellationToken stoppingToken)
             {
                 MovingAvg_Speed_Test();
-
                 _sp.GetRequiredService<IHost>().StopAsync().Wait();
+                return Task.CompletedTask;
             }
 
             void MovingAvg_Speed_Test()

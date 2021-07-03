@@ -1,22 +1,30 @@
 --------- [ 미완료 ] ---------
 
-+ 체결강도
-+ 매수 매도 신호를 모델에 저장 ~ BackTestWorker부터
++ Queue 구현
+ - Tick실시간 계속 추가  ~ 완료
+ - 오래된 데이터 ~ 파일에 저장?
+ - 체결강도 알고리즘 추가
 
-+ TradeTick: 
- - Queue 구현 : 실시간 계속 추가, 데이터 파일에 저장
++ 매수 매도 신호 알고리즘 개발
+ - 모델에 저장
+ - 변동성 K 팩터 + MACD + 체결강도
+ - 손절, 익절 
+ - BackTestWorker
+ - TickWorker ~ 
 
-+ 알고리즘: 
- - 매 거래마다 K 변경 ~ MA 반영?
- - macd --> k 관계? 
++ 활성상태에서 알고리즘 파라미터 변경 기능
+ - 데탑앱 먼저 ~ 단일사용자 테스트 용도
 
-+ K 변경, 거래주기 변경~ 활성상태에서  --> 웹앱으로 변경, 
++ 웹앱으로 확장
  - 구조 설계 필요
  - API, Service, MiddleWare 설계
 
 
  --------- [ 완료 ] ---------
 
++ LoggerMessage 기반 로깅 시스템 구축
++ WorkerBase
+ - IHostedService 대신 BackgroundService 상속
 + ICalc: getter 제거, ICalcMode에 Value 추가
 + ICalc: offset 제거
 + JsonConverter 일반화 ~ 불필요!

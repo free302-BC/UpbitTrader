@@ -9,6 +9,7 @@ using System.IO;
 using Universe.Coin.TradeLogic;
 using Universe.Coin.TradeLogic.Model;
 using Universe.Coin.TradeLogic.Calc;
+using System.Threading.Tasks;
 
 namespace Universe.Coin.App
 {
@@ -91,9 +92,9 @@ namespace Universe.Coin.App
         static (int trades, decimal rate, decimal mdd) cast(BtRes res) => res;
 
         readonly ManualResetEvent _ev;
-        protected override void doWork()
+        protected override Task doWork(CancellationToken stoppingToken)
         {
-            while (true)
+            while (!stoppingToken.IsCancellationRequested)
             {
                 if (!_set.DoFindK) 
                     run_Units_K(_client);
@@ -104,6 +105,7 @@ namespace Universe.Coin.App
                 _ev.Reset();
                 _ev.WaitOne();
             }
+            return Task.CompletedTask;
         }
 
         /// <summary>

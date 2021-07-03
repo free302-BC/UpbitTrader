@@ -25,7 +25,6 @@ namespace Universe.Coin.App
         readonly TimeModelQueue<ICalcModel> _tickQ;
         public TickWorker(IServiceProvider sp, string id = "") : base(sp, id)
         {
-            _logger.Test("--- TEST ----");
             _tickQ = new(600);
 
             updateClient();
@@ -61,11 +60,11 @@ namespace Universe.Coin.App
             registerHotkey(ConsoleKey.F5, m => run_Tick());
         }
 
-        protected override void doWork()
+        protected override async Task doWork(CancellationToken stoppingToken)
         {
-            runWsTicker();
+            await runWsTicker();
 
-            async void runWsTicker()
+            async Task runWsTicker()
             {
                 try
                 {
@@ -75,7 +74,7 @@ namespace Universe.Coin.App
                     //request.AddTrade(CurrencyId.KRW, CoinId.BTC);
                     //request.AddOrderbook(CurrencyId.KRW, CoinId.BTC);
                     request.AddTicker(CurrencyId.KRW, CoinId.BTC);
-                    await _client.ConnectWsAsync(request);
+                    await _client.ConnectWsAsync(request, stoppingToken);
                 }
                 finally
                 {
