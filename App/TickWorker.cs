@@ -56,7 +56,7 @@ namespace Universe.Coin.App
                 //addTicker();
             }
 
-            info("\r\nPress <F5> to excute run_Tick()\r\n");
+            info("Press <F5> to excute run_Tick()");
             registerHotkey(ConsoleKey.F5, m => run_Tick());
         }
 
@@ -128,9 +128,10 @@ namespace Universe.Coin.App
         {
             var param = _set.CalcParam;
             var sb = new StringBuilder();
-            sb.AppendLine($"---- buy= {param.BuyMacd}, sell= {param.SellMacd} ----");
+            var count = 720;
+            info($"---- count={count}, buy= {param.BuyMacd}, sell= {param.SellMacd} ----");
 
-            var ticks = _client.ApiTicks(count: 200000).ToModels();
+            var ticks = _client.ApiTicks(count: count).ToModels();
 
             ICalc.CalcMovingAvg(ticks, param);
             ICalc.CalcMacd(ticks, param);
@@ -152,6 +153,7 @@ namespace Universe.Coin.App
         }
         void print(StringBuilder sb, IEnumerable<ICalcModel> models, string epilog = "")
         {
+            sb.AppendLine();
             foreach (var m in models) sb.AppendLine(m.ToCalcString());
             sb.AppendLine("----------------------------------------");
             sb.AppendLine(epilog);

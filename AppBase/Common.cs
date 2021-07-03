@@ -14,6 +14,7 @@ namespace Universe.AppBase
 {
     using JS = JsonSerializer;
     using JSO = JsonSerializerOptions;
+
     public static class Extensions
     {
         public static JSO Init(this JSO? opt)
@@ -22,6 +23,8 @@ namespace Universe.AppBase
             opt.IncludeFields = true;
             opt.WriteIndented = true;
             opt.PropertyNameCaseInsensitive = false;
+            opt.NumberHandling = JsonNumberHandling.AllowReadingFromString
+                | JsonNumberHandling.AllowNamedFloatingPointLiterals;
             opt.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
             opt.Encoder = JavaScriptEncoder.Create(UnicodeRanges.BasicLatin, UnicodeRanges.HangulSyllables);
             return opt;

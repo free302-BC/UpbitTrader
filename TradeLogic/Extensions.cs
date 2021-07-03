@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Net;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using Universe.Coin.TradeLogic.Model;
@@ -16,6 +17,8 @@ namespace Universe.Coin.TradeLogic
         public static string Print(this IEnumerable<IViewModel> models, int offset, int count)
             => IViewModel.Print(models, offset, count);
 
+
+        #region ---- move to Universe.Utility ----
 
         /// <summary>
         /// 멤버의 getter 'Func'과 setter 'Action'을 리턴
@@ -69,20 +72,23 @@ namespace Universe.Coin.TradeLogic
             Action<P> setterWithoutInstance = p => setter(instance, p);
 
             return (v0, setterWithoutInstance);
-        }
+        } 
+        #endregion
 
-        public static void LogWebException(this ILogger logger, WebException ex)
+
+        public static void LogWebException(this ILogger logger, HttpRequestException ex)
         {
             var nl = Environment.NewLine;
-            var msg = $"uri= { ex.Response?.ResponseUri}{nl}ex.Status={ex.Status}{nl}ex.Message= {ex.Message}";
-            if (ex.Response != null)
-            {
-                var res = (HttpWebResponse)ex.Response;
-                Span<byte> buffer = stackalloc byte[1024];
-                res.GetResponseStream().Read(buffer);
-                var text = Encoding.ASCII.GetString(buffer);
-                msg = $"{msg}{nl}res.StatusCode= {res.StatusCode}{nl}res.Content= {text}";
-            }
+            var msg = $"ex.StatusCode={ex.StatusCode}{nl}ex.Message= {ex.Message}";
+
+            //if (ex. != null)
+            //{
+            //    var res = (HttpWebResponse)ex.Response;
+            //    Span<byte> buffer = stackalloc byte[1024];
+            //    res.GetResponseStream().Read(buffer);
+            //    var text = Encoding.ASCII.GetString(buffer);
+            //    msg = $"{msg}{nl}res.StatusCode= {res.StatusCode}{nl}res.Content= {text}";
+            //}
             logger.LogError(msg);
         }
 

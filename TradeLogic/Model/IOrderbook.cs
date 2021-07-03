@@ -16,18 +16,7 @@ namespace Universe.Coin.TradeLogic.Model
 
         long Timestamp { get; set; }
         decimal TotalAskSize { get; set; }
-        decimal TotalBidSize { get; set; }
-
-        static JsonSerializerOptions _jsonOption;
-        static IOrderbook()
-        {
-            _jsonOption = new JsonSerializerOptions
-            {
-                IncludeFields = true,
-                WriteIndented = true,
-                PropertyNameCaseInsensitive = false
-            };
-        }
+        decimal TotalBidSize { get; set; }      
 
     }//class
 }

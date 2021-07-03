@@ -1,5 +1,4 @@
 ﻿using System;
-using UnitTester;
 using Universe.Coin.TradeLogic.Calc;
 
 namespace Tester

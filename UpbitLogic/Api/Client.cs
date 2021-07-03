@@ -59,12 +59,13 @@ namespace Universe.Coin.Upbit
 
         protected override void init()
         {
-            _wc.SetAuthToken(_key);
-            _wc.SetAcceptance();
-            _wc.SetAcceptEncoding();
+            setAuthToken();
+            setAcceptance();
+            setAcceptEncoding();
             _ws.Options.KeepAliveInterval = new TimeSpan(0, 1, 30);
         }
-        
+        protected override string buildAuthKey(KeyPair key) => Helper.BuildAuthToken(key);
+
         /// <summary>
         /// api 호출에 필요한 사전작업 수행 
         /// </summary>
@@ -73,7 +74,7 @@ namespace Universe.Coin.Upbit
         /// <returns>http uri</returns>
         protected override string prepareInvoke(ApiId api, string postPath)
         {
-            if (Helper.GetApi(api).ResetAuthToken) _wc.SetAuthToken(_key);
+            if (Helper.GetApi(api).ResetAuthToken) setAuthToken();
             return Helper.GetApiPath(api, postPath);
         }
 

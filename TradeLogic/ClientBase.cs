@@ -4,6 +4,8 @@ using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Net.WebSockets;
 using System.Text;
 using System.Text.Encodings.Web;
@@ -12,7 +14,7 @@ using System.Text.Json.Serialization;
 using System.Text.Unicode;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Web;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 using Universe.Coin.TradeLogic;
 using Universe.Coin.TradeLogic.Model;
@@ -27,13 +29,15 @@ namespace Universe.Coin.TradeLogic
     /// </summary>
     public abstract class ClientBase : IClientBase
     {
-        protected readonly KeyPair _key;
+        readonly KeyPair _key;
         protected readonly ILogger _logger;
         readonly JsonSerializerOptions _jsonOptions;
 
         readonly string _wsUri;
-        protected readonly WebClient _wc;
+        protected readonly HttpClient _wc;// WebClient _wc;
+        //protected readonly WebClient _wc;// WebClient _wc;
         protected readonly ClientWebSocket _ws;
+        readonly Dictionary<string, string> _query;
 
         public ClientBase(string wsUri, string accessKey, string secretKey, ILogger logger)
         {
@@ -43,6 +47,7 @@ namespace Universe.Coin.TradeLogic
 
             _wc = new();
             _ws = new();
+            _query = new();
 
             _evPausing = new(false);
 
@@ -55,7 +60,6 @@ namespace Universe.Coin.TradeLogic
             _ws?.Dispose();
             _evPausing?.Dispose();
         }
-
 
         /// <summary>
         /// 추가적인 객체 초기화 코드
@@ -156,25 +160,29 @@ namespace Universe.Coin.TradeLogic
         /// <param name="apiId"></param>
         /// <param name="postPath">Api URL에 추가할 경로: ex) minutes candle의 unit</param>
         /// <returns></returns>
-        public virtual (ApiResultCode code, M[] data) InvokeApi<M>(ApiId api, string postPath = "")
+        public async Task<(ApiResultCode code, M[] data)> InvokeApi<M>(ApiId api, string postPath = "")
             where M : IApiModel//, new()
         {
-            return InvokeApi<M>(api, typeof(M), postPath);
+            return await InvokeApi<M>(api, typeof(M), postPath);
         }
-        public virtual (ApiResultCode code, M[] data) InvokeApi<M>(ApiId api, Type implType, string postPath = "")
+        public async Task<(ApiResultCode code, M[] data)> InvokeApi<M>(ApiId api, Type implType, string postPath = "")
             where M : IApiModel//, new()
         {
-            var httpUri = prepareInvoke(api, postPath);
+            var httpUri = QueryHelpers.AddQueryString(prepareInvoke(api, postPath), _query);
 
             try
             {
-                var raw = _wc.DownloadData(httpUri);
-                var enc = _wc.ResponseHeaders?["Content-Encoding"] ?? "?";
+                //var raw = _wc.DownloadData(httpUri);
+                var response = await _wc.GetAsync(httpUri);
+                response.EnsureSuccessStatusCode();
+                var raw = await response.Content.ReadAsByteArrayAsync();
+
+                var enc = response.Headers.GetValues("Content-Encoding").FirstOrDefault() ?? "?";
                 string json = enc[0] == 'g' ? Compression.Unzip(raw).ToUtf8String() : raw.ToUtf8String();
                 var models = (M[])JS.Deserialize(json, implType.MakeArrayType(), _jsonOptions)!;
                 return (models.Length == 0 ? ApiResultCode.OkEmpty : ApiResultCode.Ok, models);
             }
-            catch (WebException ex)
+            catch (HttpRequestException ex)
             {
                 _logger.LogWebException(ex);
                 return (ApiResultCode.TooMany, Array.Empty<M>());
@@ -189,17 +197,31 @@ namespace Universe.Coin.TradeLogic
         /// <returns>http uri</returns>
         protected abstract string prepareInvoke(ApiId apiId, string postPath);
 
-
-        protected void clearQueryString() => _wc.QueryString.Clear();
-        protected void setQueryString(string name, string value) => _wc.QueryString[name] = value;
-        protected void addQueryString(string name, string value) => _wc.QueryString.Add(name, value);
-        protected void setQueryString(string name, int count) => _wc.QueryString[name] = count.ToString();
-
-
-
-
         #endregion
 
+
+        #region ---- Http Helper ----
+
+        protected void clearQueryString() => _query.Clear();
+        protected void setQueryString(string name, string value) => _query[name] = value;
+        protected void addQueryString(string name, string value) => _query.Add(name, value);
+        protected void setQueryString(string name, int count) => _query[name] = count.ToString();
+
+        protected abstract string buildAuthKey(KeyPair key);
+
+        protected void setAuthToken() => _wc.DefaultRequestHeaders.Authorization
+            = new AuthenticationHeaderValue("Bearer", buildAuthKey(_key));
+
+        protected void setAcceptance()
+            => _wc.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+        protected void setAcceptEncoding()
+            => _wc.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("gzip"));
+
+        protected void clearAcceptEncoding()
+            => _wc.DefaultRequestHeaders.AcceptEncoding.Clear();
+
+        #endregion
 
     }//class
 }

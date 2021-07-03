@@ -32,6 +32,7 @@ namespace Universe.AppBase
             _configActions = new();
             _workerActions = new();
 
+            //Serilog init
             Log.Logger = new LoggerConfiguration()
                 .Enrich.FromLogContext()
                 .WriteTo.Console()
@@ -68,7 +69,7 @@ namespace Universe.AppBase
         static IHostBuilder createHostBuilder(CancellationTokenSource cts)
         {
             var builder = Host.CreateDefaultBuilder();
-            //builder.UseSerilog();
+            builder.UseSerilog();
 
             builder.ConfigureAppConfiguration(cb =>
             {

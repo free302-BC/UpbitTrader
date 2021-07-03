@@ -14,6 +14,7 @@ using Universe.Utility;
 using Universe.CryptoLogic;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Universe.Coin.TradeLogic;
 
 namespace Universe.Coin.Upbit
 {
@@ -24,7 +25,7 @@ namespace Universe.Coin.Upbit
         {
             try
             {
-                _jsonOption = getJsonOptions();
+                _jsonOption = IClientBase._jsonOptions;//getJsonOptions();
 
                 _apiDic = loadApiJson(_jsonOption);//API url & path
                 _coinNames = loadCoinJson(_jsonOption);//coin name dic
@@ -54,6 +55,8 @@ namespace Universe.Coin.Upbit
             opt.IncludeFields = true;
             opt.WriteIndented = true;
             opt.PropertyNameCaseInsensitive = false;
+            opt.NumberHandling = JsonNumberHandling.AllowReadingFromString
+                | JsonNumberHandling.AllowNamedFloatingPointLiterals;
             opt.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
             opt.Encoder = JavaScriptEncoder.Create(UnicodeRanges.BasicLatin, UnicodeRanges.HangulSyllables);
             return opt;

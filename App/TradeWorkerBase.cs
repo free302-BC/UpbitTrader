@@ -56,17 +56,6 @@ namespace Universe.Coin.App
             _cmdProvider.RemoveCmd(key, handler);
         }
 
-        static JsonSerializerOptions buildJsonOptions()
-        {
-            var opt = new JsonSerializerOptions();
-            opt.IncludeFields = true;
-            opt.WriteIndented = true;
-            opt.PropertyNameCaseInsensitive = false;
-            opt.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
-            opt.Encoder = JavaScriptEncoder.Create(UnicodeRanges.BasicLatin, UnicodeRanges.HangulSyllables);
-            return opt;
-        }
-
     }//class
 
 }
