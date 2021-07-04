@@ -41,7 +41,7 @@ namespace Universe.Coin.Upbit
                 try
                 {
                     _timeCounter.Add();
-                    var (code, res) = InvokeApi<C>(ApiId.TradeTicks, typeof(C));
+                    var (code, res) = InvokeApi<C>(ApiId.TradeTicks, typeof(C)).Result;//TODO: await or result?
 
                     if (code == ApiResultCode.Ok)
                     {

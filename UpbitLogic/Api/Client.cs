@@ -84,7 +84,8 @@ namespace Universe.Coin.Upbit
             => addQueryString(name, Helper.GetMarketId(currency, coin));
 
 
-        public IMarketInfo[] ApiMarketInfo() => InvokeApi<MarketInfo>(ApiId.MarketInfoAll).data;
+        public IMarketInfo[] ApiMarketInfo() 
+            => InvokeApi<MarketInfo>(ApiId.MarketInfoAll).Result.data;
 
         public string ApiTest(IApiParam param) => param.ToString()!;
 

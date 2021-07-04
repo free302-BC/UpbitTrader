@@ -11,7 +11,7 @@ using Universe.Coin.App;
 
 namespace Universe.Coin.AppGui
 {
-    using EventDic = Dictionary<ConsoleKey, CommandListener>;
+    using EventDic = Dictionary<ConsoleKey, CommandAction>;
 
     public partial class MainForm : Form, ICommandProvider
     {
@@ -26,7 +26,7 @@ namespace Universe.Coin.AppGui
         readonly EventDic _listeners;
         readonly object _lock;
 
-        public void AddCmd(ConsoleKey key, CommandListener cmd)
+        public void AddAction(ConsoleKey key, CommandAction cmd)
         {
             lock (_lock)
             {
@@ -34,7 +34,7 @@ namespace Universe.Coin.AppGui
                 else _listeners[key] = cmd;
             }
         }
-        public void RemoveCmd(ConsoleKey key, CommandListener cmd)
+        public void RemoveAction(ConsoleKey key, CommandAction cmd)
         {
             lock (_lock)
             {

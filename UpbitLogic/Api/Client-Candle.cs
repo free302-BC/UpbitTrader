@@ -51,7 +51,7 @@ namespace Universe.Coin.Upbit
                 try
                 {
                     _timeCounter.Add();
-                    var (code, res) = InvokeApi<C>(api, implType, postPath);
+                    var (code, res) = InvokeApi<C>(api, implType, postPath).Result;//TODO: await or result?
 
                     if (code == ApiResultCode.Ok)
                     {

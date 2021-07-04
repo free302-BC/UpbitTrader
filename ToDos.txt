@@ -1,11 +1,12 @@
 --------- [ 미완료 ] ---------
 
++ 체결강도 알고리즘 추가
+
 + GUI
 
 + Queue 구현
  - Tick실시간 계속 추가  ~ 완료
  - 오래된 데이터 ~ 파일에 저장?
- - 체결강도 알고리즘 추가
 
 + 매수 매도 신호 알고리즘 개발
  - 모델에 저장
@@ -24,6 +25,7 @@
 
  --------- [ 완료 ] ---------
 
++ InputWorker: 구독자의 코드를 실행하면 안됨 --> 별도 task에서 실행
 + LoggerMessage 기반 로깅 시스템 구축
 + WorkerBase
  - IHostedService 대신 BackgroundService 상속

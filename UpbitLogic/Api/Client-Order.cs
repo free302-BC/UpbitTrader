@@ -23,8 +23,9 @@ namespace Universe.Coin.Upbit
             clearQueryString();
             setQueryString("markets", currency, coin);
 
-            return InvokeApi<Orderbook>(ApiId.OrderOrderbook).data?.FirstOrDefault()?? new();
-        }        
+            var res = InvokeApi<Orderbook>(ApiId.OrderOrderbook).Result;//TODO: await or result?
+            return res.data?.FirstOrDefault() ?? new();
+        }
 
     }//class
 }

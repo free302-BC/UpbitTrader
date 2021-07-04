@@ -6,11 +6,17 @@ using System.Linq.Expressions;
 using System.Net;
 using System.Net.Http;
 using System.Text;
+using System.Text.Encodings.Web;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.Text.Unicode;
 using System.Threading.Tasks;
 using Universe.Coin.TradeLogic.Model;
 
 namespace Universe.Coin.TradeLogic
 {
+    using JSO = JsonSerializerOptions;
+
     public static class Extensions
     {
         public static string Print(this IEnumerable<IViewModel> models) => IViewModel.Print(models);
@@ -90,6 +96,19 @@ namespace Universe.Coin.TradeLogic
             //    msg = $"{msg}{nl}res.StatusCode= {res.StatusCode}{nl}res.Content= {text}";
             //}
             logger.LogError(msg);
+        }
+
+        public static JSO Init(this JSO? opt)
+        {
+            opt = opt ?? new JSO();
+            opt.IncludeFields = true;
+            opt.WriteIndented = true;
+            opt.PropertyNameCaseInsensitive = false;
+            opt.NumberHandling = JsonNumberHandling.AllowReadingFromString
+                | JsonNumberHandling.AllowNamedFloatingPointLiterals;
+            opt.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
+            opt.Encoder = JavaScriptEncoder.Create(UnicodeRanges.BasicLatin, UnicodeRanges.HangulSyllables);
+            return opt;
         }
 
     }

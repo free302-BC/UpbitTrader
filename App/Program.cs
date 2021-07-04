@@ -19,8 +19,8 @@ namespace Universe.Coin.App
             #region ---- key input listener ----
             AddService<ICommandProvider, InputWorker>(
                 start: true,
-                postFactory: (sp, iw) => 
-                    iw.AddCmd(ConsoleKey.Escape, m => sp.GetRequiredService<IHost>().StopAsync().Wait()));
+                postInit: (sp, iw) => 
+                    iw.AddAction(ConsoleKey.Escape, m => sp.GetRequiredService<IHost>().StopAsync().Wait()));
             #endregion
 
             //AddWorker<BackTestWorker, BackTestOptions>("backtest.json", "1");

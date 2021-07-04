@@ -19,7 +19,7 @@ namespace Universe.Coin.Upbit
 {
     public partial class Client : ClientBase
     {
-        public IAccount[] ApiAccount() => InvokeApi<Account>(ApiId.AccountInfo).data;
+        public IAccount[] ApiAccount() => InvokeApi<Account>(ApiId.AccountInfo).Result.data;
 
         public decimal GetBalance(CurrencyId currency)
         {

@@ -2,11 +2,11 @@
 
 namespace Universe.Coin.App
 {
-    public delegate void CommandListener(ConsoleModifiers modifiers);
+    public delegate void CommandAction(ConsoleModifiers modifiers);
 
     public interface ICommandProvider
     {
-        void AddCmd(ConsoleKey key, CommandListener cmd);
-        void RemoveCmd(ConsoleKey key, CommandListener cmd);
+        void AddAction(ConsoleKey key, CommandAction cmd);
+        void RemoveAction(ConsoleKey key, CommandAction cmd);
     }
 }

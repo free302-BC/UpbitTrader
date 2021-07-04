@@ -25,7 +25,7 @@ namespace Universe.Coin.Upbit
         {
             try
             {
-                _jsonOption = IClientBase._jsonOptions;//getJsonOptions();
+                _jsonOption = new JsonSerializerOptions().Init();
 
                 _apiDic = loadApiJson(_jsonOption);//API url & path
                 _coinNames = loadCoinJson(_jsonOption);//coin name dic

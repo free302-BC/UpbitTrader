@@ -33,17 +33,7 @@ namespace Universe.Coin.TradeLogic
 
         static IClientBase()
         {
-            _jsonOptions = new JsonSerializerOptions
-            {
-                IncludeFields = true,
-                WriteIndented = true,
-                PropertyNameCaseInsensitive = false,
-                NumberHandling = JsonNumberHandling.AllowReadingFromString
-                | JsonNumberHandling.AllowNamedFloatingPointLiterals
-            };
-            _jsonOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
-            _jsonOptions.Encoder = JavaScriptEncoder.Create(UnicodeRanges.BasicLatin, UnicodeRanges.HangulSyllables);
-            //initJsonOption(_jsonOption);
+            _jsonOptions = new JsonSerializerOptions().Init();
         }
 
         //JsonSerializerOptions JsonOptions { get; }

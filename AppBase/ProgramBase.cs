@@ -96,12 +96,12 @@ namespace Universe.AppBase
         /// <typeparam name="S">option type</typeparam>
         /// <param name="workerConfigFile"></param>
         /// <param name="workerId"></param>
-        /// <param name="postFactory">instance 생성후 수행할 액션</param>
+        /// <param name="postInit">instance 생성후 수행할 액션</param>
         /// <param name="lifeTime"></param>
         static protected void AddWorker<W, S>(
             string workerConfigFile = "",
             string workerId = "",
-            Action<IServiceProvider, W>? postFactory = null,
+            Action<IServiceProvider, W>? postInit = null,
             ServiceLifetime lifeTime = ServiceLifetime.Singleton)
             where W : WorkerBase<W, S>
             where S : class, IWorkerOptions
@@ -116,7 +116,7 @@ namespace Universe.AppBase
                 W factory(IServiceProvider sp)
                 {
                     var w = ActivatorUtilities.CreateInstance<W>(sp, _idQ.Dequeue());
-                    postFactory?.Invoke(sp, w);
+                    postInit?.Invoke(sp, w);
                     return w;
                 }
                 _ = lifeTime switch
@@ -134,7 +134,7 @@ namespace Universe.AppBase
             _workerActions.Add((sp, token) => ((IHostedService)sp.GetRequiredService<W>()).StartAsync(token));
         }
 
-        static protected void AddService<S, W>(bool start, Action<IServiceProvider, W>? postFactory = null)
+        static protected void AddService<S, W>(bool start, Action<IServiceProvider, W>? postInit = null)
             where S : class
             where W : class, S
         {
@@ -143,7 +143,7 @@ namespace Universe.AppBase
                 W factory(IServiceProvider sp)
                 {
                     var w = ActivatorUtilities.CreateInstance<W>(sp);
-                    postFactory?.Invoke(sp, w);
+                    postInit?.Invoke(sp, w);
                     return w;
                 }
                 sc.AddSingleton<S>(factory);

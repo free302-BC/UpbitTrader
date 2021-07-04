@@ -177,7 +177,7 @@ namespace Universe.Coin.TradeLogic
                 response.EnsureSuccessStatusCode();
                 var raw = await response.Content.ReadAsByteArrayAsync();
 
-                var enc = response.Headers.GetValues("Content-Encoding").FirstOrDefault() ?? "?";
+                var enc = response.Content.Headers.GetValues("Content-Encoding").FirstOrDefault() ?? "?";
                 string json = enc[0] == 'g' ? Compression.Unzip(raw).ToUtf8String() : raw.ToUtf8String();
                 var models = (M[])JS.Deserialize(json, implType.MakeArrayType(), _jsonOptions)!;
                 return (models.Length == 0 ? ApiResultCode.OkEmpty : ApiResultCode.Ok, models);

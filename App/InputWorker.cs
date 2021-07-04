@@ -18,40 +18,62 @@ using Universe.Utility;
 
 namespace Universe.Coin.App
 {
-    using EventDic = Dictionary<ConsoleKey, CommandListener>;
+    using ActionDic = Dictionary<ConsoleKey, CommandAction>;
+    //using SignalDic = Dictionary<ConsoleKey, List<EventWaitHandle>>;
 
     public class InputWorker : WorkerBase<InputWorker, TradeWorkerOptions>, ICommandProvider
     {
-
         public InputWorker(IServiceProvider sp) : base(sp, "")
         {
-            _listeners = new();
+            _actions = new();
+            //_signals = new();
             _lock = new();
         }
 
-        readonly EventDic _listeners;
+        readonly ActionDic _actions;
+        //readonly SignalDic _signals;
         readonly object _lock;
 
-        public void AddCmd(ConsoleKey key, CommandListener cmd)
+        public void AddAction(ConsoleKey key, CommandAction cmd)
         {
             lock (_lock)
             {
-                if (_listeners.ContainsKey(key)) _listeners[key] += cmd;
-                else _listeners[key] = cmd;
+                if (_actions.ContainsKey(key)) _actions[key] += cmd;
+                else _actions[key] = cmd;
             }
         }
-        public void RemoveCmd(ConsoleKey key, CommandListener cmd)
+        public void RemoveAction(ConsoleKey key, CommandAction cmd)
         {
             lock (_lock)
             {
-                if (_listeners.ContainsKey(key))
+                if (_actions.ContainsKey(key))
                 {
-                    var result = _listeners[key] - cmd;
-                    if (result is null) _listeners.Remove(key);
-                    else _listeners[key] = result;
+                    var result = _actions[key] - cmd;
+                    if (result is null) _actions.Remove(key);
+                    else _actions[key] = result;
                 }
             }
         }
+
+        //public void AddSignal(ConsoleKey key, EventWaitHandle signal)
+        //{
+        //    lock (_lock)
+        //    {
+        //        if (_signals.ContainsKey(key)) _signals[key].Add(signal);
+        //        else _signals[key] = new() { signal };
+        //    }
+        //}
+        //public void RemoveSignal(ConsoleKey key, EventWaitHandle signal)
+        //{
+        //    lock (_lock)
+        //    {
+        //        if (_signals.ContainsKey(key))
+        //        {
+        //            var result = _signals[key].Remove(signal);
+        //            if (result && _signals[key].Count == 0) _signals.Remove(key);
+        //        }
+        //    }
+        //}
 
         protected override Task doWork(CancellationToken stoppingToken)
         {
@@ -60,18 +82,33 @@ namespace Universe.Coin.App
                 var ki = Console.ReadKey(true);
                 //info($"Invoking {ki.Key} cmd...");
 
-                CommandListener? cmd = null;
+                CommandAction? cmd = null;
+                //List<EventWaitHandle>? list = null;
                 lock (_lock)
                 {
-                    if (_listeners.ContainsKey(ki.Key)) cmd = _listeners[ki.Key];
+                    if (_actions.ContainsKey(ki.Key)) cmd = _actions[ki.Key];
+                   // if (_signals.ContainsKey(ki.Key)) list = _signals[ki.Key];
                 }
-                cmd?.Invoke(ki.Modifiers);
-                //Thread.Sleep(100);
+
+                //try
+                //{
+                    if (cmd != null) Task.Run(() => cmd.Invoke(ki.Modifiers))
+                        .ContinueWith(t => logEx(ki, t.Exception) , TaskContinuationOptions.OnlyOnFaulted);
+                    //if(list != null) foreach (var h in list) h.Set();
+                //}
+                //catch (Exception ex)
+                //{
+                //    logEx(ki, ex);
+                //}
             }
             return Task.CompletedTask;
-        }
-        //protected override void workDone(){}
 
+            void logEx(ConsoleKeyInfo ki, Exception? ex)
+            {
+                var key = ki.Modifiers == 0 ? ki.Key.ToString() : $"{ki.Modifiers}, {ki.Key}";
+                log($"Error executing <{key}>", ex);
+            }
+        }
 
     }//class
 }

@@ -13,6 +13,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Universe.AppBase;
 using Universe.Coin.TradeLogic;
 using Universe.Utility;
+using System.Threading;
 //using Universe.Coin.Upbit;
 
 namespace Universe.Coin.App
@@ -30,11 +31,13 @@ namespace Universe.Coin.App
         readonly ICommandProvider _cmdProvider;
         protected readonly IClient _client;
         protected readonly JsonSerializerOptions _jsonOptions;
+        readonly AutoResetEvent _cmdSignal;
 
         protected TradeWorkerBase(IServiceProvider sp, string id = "") : base(sp, id)
         {
             _cmdProvider = sp.GetRequiredService<ICommandProvider>();
             _jsonOptions = _jsonOptions.Init();// buildJsonOptions();
+            _cmdSignal = new(false);
 
             var logger = _sp.GetRequiredService<ILogger<IClient>>();
             _client = UvLoader.Create<IClient>(_set.AssemblyFile, _set.ClientFullName,
@@ -47,13 +50,13 @@ namespace Universe.Coin.App
             base.Dispose();
         }
 
-        protected void registerHotkey(ConsoleKey key, CommandListener handler)
+        protected void registerHotkey(ConsoleKey key, CommandAction handler)
         {
-            _cmdProvider.AddCmd(key, handler);
+            _cmdProvider.AddAction(key, handler);
         }
-        protected void unregisterHotkey(ConsoleKey key, CommandListener handler)
+        protected void unregisterHotkey(ConsoleKey key, CommandAction handler)
         {
-            _cmdProvider.RemoveCmd(key, handler);
+            _cmdProvider.RemoveAction(key, handler);
         }
 
     }//class

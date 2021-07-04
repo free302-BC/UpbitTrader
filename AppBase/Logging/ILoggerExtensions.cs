@@ -50,15 +50,8 @@ namespace Universe.AppBase.Logging
 
         static ILoggerExtensions()
         {
-            //_Info = newInfo<object?>(1, nameof(Info), 
-            //    "{message}");
-            //_Info2 = newInfo<object?, object?>(2, nameof(Info), 
-            //    $"{{message1}}{Environment.NewLine}{{message2}}");
-            //_Error = newError<object?>(3, nameof(Error), 
-            //    "{message}");
-
             File.WriteAllText("logging_events.json", JS.Serialize(_items.Values,
-                new JsonSerializerOptions().Init()));
+                new JsonSerializerOptions { WriteIndented = true }));
         }
 
         #endregion
