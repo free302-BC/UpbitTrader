@@ -56,7 +56,7 @@ namespace Universe.Coin.TradeLogic
             _evPausing = new(false);
 
             init();
-            _jsonOptions = new JsonSerializerOptions(IClientBase._jsonOptions);//clone
+            _jsonOptions = new JsonSerializerOptions().Init();
         }
         public void Dispose()
         {

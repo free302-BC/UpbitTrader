@@ -7,6 +7,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\TradeLogic\TradeLogic.csproj" />
+    <ProjectReference Include="..\UnitTester\UnitTester.csproj" />
   </ItemGroup>
 
 </Project>

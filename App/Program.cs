@@ -16,17 +16,23 @@ namespace Universe.Coin.App
         static void Main(string[] args)
         {
 
-            #region ---- key input listener ----
+            #region ---- console key listener ----
+
             AddService<ICommandProvider, InputWorker>(
                 start: true,
-                postInit: (sp, iw) => 
-                    iw.AddAction(ConsoleKey.Escape, m => sp.GetRequiredService<IHost>().StopAsync().Wait()));
+                postInit: (sp, iw) =>
+                {
+                    //iw.AddAction(ConsoleKey.Escape, m => sp.GetRequiredService<IHost>().StopAsync().Wait()));
+                    iw.OnQuit += () => sp.GetRequiredService<IHost>().StopAsync().Wait();
+                    iw.QuitKey = ConsoleKey.Escape;
+                });
+
             #endregion
 
             //AddWorker<BackTestWorker, BackTestOptions>("backtest.json", "1");
             //AddWorker<BackTestWorker, BackTestOptions>(workerId: "2");
             //AddWorker<AutoTradingWorker, AutoTradingWorkerOptions>("autotrading.json");
-            
+
             AddWorker<TickWorker, TickWorkerOptions>("tick.json", "Upbit");
             //AddWorker<TickerWorker, TickerWorkerOptions>(workerId: "Binance");
 

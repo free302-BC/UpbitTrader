@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 
 namespace Universe.Coin.App
 {
@@ -6,7 +7,9 @@ namespace Universe.Coin.App
 
     public interface ICommandProvider
     {
-        void AddAction(ConsoleKey key, CommandAction cmd);
-        void RemoveAction(ConsoleKey key, CommandAction cmd);
+        //void AddAction(ConsoleKey key, CommandAction cmd);
+        //void RemoveAction(ConsoleKey key, CommandAction cmd);
+        void AddSignal(ConsoleKey key, EventWaitHandle signal);
+        void RemoveSignal(ConsoleKey key, EventWaitHandle signal);
     }
 }

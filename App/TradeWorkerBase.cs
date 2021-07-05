@@ -35,7 +35,7 @@ namespace Universe.Coin.App
         protected TradeWorkerBase(IServiceProvider sp, string id = "") : base(sp, id)
         {
             _cmdProvider = sp.GetRequiredService<ICommandProvider>();
-            _jsonOptions = _jsonOptions.Init();
+            _jsonOptions = new JsonSerializerOptions().Init();
 
             var logger = _sp.GetRequiredService<ILogger<IClient>>();
             _client = UvLoader.Create<IClient>(_set.AssemblyFile, _set.ClientFullName,
@@ -50,12 +50,15 @@ namespace Universe.Coin.App
 
         protected void registerHotkey(ConsoleKey key, CommandAction handler)
         {
-            _cmdProvider.AddAction(key, handler);
+            //_cmdProvider.AddAction(key, handler);
         }
         protected void unregisterHotkey(ConsoleKey key, CommandAction handler)
         {
-            _cmdProvider.RemoveAction(key, handler);
+            //_cmdProvider.RemoveAction(key, handler);
         }
+
+
+
 
     }//class
 

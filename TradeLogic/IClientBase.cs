@@ -39,16 +39,7 @@ namespace Universe.Coin.TradeLogic
         #endregion
 
 
-        #region ---- Json Options ----
-
-        static IClientBase()
-        {
-            _jsonOptions = new JsonSerializerOptions().Init();
-        }
-
-        //JsonSerializerOptions JsonOptions { get; }
-        protected static readonly JsonSerializerOptions _jsonOptions;
-
+        #region ---- Interface Type Implimentation & Json ----
 
         Type GetImplType<I>();
         I CreateInstance<I>();

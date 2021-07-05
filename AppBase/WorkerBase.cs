@@ -55,7 +55,9 @@ namespace Universe.AppBase
             {
                 Thread.CurrentThread.Name = $"{Id}";
                 info($"<{Id}> ExecuteAsync()...");
+
                 doWork(stoppingToken);
+
             }, stoppingToken)
 
             .ContinueWith(

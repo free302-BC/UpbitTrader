@@ -5,6 +5,7 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Universe.Coin.App;
@@ -24,27 +25,16 @@ namespace Universe.Coin.AppGui
         }
 
         readonly EventDic _listeners;
-        readonly object _lock;
+        readonly object _lock;                
 
-        public void AddAction(ConsoleKey key, CommandAction cmd)
+        public void AddSignal(ConsoleKey key, EventWaitHandle signal)
         {
-            lock (_lock)
-            {
-                if (_listeners.ContainsKey(key)) _listeners[key] += cmd;
-                else _listeners[key] = cmd;
-            }
+            throw new NotImplementedException();
         }
-        public void RemoveAction(ConsoleKey key, CommandAction cmd)
+
+        public void RemoveSignal(ConsoleKey key, EventWaitHandle signal)
         {
-            lock (_lock)
-            {
-                if (_listeners.ContainsKey(key))
-                {
-                    var result = _listeners[key] - cmd;
-                    if (result is null) _listeners.Remove(key);
-                    else _listeners[key] = result;
-                }
-            }
+            throw new NotImplementedException();
         }
     }
 }
