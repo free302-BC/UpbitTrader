@@ -19,7 +19,13 @@ namespace Universe.Coin.TradeLogic.Model
         decimal Macd { get; set; }
         decimal MacdOsc { get; set; }
 
+        //ABR 계산용
+        int NumAsks { get; set; }
+        int NumBids { get; set; }
+        decimal ABR { get; set; }
+
         decimal Target { get; set; }
+        decimal BuyPrice { get; set; }
         TimingSignal Signal { get; set; }
         bool TradeDone { get; set; }
 

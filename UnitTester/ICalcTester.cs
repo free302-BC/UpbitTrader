@@ -11,13 +11,10 @@ namespace UnitTester
 {
     public class ICalcTester
     {
-        [Fact]
-        void test()
-        {
-            //ICalc.MovingAvgTest();
-            ICalc.MacdTest();
-            //ICalc.NormalizedTest();
-        }
+        [Fact] void MovingAvgTest() => ICalc.MovingAvgTest();
+        [Fact] void MacdTest() => ICalc.MacdTest();
+        [Fact] void NormalizedTest() => ICalc.NormalizedTest();
+        [Fact] void MacdProfitRate() => ICalc.MacdProfitRate();
 
     }
 }

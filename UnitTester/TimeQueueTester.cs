@@ -17,7 +17,8 @@ namespace UnitTester
     {
         static Stopwatch _watch = Stopwatch.StartNew();
 
-        [Fact]public static void timeQ_calcModel()
+        [Fact]
+        public static void timeQ_calcModel()
         {
             var data = Enumerable.Range(0, 100000).Select(x => new M(x * 100));
             var q1 = new TimeModelQueue<M>(600);
@@ -51,7 +52,13 @@ namespace UnitTester
             public decimal MovingAvg { get; set; }
             public decimal Macd { get; set; }
             public decimal MacdOsc { get; set; }
+
+            public int NumAsks { get; set; }
+            public int NumBids { get; set; }
+            public decimal ABR { get; set; }
+
             public decimal Target { get; set; }
+            public decimal BuyPrice { get; set; }
             public TimingSignal Signal { get; set; }
             public bool TradeDone { get; set; }
             public decimal Rate { get; set; }
@@ -68,7 +75,8 @@ namespace UnitTester
         }
 
 
-        [Fact] void generic_timeQ()
+        [Fact]
+        void generic_timeQ()
         {
             Random r = new();
             var q = new TimeQueue<int>(5);
@@ -82,7 +90,8 @@ namespace UnitTester
         }
 
 
-        [Fact] void test()
+        [Fact]
+        void test()
         {
             var now = DateTime.Parse(DateTime.Now.ToString());
             var local = now.ToLocalTime().ToUniversalTime();

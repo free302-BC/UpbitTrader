@@ -85,7 +85,7 @@ namespace Universe.Coin.App
                     var newTicks = _client.ApiTicks(count: numTicks).ToModels().Where(x => !lastTicks.Contains(x.Serial));
                     var numNewTicks = newTicks.Count();
                     if (numNewTicks > numTicks / 5) info($"numNewTicks= <{numNewTicks}>");
-                    foreach (var tick in newTicks) report(tick, tick.Dir == TradeTickDir.B ? 1 : -1);
+                    //foreach (var tick in newTicks) report(tick, tick.Dir == TradeTickDir.B ? 1 : -1);
                     lastTicks.AddRange(newTicks.Select(x => x.Serial));
 
                     //check ticks buffer
@@ -111,7 +111,7 @@ namespace Universe.Coin.App
                     }
 
                     //check buy condition
-                    var current = order.askUP;
+                    var current = order.AskUnitPrice;
                     if (current > target && !buy)
                     {
                         var krw = _client.GetBalance(CurrencyId.KRW);//get balnace

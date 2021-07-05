@@ -21,7 +21,13 @@ namespace Universe.Coin.TradeLogic.Model
         public decimal MovingAvg { get; set; }
         public decimal Macd { get; set; }
         public decimal MacdOsc { get; set; }
+
+        public int NumAsks { get; set; }
+        public int NumBids { get; set; }
+        public decimal ABR { get; set; }
+
         public decimal Target { get; set; }
+        public decimal BuyPrice { get; set; }
         public bool TradeDone { get; set; }
         public TimingSignal Signal { get; set; }
         public decimal Rate { get; set; } = 1.0m;
@@ -61,7 +67,7 @@ namespace Universe.Coin.TradeLogic.Model
             => $"[{TimeKST:HH:mm:ss.fff}] {Opening,8:F1} {High,8:F1} {Low,8:F1} {Closing,8:F1} : {Delta,8:F1} {Dir} | {Market,8}";
 
         public string ToCalcString()
-            => $"[{TimeKST:HH:mm:ss.fff}]{Value,8:F1}{MovingAvg,8:F1}{Macd,8:F2}{MacdOsc,8:F2}{Signal,5} |{Rate,8:F4}{CumRate,8:F4}";
+            => $"[{TimeKST:HH:mm:ss.fff}]{Value,8:F1}{MovingAvg,8:F1}{Macd,8:F2}{MacdOsc,8:F2}{Signal,5} |{Rate,8:F5}{CumRate,8:F5}";
         public string CalcHeader => $"[TimeKST]\tPrice\tDir\tMacd\tSignal\tRate\tCumRate";
 
         static readonly (string name, int wdith)[] _names =

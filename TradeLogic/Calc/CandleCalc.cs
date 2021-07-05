@@ -13,8 +13,14 @@ namespace Universe.Coin.TradeLogic.Calc
     /// </summary>
     public class CandleCalc : ICalc
     {
-        const decimal _FeeRate = 0.0005m * 2;
         public static ICalc I = new CandleCalc();
+        const decimal _FeeRate = 0.0005m * 2;
+
+        decimal ICalc.calcABR(ICalcModel model, ICalcModel prev)
+        {
+            throw new NotImplementedException();
+        }
+
 
         /// <summary>
         /// 주어진 K factor에 따라 model의 Profit Rate를 계산
@@ -22,7 +28,7 @@ namespace Universe.Coin.TradeLogic.Calc
         /// <param name="model"></param>
         /// <param name="prev"></param>
         /// <param name="param"></param>
-        void ICalc.CalcSignal(ICalcModel model, ICalcModel prev, ICalcParam param)
+        void ICalc.calcSignal(ICalcModel model, ICalcModel prev, ICalcParam param)
         {
             calcSignal_K_MA(model, prev, param);
         }

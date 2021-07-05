@@ -23,6 +23,9 @@ namespace Universe.Coin.App
     public class TickWorker : TradeWorkerBase<TickWorker, TickWorkerOptions>
     {
         readonly TimeModelQueue<ICalcModel> _tickQ;
+        volatile int _maxWindowSize = 0;
+        string _headerLine = "";
+
         public TickWorker(IServiceProvider sp, string id = "") : base(sp, id)
         {
             _tickQ = new(600);
@@ -30,30 +33,33 @@ namespace Universe.Coin.App
             updateClient();
             onOptionsUpdate += updateClient;
 
-            registerHotkey(ConsoleKey.F9, m => updateClient());
+            registerHotkey(ConsoleKey.F9, m => 
+            {
+                _set.Pausing = !_set.Pausing;
+                _client.Pause(_set.Pausing);
+                updateClient(); 
+            });
             void updateClient()
             {
-                info($"[{Id}] Pausing= {_set.Pausing = !_set.Pausing}");
                 _maxWindowSize = Math.Max(_set.CalcParam.WindowSize, ((int[])_set.CalcParam.MacdParam).Max());
-                _client.Pause(_set.Pausing);
+                printParam();
             }
 
-            registerHotkey(ConsoleKey.Spacebar, m => changeBuy(0));
-            registerHotkey(ConsoleKey.F1, m => changeBuy(-0.1m));
-            registerHotkey(ConsoleKey.F2, m => changeBuy(+0.1m));
-            registerHotkey(ConsoleKey.F3, m => changeSell(-0.1m));
-            registerHotkey(ConsoleKey.F4, m => changeSell(+0.1m));
-            void changeBuy(decimal delta)
+            registerHotkey(ConsoleKey.Spacebar, m => printParam());
+            registerHotkey(ConsoleKey.F1, m => changeParam(-0.1m, true));
+            registerHotkey(ConsoleKey.F2, m => changeParam(+0.1m, true));
+            registerHotkey(ConsoleKey.F3, m => changeParam(-0.1m, false));
+            registerHotkey(ConsoleKey.F4, m => changeParam(+0.1m, false));
+            void changeParam(decimal delta, bool buy)
             {
-                _set.CalcParam.BuyMacd += delta;
-                info($"Buy={_set.CalcParam.BuyMacd}, Sell={_set.CalcParam.SellMacd}, MacdParam={_set.CalcParam.MacdParam}");
-                //addTicker();
-            }
-            void changeSell(decimal delta)
+                if(buy) _set.CalcParam.BuyMacd += delta;
+                else _set.CalcParam.SellMacd += delta;
+                printParam();
+            }            
+            void printParam()
             {
-                _set.CalcParam.SellMacd += delta;
-                info($"Buy={_set.CalcParam.BuyMacd}, Sell={_set.CalcParam.SellMacd}, MacdParam={_set.CalcParam.MacdParam}");
-                //addTicker();
+                info($"[{Id}] Pausing={_set.Pausing}, Buy={_set.CalcParam.BuyMacd}, Sell={_set.CalcParam.SellMacd}, MacdParam={_set.CalcParam.MacdParam}");
+                report(_headerLine);
             }
 
             info("Press <F5> to excute run_Tick()");
@@ -71,9 +77,14 @@ namespace Universe.Coin.App
                     _client.OnWsReceived += onWsReceived;
 
                     var request = _client.CreateInstance<IWsRequest>();
-                    //request.AddTrade(CurrencyId.KRW, CoinId.BTC);
+
+                    request.AddTrade(CurrencyId.KRW, CoinId.BTC);
+                    _headerLine = TickModel.Empty.CalcHeader;
+
                     //request.AddOrderbook(CurrencyId.KRW, CoinId.BTC);
-                    request.AddTicker(CurrencyId.KRW, CoinId.BTC);
+                    //_headerLine = OrderbookModel.Empty.CalcHeader;
+
+                    //request.AddTicker(CurrencyId.KRW, CoinId.BTC);
                     await _client.ConnectWsAsync(request, stoppingToken);
                 }
                 finally
@@ -91,12 +102,9 @@ namespace Universe.Coin.App
             {
                 TradeEvent.Trade => _client.Deserialize<ITradeTick>(json).ToModel(),
                 TradeEvent.Ticker => _client.Deserialize<ITicker>(json).ToModel(),
-                //TradeEvent.Order => _client.Deserialize<IOrderbook>(json).ToModel(),
+                TradeEvent.Order => _client.Deserialize<IOrderbook>(json).ToModel(),
                 _ => throw new NotImplementedException(),
             };
-
-            //if (model is TradeTickModel) report(model, (int)((TradeTickModel)model).Dir);
-            //else report(model);
 
             if (@event == TradeEvent.Trade) _tradeCounter++;
             else if (@event == TradeEvent.Ticker) _tickerCounter++;
@@ -105,7 +113,6 @@ namespace Universe.Coin.App
             run(model);
         }
 
-        volatile int _maxWindowSize = 0;
         volatile int _tradeCounter = 0;
         volatile int _tickerCounter = 0;
         void run(ICalcModel model)
@@ -116,7 +123,8 @@ namespace Universe.Coin.App
 
             ICalc.CalcMovingAvg(models, param, models.Length - 1);
             ICalc.CalcMacd(models, param, models.Length - 1);
-            TickerCalc.I.CalcProfitRate(models, param, models.Length - 1);
+            TickCalc.I.CalcABR(models, models.Length - 1);
+            TickCalc.I.CalcProfitRate(models, param, models.Length - 1);
             ICalc.CalcCumRate(models, models.Length - 1);
             //ICalcTradeTick.CalcDrawDown(ticks);
 
@@ -135,8 +143,8 @@ namespace Universe.Coin.App
 
             ICalc.CalcMovingAvg(ticks, param);
             ICalc.CalcMacd(ticks, param);
-
-            TickerCalc.I.CalcProfitRate(ticks, param);
+            TickCalc.I.CalcABR(ticks);
+            TickCalc.I.CalcProfitRate(ticks, param);
             var fpr = (ICalc.CalcCumRate(ticks) - 1) * 100;
             //ICalcTradeTick.CalcDrawDown(ticks);
 

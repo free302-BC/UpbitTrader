@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 
 namespace Universe.Coin.TradeLogic
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public enum TradeEvent 
     { 
         Ticker, //현재가
@@ -34,23 +37,33 @@ namespace Universe.Coin.TradeLogic
         PICA, CELO, NEAR, AUCTION, GRT, SNX
     }
     
+    /// <summary>
+    /// 현재가의 추세
+    /// </summary>
     public enum TickerDir
     {
         E,  //even
         F,  //down
         R   //rise
     }
+
+    /// <summary>
+    /// 거래 방향
+    /// </summary>
     public enum TradeTickDir : int
     {
         A = -1,  //ask 매도
         B = 1  //bid 매수
     }
 
+    /// <summary>
+    /// 알고리즘 계산 결과
+    /// </summary>
     public enum TimingSignal
     {
         N,
         Buy = -1,  //매수 신호
-        Hold = -2,   //매수 상태 유지
+        Hold = -2, //매수 상태 유지
         Sell = +1, //매도 신호
     }
 
@@ -59,11 +72,18 @@ namespace Universe.Coin.TradeLogic
         None = 0, M1 = 1, M3 = 3, M5 = 5, M15 = 15, M10 = 10, M30 = 30, M60 = 60, M240 = 240,
         DAY = 1440, WEEK = 10080, MONTH = 302400
     }
+
+    /// <summary>
+    /// moving average 윈도우 함수
+    /// </summary>
     public enum WindowFunction : int
     {
         None, Identical, Linear, Gaussian
     }
 
+    /// <summary>
+    /// 웹 API 호출 결과
+    /// </summary>
     public enum ApiResultCode
     {
         Ok = 0,             //정상결과, 1개 이상의 아이템
@@ -73,6 +93,7 @@ namespace Universe.Coin.TradeLogic
     }
 
     public enum HttpMethod { GET, POST, DELETE }
+    
     public enum ApiId
     {
         None = 0,

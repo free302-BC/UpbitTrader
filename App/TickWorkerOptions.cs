@@ -13,6 +13,7 @@ namespace Universe.Coin.App
     {
         public TickWorkerOptions()
         {
+            Pausing = true;
             CalcParam = new CalcParam();
         }
 

@@ -14,9 +14,11 @@ namespace Universe.Coin.TradeLogic
     {
 
         #region ---- WebSocket ----
+
         Task ConnectWsAsync(IWsRequest request, CancellationToken stoppingToken);
         event Action<string>? OnWsReceived;
         void Pause(bool doPause);
+
         #endregion
 
 
