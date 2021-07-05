@@ -14,69 +14,39 @@ namespace Universe.AppBase.Logging
 {
     using JS = JsonSerializer;
 
-    public static class ILoggerExtensions
+    public interface ILoggerExtensions
     {
-        #region ---- Item Dic & Methods ----
+        void SaveAsJson(string filePath);
 
-        //key == eventId : id 중복 검증을 위해 dictionary 사용
-        static Dictionary<int, EventItem> _items = new();
-        static void addItem(int id, string name, string template)
-        {
-            if (_items.ContainsKey(id))
-                throw new ArgumentException($"Invalid eventId '{id}': used by {_items[id].name}", nameof(id));
-            _items.Add(id, new(id, name, template));
-        }
+        protected void addItem(int id, string name, string template);
 
-        record EventItem(int id, string name, string template)
+        protected EventItem this[int id] { get; }
+
+        protected record EventItem(int id, string name, string template)
         {
             [JsonIgnore] public EventId eid = new EventId(id, name);
         }
 
-        static Action<ILogger, T, Exception?> newInfo<T>(int id, string name, string template)
+        Action<ILogger, T, Exception?> newInfo<T>(int id, string name, string template)
         {
             addItem(id, name, template);
-            return LoggerMessage.Define<T>(LogLevel.Information, _items[id].eid, _items[id].template);
+            return LoggerMessage.Define<T>(LogLevel.Information, this[id].eid, this[id].template);
         }
-        static Action<ILogger, T1, T2, Exception?> newInfo<T1, T2>(int id, string name, string template)
+        Action<ILogger, T1, T2, Exception?> newInfo<T1, T2>(int id, string name, string template)
         {
             addItem(id, name, template);
-            return LoggerMessage.Define<T1, T2>(LogLevel.Information, _items[id].eid, _items[id].template);
+            return LoggerMessage.Define<T1, T2>(LogLevel.Information, this[id].eid, this[id].template);
         }
-        static Action<ILogger, T, Exception?> newError<T>(int id, string name, string template)
+        Action<ILogger, T, Exception?> newError<T>(int id, string name, string template)
         {
             addItem(id, name, template);
-            return LoggerMessage.Define<T>(LogLevel.Error, _items[id].eid, _items[id].template);
+            return LoggerMessage.Define<T>(LogLevel.Error, this[id].eid, this[id].template);
         }
-
-        static ILoggerExtensions()
+        Action<ILogger, T1, T2, Exception?> newError<T1, T2>(int id, string name, string template)
         {
-            File.WriteAllText("logging_events.json", JS.Serialize(_items.Values,
-                new JsonSerializerOptions { WriteIndented = true }));
+            addItem(id, name, template);
+            return LoggerMessage.Define<T1, T2>(LogLevel.Error, this[id].eid, this[id].template);
         }
-
-        #endregion
-
-        // Info(object? message)
-        static readonly Action<ILogger, object?, Exception?> _Info 
-            = newInfo<object?>(1, nameof(Info), "{message}");
-        public static void Info(this ILogger logger, object? message)
-            => _Info(logger, message, null);
-
-        // Info2(object? message1, object? message2)
-        static readonly Action<ILogger, object?, object?, Exception?> _Info2 
-            = newInfo<object?, object?>(2, nameof(Info),
-                $"{{message1}}{Environment.NewLine}{{message2}}");
-        public static void Info(this ILogger logger, object? message1, object? message2)
-            => _Info2(logger, message1, message2, null);
-
-        // Error(object? message, Exception exception)
-        static readonly Action<ILogger, object?, Exception?> _Error 
-            = newError<object?>(-1, nameof(Error), "{message}");
-        public static void Error(this ILogger logger, object? message, Exception? exception = default)
-            => _Error(logger, message, exception);
-
-
-
 
     }//class
 }

@@ -19,6 +19,7 @@ using Microsoft.Extensions.Logging;
 using Universe.Coin.TradeLogic;
 using Universe.Coin.TradeLogic.Model;
 using Universe.Utility;
+using Universe.AppBase.Logging;
 
 namespace Universe.Coin.TradeLogic
 {
@@ -64,7 +65,9 @@ namespace Universe.Coin.TradeLogic
             _evPausing?.Dispose();
         }
 
-        protected void log(string? message) => _logger.LogError(message);
+        protected void info(object? message) => _logger.Info(message);
+        protected void info(object? msg1, object? msg2) => _logger.Info(msg1, msg2);
+        protected void log(object? msg1, Exception? ex = default) => _logger.Error(msg1, ex);
 
         /// <summary>
         /// 추가적인 객체 초기화 코드
@@ -136,12 +139,12 @@ namespace Universe.Coin.TradeLogic
             Task connect()
             {
                 return _ws.ConnectAsync(new Uri(_wsUri), stoppingToken)
-                    .ContinueWith(t => _logger.LogInformation($"Websocket connected: {_wsUri}"),
+                    .ContinueWith(t => info("Websocket connected", _wsUri),
                         TaskContinuationOptions.OnlyOnRanToCompletion);//.Wait();
             }
             ValueTask sendWsRequest()
             {
-                _logger.LogInformation($"Websocket sending request...");
+                info($"Websocket sending request...");
                 var json = _wsRequest.ToJsonBytes();
                 var rm = new ReadOnlyMemory<byte>(json, 0, json.Length);
                 return _ws.SendAsync(rm, WebSocketMessageType.Binary, true, stoppingToken);
@@ -149,7 +152,7 @@ namespace Universe.Coin.TradeLogic
 
             async Task wsReceiver()
             {
-                _logger.LogInformation("Entering websocket receiving...");
+                info("Entering websocket receiving...");
 
                 var array = new byte[1024 * 1024];
                 Memory<byte> buffer = new(array);
@@ -163,7 +166,7 @@ namespace Universe.Coin.TradeLogic
                     //nWsReceived?.Invoke(json);
                     parse(json);
                 }
-                _logger.LogInformation("Exiting websocket receiving...");
+                info("Exiting websocket receiving...");
             }
 
             void parse(string json)
@@ -219,7 +222,8 @@ namespace Universe.Coin.TradeLogic
             }
             catch (HttpRequestException ex)
             {
-                _logger.LogWebException(ex);
+                //_logger.LogWebException(ex);
+                info(ex.StatusCode, ex.Message);
                 return (ApiResultCode.TooMany, Array.Empty<M>());
             }
         }

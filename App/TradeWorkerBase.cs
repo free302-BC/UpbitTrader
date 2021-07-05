@@ -31,13 +31,11 @@ namespace Universe.Coin.App
         readonly ICommandProvider _cmdProvider;
         protected readonly IClient _client;
         protected readonly JsonSerializerOptions _jsonOptions;
-        readonly AutoResetEvent _cmdSignal;
 
         protected TradeWorkerBase(IServiceProvider sp, string id = "") : base(sp, id)
         {
             _cmdProvider = sp.GetRequiredService<ICommandProvider>();
-            _jsonOptions = _jsonOptions.Init();// buildJsonOptions();
-            _cmdSignal = new(false);
+            _jsonOptions = _jsonOptions.Init();
 
             var logger = _sp.GetRequiredService<ILogger<IClient>>();
             _client = UvLoader.Create<IClient>(_set.AssemblyFile, _set.ClientFullName,
