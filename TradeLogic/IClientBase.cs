@@ -15,8 +15,16 @@ namespace Universe.Coin.TradeLogic
 
         #region ---- WebSocket ----
 
-        Task ConnectWsAsync(IWsRequest request, CancellationToken stoppingToken);
-        event Action<string>? OnWsReceived;
+        void AddTick(CurrencyId currency, CoinId coin, (string key, object value) option = default);
+        void AddOrderbook(CurrencyId currency, CoinId coin, (string key, object value) option = default);
+        void AddTicker(CurrencyId currency, CoinId coin, (string key, object value) option = default);
+
+        Task ConnectWsAsync(CancellationToken stoppingToken);
+        
+        event Action<TickModel>? WsTick;
+        event Action<OrderbookModel>? WsOrderbook;
+        event Action<TickerModel>? WsTicker;
+
         void Pause(bool doPause);
 
         #endregion

@@ -74,47 +74,26 @@ namespace Universe.Coin.App
             {
                 try
                 {
-                    _client.OnWsReceived += onWsReceived;
+                    _client.WsTick += onWsTick;
 
-                    var request = _client.CreateInstance<IWsRequest>();
-
-                    request.AddTrade(CurrencyId.KRW, CoinId.BTC);
+                    _client.AddTick(CurrencyId.KRW, CoinId.BTC);
                     _headerLine = TickModel.Empty.CalcHeader;
 
-                    //request.AddOrderbook(CurrencyId.KRW, CoinId.BTC);
-                    //_headerLine = OrderbookModel.Empty.CalcHeader;
-
-                    //request.AddTicker(CurrencyId.KRW, CoinId.BTC);
-                    await _client.ConnectWsAsync(request, stoppingToken);
+                    await _client.ConnectWsAsync(stoppingToken);
                 }
                 finally
                 {
-                    _client.OnWsReceived -= onWsReceived;
+                    _client.WsTick -= onWsTick;
                 }
             }            
         }
-        void onWsReceived(string json)
+
+        void onWsTick(TickModel model)
         {
-            var resType = _client.GetImplType<IWsResponse>();
-            var @event = ((IWsResponse)JS.Deserialize(json, resType, _jsonOptions)!).Event;
-
-            ICalcModel model = @event switch
-            {
-                TradeEvent.Trade => _client.Deserialize<ITradeTick>(json).ToModel(),
-                TradeEvent.Ticker => _client.Deserialize<ITicker>(json).ToModel(),
-                TradeEvent.Order => _client.Deserialize<IOrderbook>(json).ToModel(),
-                _ => throw new NotImplementedException(),
-            };
-
-            if (@event == TradeEvent.Trade) _tradeCounter++;
-            else if (@event == TradeEvent.Ticker) _tickerCounter++;
-
             _tickQ.Add(model);
             run(model);
-        }
+        }        
 
-        volatile int _tradeCounter = 0;
-        volatile int _tickerCounter = 0;
         void run(ICalcModel model)
         {
             var param = _set.CalcParam;
@@ -128,7 +107,7 @@ namespace Universe.Coin.App
             ICalc.CalcCumRate(models, models.Length - 1);
             //ICalcTradeTick.CalcDrawDown(ticks);
 
-            report($"{model.ToCalcString()} | ({_tradeCounter}, {_tickerCounter})", (int)model.Signal);
+            report(model.ToCalcString(), (int)model.Signal);
             //File.WriteAllText("ticker_ws.txt", model.ToCalcString());
         }
 

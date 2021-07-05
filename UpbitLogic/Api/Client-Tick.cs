@@ -73,7 +73,7 @@ namespace Universe.Coin.Upbit
                     sb.AppendLine("----------------------------------------------");
                     _timeCounter.Dump(sb);
                     File.AppendAllText("api_ticks_error.log", sb.ToString());
-                    _logger.LogError(sb.ToString());
+                    log(sb.ToString());
                     throw;
                 }
             }

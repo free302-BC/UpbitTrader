@@ -28,6 +28,7 @@ namespace Universe.Coin.TradeLogic.Model
         public decimal ABR { get; set; }
 
         public decimal Target { get; set; }
+        public decimal BuyPrice { get; set; }
         public bool TradeDone { get; set; }
         public TimingSignal Signal { get; set; }
         public decimal Rate { get; set; } = 1.0m;

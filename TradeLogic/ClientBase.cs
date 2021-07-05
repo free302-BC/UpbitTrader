@@ -30,14 +30,15 @@ namespace Universe.Coin.TradeLogic
     public abstract class ClientBase : IClientBase
     {
         readonly KeyPair _key;
-        protected readonly ILogger _logger;
+        readonly ILogger _logger;
         readonly JsonSerializerOptions _jsonOptions;
 
         readonly string _wsUri;
-        protected readonly HttpClient _wc;// WebClient _wc;
-        //protected readonly WebClient _wc;// WebClient _wc;
-        protected readonly ClientWebSocket _ws;
+        readonly HttpClient _wc;
         readonly Dictionary<string, string> _query;
+
+        readonly ClientWebSocket _ws;
+        readonly IWsRequest _wsRequest;
 
         public ClientBase(string wsUri, string accessKey, string secretKey, ILogger logger)
         {
@@ -46,8 +47,10 @@ namespace Universe.Coin.TradeLogic
             _key = (accessKey, secretKey);
 
             _wc = new();
-            _ws = new();
             _query = new();
+
+            _ws = new();
+            _wsRequest = CreateInstance<IWsRequest>();
 
             _evPausing = new(false);
 
@@ -61,11 +64,17 @@ namespace Universe.Coin.TradeLogic
             _evPausing?.Dispose();
         }
 
+        protected void log(string? message) => _logger.LogError(message);
+
         /// <summary>
         /// 추가적인 객체 초기화 코드
         /// WebClient header, websocket keep-alive-time
         /// </summary>
         protected abstract void init();
+
+
+
+        #region ---- Implimenting Types ----
 
         static ClientBase() => _types = new();
         static Dictionary<Type, Type> _types;
@@ -84,14 +93,23 @@ namespace Universe.Coin.TradeLogic
             var model = JS.Deserialize(json, GetImplType<I>(), _jsonOptions) ?? CreateInstance<I>()!;
             return (I)model;
         }
+        #endregion
 
 
         #region ---- WebSocket ----
 
-        /// <summary>
-        /// 
-        /// </summary>
-        public event Action<string>? OnWsReceived;
+        public void AddTick(CurrencyId currency, CoinId coin, (string key, object value) option = default)
+            => _wsRequest.AddTrade(currency, coin, option);
+        public void AddOrderbook(CurrencyId currency, CoinId coin, (string key, object value) option = default)
+            => _wsRequest.AddOrderbook(currency, coin, option);
+        public void AddTicker(CurrencyId currency, CoinId coin, (string key, object value) option = default)
+            => _wsRequest.AddTicker(currency, coin, option);        
+
+       
+        public event Action<TickModel>? WsTick;
+        public event Action<OrderbookModel>? WsOrderbook;
+        public event Action<TickerModel>? WsTicker;
+
 
         /// <summary>
         /// 
@@ -108,7 +126,7 @@ namespace Universe.Coin.TradeLogic
         /// <summary>
         /// Connect and receive
         /// </summary>
-        public async Task ConnectWsAsync(IWsRequest request, CancellationToken stoppingToken)
+        public async Task ConnectWsAsync(CancellationToken stoppingToken)
         {
             await connect();
             await sendWsRequest();
@@ -124,7 +142,7 @@ namespace Universe.Coin.TradeLogic
             ValueTask sendWsRequest()
             {
                 _logger.LogInformation($"Websocket sending request...");
-                var json = request.ToJsonBytes();
+                var json = _wsRequest.ToJsonBytes();
                 var rm = new ReadOnlyMemory<byte>(json, 0, json.Length);
                 return _ws.SendAsync(rm, WebSocketMessageType.Binary, true, stoppingToken);
             }
@@ -142,9 +160,26 @@ namespace Universe.Coin.TradeLogic
 
                     var res = await _ws.ReceiveAsync(buffer, stoppingToken);
                     var json = Encoding.UTF8.GetString(array, 0, res.Count);
-                    OnWsReceived?.Invoke(json);
+                    //nWsReceived?.Invoke(json);
+                    parse(json);
                 }
                 _logger.LogInformation("Exiting websocket receiving...");
+            }
+
+            void parse(string json)
+            {
+                var resType = GetImplType<IWsResponse>();
+                var @event = ((IWsResponse)JS.Deserialize(json, resType, _jsonOptions)!).Event;
+
+                switch (@event)
+                {
+                    case TradeEvent.Trade: WsTick?.Invoke(Deserialize<ITradeTick>(json).ToModel()); 
+                        break;
+                    case TradeEvent.Ticker: WsTicker?.Invoke(Deserialize<ITicker>(json).ToModel()); 
+                        break;
+                    case TradeEvent.Order: WsOrderbook?.Invoke(Deserialize<IOrderbook>(json).ToModel()); 
+                        break;
+                };
             }
         }
 
@@ -208,6 +243,8 @@ namespace Universe.Coin.TradeLogic
         protected void setQueryString(string name, int count) => _query[name] = count.ToString();
 
         protected abstract string buildAuthKey(KeyPair key);
+
+        protected void setKeepAlive(TimeSpan dt) => _ws.Options.KeepAliveInterval = dt;
 
         protected void setAuthToken() => _wc.DefaultRequestHeaders.Authorization
             = new AuthenticationHeaderValue("Bearer", buildAuthKey(_key));

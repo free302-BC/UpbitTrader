@@ -62,7 +62,7 @@ namespace Universe.Coin.Upbit
             setAuthToken();
             setAcceptance();
             setAcceptEncoding();
-            _ws.Options.KeepAliveInterval = new TimeSpan(0, 1, 30);
+            setKeepAlive(new TimeSpan(0, 1, 30));
         }
         protected override string buildAuthKey(KeyPair key) => Helper.BuildAuthToken(key);
 
