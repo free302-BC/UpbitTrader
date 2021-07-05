@@ -80,6 +80,7 @@ namespace Universe.AppBase
         protected void info(object? message) => _logger.Info(message);
         protected void info(object? msg1, object? msg2) => _logger.Info(msg1, msg2);
         protected void log(object? msg1, Exception? ex = default) => _logger.Error(msg1, ex);
+        protected void log(object? msg1, object? msg2, Exception? ex = default) => _logger.Error(msg1, msg2, ex);
 
         #endregion
 

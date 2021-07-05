@@ -1,19 +1,20 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <CodeSnippets xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
 
-  <!-- Logging Extensions : Add Logging Action with 1 parameter  -->
+
+  <!-- Logging Extensions : Add Error with T1  -->
   <CodeSnippet Format="1.0.0">
     <Header>
-      <Title>Logging: Action 1</Title>
+      <Title>Logging: newError[T1] </Title>
     </Header>
     <Snippet>
       <Code Language="CSharp">
         <![CDATA[   
       // $EventName$($T1$ $T1Param$)
       static readonly Action<ILogger, $T1$, Exception?> _$EventName$
-      = newInfo<$T1$>($EID$, nameof($EventName$), "{$T1Param$}");
-      public static void $EventName$(this ILogger logger, $T1$ $T1Param$) 
-            => _$EventName$(logger, $T1Param$, null);
+      = ILoggerExtensions.newError<$T1$>($EID$, nameof($EventName$), "{$T1Param$}");
+      public static void $EventName$(this ILogger logger, $T1$ $T1Param$, Exception? exception = default) 
+            => _$EventName$(logger, $T1Param$, exception);
       ]]>
       </Code>
       <Declarations>
@@ -41,17 +42,108 @@
     </Snippet>
   </CodeSnippet>
 
-  <!-- Logging Extensions : Add Logging Action with 2 parameter  -->
+  <!-- Logging Extensions : Add Info with T1 T2  -->
   <CodeSnippet Format="1.0.0">
     <Header>
-      <Title>Logging: Action 2</Title>
+      <Title>Logging: newError[T1,T2]</Title>
     </Header>
     <Snippet>
       <Code Language="CSharp">
         <![CDATA[   
       // $EventName$($T1$ $T1Param$, $T2$ $T2Param$)
       static readonly Action<ILogger, $T1$, $T2$, Exception?> _$EventName$
-      = newInfo<$T1$, $T2$>($EID$, nameof($EventName$), "{$T1Param$}, {$T2Param$}");
+      = ILoggerExtensions.newError<$T1$, $T2$>($EID$, nameof($EventName$), "{$T1Param$}, {$T2Param$}");
+      public static void $EventName$(this ILogger logger, $T1$ $T1Param$, $T2$ $T2Param$, Exception? exception = default) 
+            => _$EventName$(logger, $T1Param$, $T2Param$, exception);
+      ]]>
+      </Code>
+      <Declarations>
+        <Literal>
+          <ID>T1</ID>
+          <ToolTip>Choose Type Parameter</ToolTip>
+          <Default>string</Default>
+        </Literal>
+        <Literal>
+          <ID>T1Param</ID>
+          <ToolTip>Choose Parameter Name</ToolTip>
+          <Default>t1</Default>
+        </Literal>
+        <Literal>
+          <ID>T2</ID>
+          <ToolTip>Choose Type Parameter</ToolTip>
+          <Default>string</Default>
+        </Literal>
+        <Literal>
+          <ID>T2Param</ID>
+          <ToolTip>Choose Parameter Name</ToolTip>
+          <Default>t2</Default>
+        </Literal>
+        <Literal>
+          <ID>EventName</ID>
+          <ToolTip>Choose Field Name</ToolTip>
+          <Default>t1Requested</Default>
+        </Literal>
+        <Literal>
+          <ID>EID</ID>
+          <ToolTip>Choose Event ID</ToolTip>
+          <Default>1</Default>
+        </Literal>        
+      </Declarations>
+    </Snippet>
+  </CodeSnippet>
+  <!-- ++++++++ -->
+  
+  <!-- Logging Extensions : Add Info with T1  -->
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>Logging: newInfo[T1] </Title>
+    </Header>
+    <Snippet>
+      <Code Language="CSharp">
+        <![CDATA[   
+      // $EventName$($T1$ $T1Param$)
+      static readonly Action<ILogger, $T1$, Exception?> _$EventName$
+      = ILoggerExtensions.newInfo<$T1$>($EID$, nameof($EventName$), "{$T1Param$}");
+      public static void $EventName$(this ILogger logger, $T1$ $T1Param$) 
+            => _$EventName$(logger, $T1Param$, null);
+      ]]>
+      </Code>
+      <Declarations>
+        <Literal>
+          <ID>T1</ID>
+          <ToolTip>Choose Type Parameter</ToolTip>
+          <Default>string</Default>
+        </Literal>
+        <Literal>
+          <ID>T1Param</ID>
+          <ToolTip>Choose Parameter Name</ToolTip>
+          <Default>t1</Default>
+        </Literal>
+        <Literal>
+          <ID>EventName</ID>
+          <ToolTip>Choose Field Name</ToolTip>
+          <Default>t1Requested</Default>
+        </Literal>
+        <Literal>
+          <ID>EID</ID>
+          <ToolTip>Choose Event ID</ToolTip>
+          <Default>1</Default>
+        </Literal>
+      </Declarations>
+    </Snippet>
+  </CodeSnippet>
+
+  <!-- Logging Extensions : Add Info with T1 T2  -->
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>Logging: newInfo[T1,T2]</Title>
+    </Header>
+    <Snippet>
+      <Code Language="CSharp">
+        <![CDATA[   
+      // $EventName$($T1$ $T1Param$, $T2$ $T2Param$)
+      static readonly Action<ILogger, $T1$, $T2$, Exception?> _$EventName$
+      = ILoggerExtensions.newInfo<$T1$, $T2$>($EID$, nameof($EventName$), "{$T1Param$}, {$T2Param$}");
       public static void $EventName$(this ILogger logger, $T1$ $T1Param$, $T2$ $T2Param$) 
             => _$EventName$(logger, $T1Param$, $T2Param$,null);
       ]]>
@@ -94,14 +186,14 @@
   <!-- Logging Extensions : Add Scope Func  -->
   <CodeSnippet Format="1.0.0">
     <Header>
-      <Title>Logging: Add Scope</Title>
+      <Title>Logging: Scope</Title>
     </Header>
     <Snippet>
       <Code Language="CSharp">
         <![CDATA[   
       // $EventName$($T1$ $T1Param$)      
       static readonly Func<ILogger, $T1$, IDisposable> _$EventName$
-      = LoggerMessage.DefineScope<$T1$>("$T1Param$ = '{$T1Param$}'");
+      = ILoggerExtensions.newScope<$T1$>("$T1Param$");
       public static IDisposable $EventName$(this ILogger logger, $T1$ $T1Param$) 
             => _$EventName$(logger, $T1Param$);
       ]]>
@@ -129,7 +221,7 @@
   
   <CodeSnippet Format="1.0.0">
     <Header>
-      <Title>Extension</Title>
+      <Title>Model Extension</Title>
     </Header>
     <Snippet>
       <Code Language="CSharp">

@@ -36,7 +36,7 @@ namespace Universe.Coin.TradeLogic
 
         readonly string _wsUri;
         readonly HttpClient _wc;
-        readonly Dictionary<string, string> _query;
+        readonly Dictionary<string, string?> _query;
 
         readonly ClientWebSocket _ws;
         readonly IWsRequest _wsRequest;
@@ -68,6 +68,7 @@ namespace Universe.Coin.TradeLogic
         protected void info(object? message) => _logger.Info(message);
         protected void info(object? msg1, object? msg2) => _logger.Info(msg1, msg2);
         protected void log(object? msg1, Exception? ex = default) => _logger.Error(msg1, ex);
+        protected void log(object? msg1, object? msg2, Exception? ex = default) => _logger.Error(msg1, msg2, ex);
 
         /// <summary>
         /// 추가적인 객체 초기화 코드
