@@ -23,20 +23,24 @@ namespace Universe.Coin.App
     /// </summary>
     /// <typeparam name="W"></typeparam>
     /// <typeparam name="S"></typeparam>
-    public abstract class TradeWorkerBase<W, S> 
-                : WorkerBase<W, S>, IDisposable
-        where W : WorkerBase<W, S> 
+    public abstract class TradeWorkerBase<W, S> : WorkerBase<W, S>, IDisposable
+        where W : WorkerBase<W, S>
         where S : TradeWorkerOptions, IClientOptions
     {
-        readonly ICommandProvider _cmdProvider;
+        readonly IInputProvider _cmdProvider;
         protected readonly IClient _client;
         protected readonly JsonSerializerOptions _jsonOptions;
+        readonly OrderedDic<AutoResetEvent, Action> _events;
 
         protected TradeWorkerBase(IServiceProvider sp, string id = "") : base(sp, id)
         {
-            _cmdProvider = sp.GetRequiredService<ICommandProvider>();
+            _events = new();
+            _cmdProvider = sp.GetRequiredService<IInputProvider>();
+
+            //TODO: 필요?
             _jsonOptions = new JsonSerializerOptions().Init();
 
+            //init client
             var logger = _sp.GetRequiredService<ILogger<IClient>>();
             _client = UvLoader.Create<IClient>(_set.AssemblyFile, _set.ClientFullName,
                 _set.GetAccessKey(), _set.GetSecretKey(), logger);
@@ -48,13 +52,28 @@ namespace Universe.Coin.App
             base.Dispose();
         }
 
-        protected void registerHotkey(ConsoleKey key, CommandAction handler)
+        protected override Task doWork(CancellationToken stoppingToken)
         {
-            //_cmdProvider.AddAction(key, handler);
+            var events = _events.Keys.ToArray();
+            while (!stoppingToken.IsCancellationRequested)
+            {
+                var index = WaitHandle.WaitAny(events);
+                _events[index]?.Invoke();
+            }
+            return Task.CompletedTask;
         }
-        protected void unregisterHotkey(ConsoleKey key, CommandAction handler)
+
+        protected void registerHotkey(ConsoleKey key, Action handler, ConsoleModifiers mod = 0)
         {
-            //_cmdProvider.RemoveAction(key, handler);
+            var @event = new AutoResetEvent(false);
+            _cmdProvider.AddSignal(key, @event, mod);
+            _events.Add(@event, handler);
+        }
+        protected void unregisterHotkey(ConsoleKey key, Action handler, ConsoleModifiers mod = 0)
+        {
+            var @event = _events.Where(p => p.Value == handler).FirstOrDefault().Key;
+            _cmdProvider.RemoveSignal(key, @event, mod);
+            _events.Remove(@event);
         }
 
 

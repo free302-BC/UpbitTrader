@@ -24,7 +24,7 @@ namespace Universe.Coin.AppGui
             Application.SetCompatibleTextRenderingDefault(false);
 
             var form = new MainForm();
-            AddService<ICommandProvider, MainForm>(false, form);
+            AddService<IInputProvider, MainForm>(false, form);
             AddWorker<TickWorker, TickWorkerOptions>("tick.json", "Upbit");
             Task.Run(RunHost);
 

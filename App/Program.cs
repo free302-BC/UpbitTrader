@@ -18,7 +18,7 @@ namespace Universe.Coin.App
 
             #region ---- console key listener ----
 
-            AddService<ICommandProvider, InputWorker>(
+            AddService<IInputProvider, InputWorker>(
                 start: true,
                 postInit: (sp, iw) =>
                 {

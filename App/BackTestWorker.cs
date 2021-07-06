@@ -31,46 +31,41 @@ namespace Universe.Coin.App
         }
         void registerHotkey()
         {
-            registerHotkey(ConsoleKey.Spacebar, m => _ev.Set());
-            registerHotkey(ConsoleKey.F1, m =>
+            registerHotkey(ConsoleKey.Spacebar, () => _ev.Set());
+            registerHotkey(ConsoleKey.F1, () =>
             {
                 _set.DoFindK = !_set.DoFindK;
                 info($"DoFindK: {_set.DoFindK}");
             });
 
-            registerHotkey(ConsoleKey.F2, m => onChangeNumericParam(m, 3, () => _set.Hours));
-            registerHotkey(ConsoleKey.F3, m => onChangeNumericParam(m, 0.1m, () => _set.CalcParam.FactorK));
-            registerHotkey(ConsoleKey.F4, m => onChangeNumericParam(m, 3, () => _set.CalcParam.WindowSize));
-            registerHotkey(ConsoleKey.F5, onToggleWF);
+            registerHotkey(ConsoleKey.F2, () => _set.Hours += 3);
+            registerHotkey(ConsoleKey.F2, () => _set.Hours -= 3, ConsoleModifiers.Shift);
+            registerHotkey(ConsoleKey.F2, () => _set.Hours *= 2, ConsoleModifiers.Control);
+            registerHotkey(ConsoleKey.F2, () => _set.Hours /= 2, ConsoleModifiers.Control | ConsoleModifiers.Shift);
+
+            registerHotkey(ConsoleKey.F3, () => _set.CalcParam.FactorK += 0.1m);
+            registerHotkey(ConsoleKey.F3, () => _set.CalcParam.FactorK -= 0.1m, ConsoleModifiers.Shift);
+            registerHotkey(ConsoleKey.F3, () => _set.CalcParam.FactorK *= 2, ConsoleModifiers.Control);
+            registerHotkey(ConsoleKey.F3, () => _set.CalcParam.FactorK /= 2, ConsoleModifiers.Control | ConsoleModifiers.Shift);
+
+            registerHotkey(ConsoleKey.F4, () => _set.CalcParam.WindowSize += 3);
+            registerHotkey(ConsoleKey.F4, () => _set.CalcParam.WindowSize -= 3, ConsoleModifiers.Shift);
+            registerHotkey(ConsoleKey.F4, () => _set.CalcParam.WindowSize *= 2, ConsoleModifiers.Control);
+            registerHotkey(ConsoleKey.F4, () => _set.CalcParam.WindowSize /= 2, ConsoleModifiers.Control | ConsoleModifiers.Shift);
+
+            registerHotkey(ConsoleKey.F5, ()=> onToggleWF(1));
+            registerHotkey(ConsoleKey.F5, () => onToggleWF(-1), ConsoleModifiers.Shift);
             registerHotkey(ConsoleKey.F12, onRemoveFile);
-
-            void onChangeNumericParam<P>(ConsoleModifiers modifier, P delta, Expression<Func<P>> selector)
+            
+            void onToggleWF(int delta)
             {
-                var set = selector.ToDelegate();
-                dynamic dv = delta!;
-                dynamic v0 = set.getter()!;
+                //var delta = modifier.HasFlag(ConsoleModifiers.Shift) ? -1 : +1;
 
-                if (modifier.HasFlag(ConsoleModifiers.Control))
-                {
-                    if (modifier.HasFlag(ConsoleModifiers.Shift))
-                        set.setter(v0 / 2);
-                    else
-                        set.setter(v0 * 2);
-                }
-                else
-                {
-                    set.setter(v0 + (modifier.HasFlag(ConsoleModifiers.Shift) ? -dv : +dv));
-                }
-                info($"{((MemberExpression)selector.Body).Member.Name}: {set.getter()}");
-            }
-            void onToggleWF(ConsoleModifiers modifier)
-            {
-                var delta = modifier.HasFlag(ConsoleModifiers.Shift) ? -1 : +1;
                 _set.CalcParam.WindowFunction
                     = (WindowFunction)(((int)_set.CalcParam.WindowFunction + delta) % (int)(1 + WindowFunction.Gaussian));
                 info($"WindowFunction: {_set.CalcParam.WindowFunction}");
             }
-            void onRemoveFile(ConsoleModifiers modifier)
+            void onRemoveFile()
             {
                 var units = new[]
                 { CandleUnit.M240, CandleUnit.M60, CandleUnit.M30,

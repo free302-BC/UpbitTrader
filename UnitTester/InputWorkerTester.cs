@@ -25,7 +25,7 @@ namespace UnitTester
     {
         [Fact] public static void Test()//execute in console 'Tester' app
         {
-            AddService<ICommandProvider, InputWorker>(
+            AddService<IInputProvider, InputWorker>(
                 start: true,
                 postInit: (sp, iw) =>
                 {
@@ -44,7 +44,7 @@ namespace UnitTester
             public TestWorker(IServiceProvider sp, string id = "") : base(sp, id)
             {
                 _signal = new(false);
-                var iw = sp.GetRequiredService<ICommandProvider>();
+                var iw = sp.GetRequiredService<IInputProvider>();
                 iw.AddSignal(ConsoleKey.Spacebar, _signal);
             }
             public override void Dispose()

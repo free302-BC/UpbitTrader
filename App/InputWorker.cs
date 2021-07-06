@@ -18,18 +18,20 @@ using Universe.Utility;
 
 namespace Universe.Coin.App
 {
-    using ActionDic = Dictionary<ConsoleKey, CommandAction>;
-    using SignalDic = Dictionary<ConsoleKey, List<EventWaitHandle>>;
+    //using ActionDic = Dictionary<ConsoleKey, CommandAction>;
+    using SignalDic = SortedMultiDictionary<ConsoleKey, ConsoleModifiers, List<EventWaitHandle>>;
 
-    public class InputWorker : WorkerBase<InputWorker, TradeWorkerOptions>, ICommandProvider
+    public class InputWorker : WorkerBase<InputWorker, TradeWorkerOptions>, IInputProvider
     {
-        readonly ActionDic _actions;
+        //readonly ActionDic _actions;
         readonly SignalDic _signals;
         readonly object _lock;
+        SignalDic IInputProvider._signals => _signals;
+        object IInputProvider._lock => _lock;
 
         public InputWorker(IServiceProvider sp) : base(sp, "")
         {
-            _actions = new();
+            //_actions = new();
             _signals = new();
             _lock = new();
         }
@@ -38,56 +40,30 @@ namespace Universe.Coin.App
         public ConsoleKey QuitKey { get; set; }
         public event Action? OnQuit;
 
-        /// <summary>
-        /// InputWorker의 doWork()와 같은 쓰레드에서 수행되는 코드 등록
-        /// </summary>
-        /// <param name="key"></param>
-        /// <param name="cmd"></param>
-        public void AddAction(ConsoleKey key, CommandAction cmd)
-        {
-            lock (_lock)
-            {
-                if (_actions.ContainsKey(key)) _actions[key] += cmd;
-                else _actions[key] = cmd;
-            }
-        }
-        public void RemoveAction(ConsoleKey key, CommandAction cmd)
-        {
-            lock (_lock)
-            {
-                if (_actions.ContainsKey(key))
-                {
-                    var result = _actions[key] - cmd;
-                    if (result is null) _actions.Remove(key);
-                    else _actions[key] = result;
-                }
-            }
-        }
 
-        /// <summary>
-        /// 이벤트시 신호를 수신하는 핸들 등록
-        /// </summary>
-        /// <param name="key"></param>
-        /// <param name="signal"></param>
-        public void AddSignal(ConsoleKey key, EventWaitHandle signal)
-        {
-            lock (_lock)
-            {
-                if (_signals.ContainsKey(key)) _signals[key].Add(signal);
-                else _signals[key] = new() { signal };
-            }
-        }
-        public void RemoveSignal(ConsoleKey key, EventWaitHandle signal)
-        {
-            lock (_lock)
-            {
-                if (_signals.ContainsKey(key))
-                {
-                    var result = _signals[key].Remove(signal);
-                    if (result && _signals[key].Count == 0) _signals.Remove(key);
-                }
-            }
-        }
+        ///// <summary>
+        ///// 이벤트시 신호를 수신하는 핸들 등록
+        ///// </summary>
+        //public void AddSignal(ConsoleKey key, EventWaitHandle signal, ConsoleModifiers mod= 0)
+        //{
+        //    lock (_lock)
+        //    {
+        //        if (_signals.ContainsKey(key, mod)) _signals[key, mod].Add(signal);
+        //        else _signals[key, mod] = new() { signal };
+        //    }
+        //}
+        //public void RemoveSignal(ConsoleKey key, EventWaitHandle signal, ConsoleModifiers mod= 0)
+        //{
+        //    lock (_lock)
+        //    {
+        //        if (_signals.ContainsKey(key, mod))
+        //        {
+        //            var result = _signals[key, mod].Remove(signal);
+        //            if (result && _signals[key, mod].Count == 0) _signals.Remove(key, mod);
+        //        }
+        //    }
+        //}
+
 
         protected override Task doWork(CancellationToken stoppingToken)
         {
@@ -98,17 +74,17 @@ namespace Universe.Coin.App
 
                 if (ki.Key == QuitKey) OnQuit?.Invoke();
 
-                CommandAction? cmd = null;
+                //CommandAction? cmd = null;
                 List<EventWaitHandle>? list = null;
                 lock (_lock)
                 {
-                    if (_actions.ContainsKey(ki.Key)) cmd = _actions[ki.Key];
-                    if (_signals.ContainsKey(ki.Key)) list = _signals[ki.Key];
+                    //if (_actions.ContainsKey(ki.Key)) cmd = _actions[ki.Key];
+                    if (_signals.ContainsKey(ki.Key, ki.Modifiers)) list = _signals[ki.Key, ki.Modifiers];
                 }
 
                 try
                 {
-                    cmd?.Invoke(ki.Modifiers);
+                    //cmd?.Invoke(ki.Modifiers);
                     if (list != null) foreach (var h in list) h.Set();
                 }
                 catch (Exception ex)
@@ -124,6 +100,6 @@ namespace Universe.Coin.App
                 log($"Error executing <{key}>", ex);
             }
         }
-
+        
     }//class
 }

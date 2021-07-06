@@ -28,7 +28,7 @@ namespace Universe.Coin.App
             _evPausing = new(false);
             onOptionsUpdate += () => { if (!_set.Pausing) _evPausing.Set(); };
 
-            registerHotkey(ConsoleKey.F10, m =>
+            registerHotkey(ConsoleKey.F10, () =>
             {
                 info($"Pausing= {_set.Pausing = !_set.Pausing}");
                 if (_set.Pausing) _evPausing.Reset();

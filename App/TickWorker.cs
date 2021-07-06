@@ -33,7 +33,7 @@ namespace Universe.Coin.App
             updateClient();
             onOptionsUpdate += updateClient;
 
-            registerHotkey(ConsoleKey.F9, m => 
+            registerHotkey(ConsoleKey.F9, () => 
             {
                 _set.Pausing = !_set.Pausing;
                 _client.Pause(_set.Pausing);
@@ -45,11 +45,11 @@ namespace Universe.Coin.App
                 printParam();
             }
 
-            registerHotkey(ConsoleKey.Spacebar, m => printParam());
-            registerHotkey(ConsoleKey.F1, m => changeParam(-0.1m, true));
-            registerHotkey(ConsoleKey.F2, m => changeParam(+0.1m, true));
-            registerHotkey(ConsoleKey.F3, m => changeParam(-0.1m, false));
-            registerHotkey(ConsoleKey.F4, m => changeParam(+0.1m, false));
+            registerHotkey(ConsoleKey.Spacebar, () => printParam());
+            registerHotkey(ConsoleKey.F1, () => changeParam(-0.1m, true));
+            registerHotkey(ConsoleKey.F2, () => changeParam(+0.1m, true));
+            registerHotkey(ConsoleKey.F3, () => changeParam(-0.1m, false));
+            registerHotkey(ConsoleKey.F4, () => changeParam(+0.1m, false));
             void changeParam(decimal delta, bool buy)
             {
                 if(buy) _set.CalcParam.BuyMacd += delta;
@@ -63,7 +63,7 @@ namespace Universe.Coin.App
             }
 
             info("Press <F5> to excute run_Tick()");
-            registerHotkey(ConsoleKey.F5, m => run_Tick());
+            registerHotkey(ConsoleKey.F5, () => run_Tick());
         }
 
         protected override async Task doWork(CancellationToken stoppingToken)
