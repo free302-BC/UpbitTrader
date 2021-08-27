@@ -10,7 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Universe.AppBase;
-using Universe.AppBase.Logging;
+using Universe.Logging;
 using Universe.Coin.TradeLogic;
 using Universe.Coin.TradeLogic.Calc;
 using Universe.Coin.TradeLogic.Model;

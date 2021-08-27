@@ -19,7 +19,7 @@ using Microsoft.Extensions.Logging;
 using Universe.Coin.TradeLogic;
 using Universe.Coin.TradeLogic.Model;
 using Universe.Utility;
-using Universe.AppBase.Logging;
+using Universe.Logging;
 
 namespace Universe.Coin.TradeLogic
 {

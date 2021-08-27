@@ -7,7 +7,7 @@ using Universe.AppBase;
 using Microsoft.Extensions.Options;
 using System.Threading;
 using Microsoft.Extensions.Hosting;
-using Universe.AppBase.Logging;
+using Universe.Logging;
 
 namespace Universe.Coin.App
 {
