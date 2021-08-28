@@ -9,6 +9,7 @@ using System.Threading;
 using Microsoft.Extensions.Hosting;
 using Universe.Logging;
 
+
 namespace Universe.Coin.App
 {
     class Program : ProgramBase
@@ -18,23 +19,26 @@ namespace Universe.Coin.App
 
             #region ---- console key listener ----
 
-            AddService<IInputProvider, InputWorker>(
-                start: true,
+            AddWorker<IInputProvider, InputWorker>(
                 postInit: (sp, iw) =>
                 {
+                    var w = iw as InputWorker ?? throw new InvalidCastException();
                     //iw.AddAction(ConsoleKey.Escape, m => sp.GetRequiredService<IHost>().StopAsync().Wait()));
-                    iw.OnQuit += () => sp.GetRequiredService<IHost>().StopAsync().Wait();
-                    iw.QuitKey = ConsoleKey.Escape;
+                    w.OnQuit += () => sp.GetRequiredService<IHost>().StopAsync().Wait();
+                    w.QuitKey = ConsoleKey.Escape;
                 });
 
             #endregion
 
-            AddWorker<BackTestWorker, BackTestOptions>("backtest.json", "1");
-            //AddWorker<BackTestWorker, BackTestOptions>(workerId: "2");
-            //AddWorker<AutoTradingWorker, AutoTradingWorkerOptions>("autotrading.json");
+            //AddWorker<BackTestWorker>("1");
+            //AddWorkerOption<BackTestWorker, BackTestOptions>("backtest.json");
+            //AddWorker<BackTestWorker>(workerId: "2");
+            //AddWorker<AutoTradingWorker>();
+            //AddWorkerOption<AutoTradingWorker, AutoTradingWorkerOptions>("autotrading.json");
 
-            AddWorker<TickWorker, TickWorkerOptions>("tick.json", "Upbit");
-            //AddWorker<TickerWorker, TickerWorkerOptions>(workerId: "Binance");
+            AddWorker<TickWorker>("Upbit");
+            AddWorkerOption<TickWorker, TickWorkerOptions>("tick.json");
+            AddWorker<TickWorker>(workerId: "Binance");
 
             RunHost();
         }

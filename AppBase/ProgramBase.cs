@@ -15,23 +15,23 @@ using Universe.Logging;
 
 namespace Universe.AppBase
 {
-    using ServiceAction = Action<HostBuilderContext, IServiceCollection>;//action ConfigureServices
-    using ConfigAction = Action<IConfigurationBuilder>;//action ConfigureAppConfiguration
+    using ServiceAction = Action<HostBuilderContext, IServiceCollection>;//action in ConfigureServices
+    using ConfigAction = Action<IConfigurationBuilder>;//action in ConfigureAppConfiguration
     using WorkerAction = Action<IServiceProvider, CancellationToken>;//action start worker
 
+    /// <summary>
+    /// 
+    /// </summary>
     public class ProgramBase
     {
         static readonly Action<object?> log = Console.WriteLine;
         static readonly List<ServiceAction> _serviceActions;
         static readonly List<ConfigAction> _configActions;
-        static readonly List<WorkerAction> _workerActions;
 
         static ProgramBase()
         {
             _serviceActions = new();
             _configActions = new();
-            _workerActions = new();
-            
         }
 
         public static void RunHost()
@@ -45,9 +45,6 @@ namespace Universe.AppBase
                     .ContinueWith(
                         t => log($"{nameof(ProgramBase)}.{nameof(RunHost)}(): {t.Exception}"),
                         TaskContinuationOptions.OnlyOnFaulted);
-
-                //run worker
-                foreach (var action in _workerActions) action(host.Services, cts.Token);
 
                 host.WaitForShutdown();
             }
@@ -68,7 +65,7 @@ namespace Universe.AppBase
 
             builder.ConfigureServices((context, services) =>
             {
-                services.AddSingleton(cts);
+                //services.AddSingleton(cts);//TODO: 필요?
                 services.AddSimpleConsole();
                 foreach (var action in _serviceActions) action(context, services);
             });
@@ -80,84 +77,97 @@ namespace Universe.AppBase
         static Queue<string> _idQ = new();//등록된 id를 저장
 
         /// <summary>
-        /// 
+        /// BackgroundWorker를 옵션 및 설정파일과 함께 추가
         /// </summary>
         /// <typeparam name="W">service type</typeparam>
-        /// <typeparam name="S">option type</typeparam>
-        /// <param name="workerConfigFile"></param>
-        /// <param name="workerId"></param>
-        /// <param name="postInit">instance 생성후 수행할 액션</param>
-        /// <param name="lifeTime"></param>
-        static protected void AddWorker<W, S>(
-            string workerConfigFile = "",
+        /// <param name="workerId">같은 타입의 워커 인스턴스를 구별할 아이디</param>
+        /// <param name="postInit">instance 생성직후 수행할 액션</param>
+        static protected void AddWorker<W>(
             string workerId = "",
-            Action<IServiceProvider, W>? postInit = null,
-            ServiceLifetime lifeTime = ServiceLifetime.Singleton)
-            where W : WorkerBase<W, S>
-            where S : class, IWorkerOptions
+            Action<IServiceProvider, W>? postInit = null)
+            where W : BackgroundService
         {
-            //config            
-            if (!string.IsNullOrWhiteSpace(workerConfigFile))
-                _configActions.Add(cb => cb.AddJsonFile(workerConfigFile, false, true));
+            AddWorker<W, W>(workerId, postInit);
+        }
 
+        /// <summary>
+        /// 인터페이스 I를 구현하는 background worker W를 등록
+        /// </summary>
+        /// <typeparam name="I">interface</typeparam>
+        /// <typeparam name="W">implimenting class</typeparam>
+        /// <param name="postInit"></param>
+        static protected void AddWorker<I, W>(
+            string workerId = "",
+            Action<IServiceProvider, W>? postInit = null)
+            where I : class, IHostedService
+            where W : BackgroundService, I
+        {
             _serviceActions.Add((ctx, sc) =>
             {
                 _idQ.Enqueue(workerId);
+
                 W factory(IServiceProvider sp)
                 {
                     var w = ActivatorUtilities.CreateInstance<W>(sp, _idQ.Dequeue());
                     postInit?.Invoke(sp, w);
                     return w;
                 }
-                _ = lifeTime switch
-                {
-                    ServiceLifetime.Singleton => sc.AddSingleton(factory),
-                    ServiceLifetime.Scoped => sc.AddScoped(factory),
-                    _ => sc.AddTransient(factory)
-                };
-
-                //options
-                sc.AddOptions<S>(ctx.Configuration.GetSection(typeof(W).Name));
+                sc.AddSingleton<I>(factory);
+                sc.AddHostedService<I>(sp => sp.GetRequiredService<I>());
             });
-
-            //worker
-            _workerActions.Add((sp, token) => ((IHostedService)sp.GetRequiredService<W>()).StartAsync(token));
         }
 
-        static protected void AddService<S, W>(bool start, Action<IServiceProvider, W>? postInit = null)
-            where S : class
-            where W : class, S
+        /// <summary>
+        /// 인터페이스 I를 구현하는 service W를 등록
+        /// </summary>
+        /// <typeparam name="I">interface</typeparam>
+        /// <typeparam name="W">class implimenting I</typeparam>
+        /// <param name="instance"></param>
+        /// <param name="factory"></param>
+        /// <param name="life"></param>
+        static protected void AddService<I, W>(
+            W? instance = default,
+            Func<IServiceProvider, W>? factory = null,
+            ServiceLifetime life = ServiceLifetime.Singleton)
+            where I : class
+            where W : class, I
         {
             _serviceActions.Add((ctx, sc) =>
             {
-                W factory(IServiceProvider sp)
+                if (instance != null) sc.AddSingleton(instance);
+                else if (factory != null)
                 {
-                    var w = ActivatorUtilities.CreateInstance<W>(sp);
-                    postInit?.Invoke(sp, w);
-                    return w;
+                    _ = life switch
+                    {
+                        ServiceLifetime.Singleton => sc.AddScoped(factory),
+                        ServiceLifetime.Scoped => sc.AddScoped(factory),
+                        ServiceLifetime.Transient => sc.AddTransient(factory),
+                        _ => throw new ArgumentException("Inconsistent parameters")
+                    };
                 }
-                sc.AddSingleton<S>(factory);
             });
-
-            //worker
-            if (start)
-                _workerActions.Add((sp, token) => ((IHostedService)sp.GetRequiredService<S>()).StartAsync(token));
         }
 
-        static protected void AddService<S, W>(bool start, W instance)
-            where S : class
-            where W : class, S
+
+        /// <summary>
+        /// W에 대한 옵션 O와 설정파일을 등록
+        /// </summary>
+        /// <typeparam name="W"></typeparam>
+        /// <typeparam name="O"></typeparam>
+        /// <param name="workerConfigFile">설정 json 파일</param>
+        static protected void AddWorkerOption<W, O>(
+            string workerConfigFile = "")
+            where W : WorkerBase<W, O>
+            where O : class, IWorkerOptions
         {
-            _serviceActions.Add((ctx, sc) =>
-            {
-                sc.AddSingleton<S>(instance);
-            });
+            //config            
+            if (!string.IsNullOrWhiteSpace(workerConfigFile))
+                _configActions.Add(cb => cb.AddJsonFile(workerConfigFile, false, true));
 
-            //worker
-            if (start)
-                _workerActions.Add((sp, token) => ((IHostedService)sp.GetRequiredService<S>()).StartAsync(token));
+            //options
+            _serviceActions.Add((ctx, sc)
+                => sc.AddOptions<O>(ctx.Configuration.GetSection(typeof(W).Name)));
         }
-
 
     }//class
 }

@@ -25,15 +25,14 @@ namespace UnitTester
     {
         [Fact] public static void Test()//execute in console 'Tester' app
         {
-            AddService<IInputProvider, InputWorker>(
-                start: true,
+            AddWorker<IInputProvider, InputWorker>(
                 postInit: (sp, iw) =>
                 {
                     //iw.AddAction(ConsoleKey.Escape, m => sp.GetRequiredService<IHost>().StopAsync().Wait()));
                     iw.OnQuit += () => sp.GetRequiredService<IHost>().StopAsync().Wait();
                     iw.QuitKey = ConsoleKey.Escape;
                 });
-            AddWorker<TestWorker, TradeWorkerOptions>();
+            AddWorker<TestWorker>();
             RunHost();
         }
 

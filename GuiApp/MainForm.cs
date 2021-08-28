@@ -65,5 +65,16 @@ namespace Universe.Coin.AppGui
             MessageBox.Show($"{msg}\r\n{ex?.Message}");
         }
 
+        public Task StartAsync(CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task StopAsync(CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+
     }//class
 }

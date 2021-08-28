@@ -44,7 +44,7 @@ namespace UnitTester
         [Fact]
         public void Run()
         {
-            AddWorker<TestWorker, TradeWorkerOptions>();
+            AddWorker<TestWorker>();
             RunHost();
         }
 

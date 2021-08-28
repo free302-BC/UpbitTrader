@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.Hosting;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using Universe.Utility;
@@ -7,7 +8,7 @@ namespace Universe.Coin.App
 {
     using SignalDic = SortedMultiDictionary<ConsoleKey, ConsoleModifiers, List<EventWaitHandle>>;
 
-    public interface IInputProvider
+    public interface IInputProvider : IHostedService
     {
         protected abstract SignalDic _signals { get; }
         protected object _lock { get; }

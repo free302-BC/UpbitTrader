@@ -29,7 +29,7 @@ namespace Universe.Coin.App
         SignalDic IInputProvider._signals => _signals;
         object IInputProvider._lock => _lock;
 
-        public InputWorker(IServiceProvider sp) : base(sp, "")
+        public InputWorker(IServiceProvider sp, string id = "") : base(sp, id)
         {
             //_actions = new();
             _signals = new();

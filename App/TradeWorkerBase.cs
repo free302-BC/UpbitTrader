@@ -38,7 +38,7 @@ namespace Universe.Coin.App
         protected TradeWorkerBase(IServiceProvider sp, string id = "") : base(sp, id)
         {
             _events = new();
-            _cmdProvider = sp.GetRequiredService<IInputProvider>();
+            _cmdProvider = sp.GetRequiredService<IInputProvider>();            
 
             //TODO: 필요?
             _jsonOptions = new JsonSerializerOptions().Init();
