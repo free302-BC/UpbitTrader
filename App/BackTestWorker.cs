@@ -89,6 +89,9 @@ namespace Universe.Coin.App
         readonly ManualResetEvent _ev;
         protected override Task doWork(CancellationToken stoppingToken)
         {
+            //event proxy 수행
+            _ = base.doWork(stoppingToken);
+
             while (!stoppingToken.IsCancellationRequested)
             {
                 if (!_set.DoFindK) 

@@ -38,6 +38,9 @@ namespace Universe.Coin.App
 
         protected override Task doWork(CancellationToken stoppingToken)
         {
+            //event proxy 수행
+            _ = base.doWork(stoppingToken);
+
             //market(_client);
             //account(_client);
             //ticker(_client);

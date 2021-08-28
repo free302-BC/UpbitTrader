@@ -1,5 +1,9 @@
 --------- [ 미완료 ] ---------
 
++ InputWorker: 구독자의 코드를 실행하면 안됨
+  --> ActionDic 제거, SignalDic 사용
+  --> EventWaitHandle.Set()만 수행
+
 + 체결강도 알고리즘 추가
  - window: 갯수 or 시간? 
 
@@ -25,7 +29,7 @@
 
  --------- [ 완료 ] ---------
 
-+ InputWorker: 구독자의 코드를 실행하면 안됨 --> 별도 task에서 실행
+
 + LoggerMessage 기반 로깅 시스템 구축
 + WorkerBase
  - IHostedService 대신 BackgroundService 상속

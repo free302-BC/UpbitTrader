@@ -30,7 +30,10 @@ namespace Universe.Coin.App
         readonly IInputProvider _cmdProvider;
         protected readonly IClient _client;
         protected readonly JsonSerializerOptions _jsonOptions;
+
+        //event와 action 연결 --> event 발생시 action 호출
         readonly OrderedDic<AutoResetEvent, Action> _events;
+        readonly object _lock = new object();
 
         protected TradeWorkerBase(IServiceProvider sp, string id = "") : base(sp, id)
         {
@@ -44,6 +47,8 @@ namespace Universe.Coin.App
             var logger = _sp.GetRequiredService<ILogger<IClient>>();
             _client = UvLoader.Create<IClient>(_set.AssemblyFile, _set.ClientFullName,
                 _set.GetAccessKey(), _set.GetSecretKey(), logger);
+
+            //TODO: 
         }
 
         public override void Dispose()
@@ -52,28 +57,41 @@ namespace Universe.Coin.App
             base.Dispose();
         }
 
+        /// <summary>
+        /// event proxy : 쓰레드간 이벤트 중계 
+        ///  -> 이벤트 핸들러를 소스에서 수행하지않고 구독 쓰레드에서 수행
+        /// 자식클래스의 doWork에서 반드시 먼저 호출해야 함.
+        /// </summary>
         protected override Task doWork(CancellationToken stoppingToken)
         {
-            var events = _events.Keys.ToArray();
-            while (!stoppingToken.IsCancellationRequested)
+            return Task.Run(() =>
             {
-                var index = WaitHandle.WaitAny(events);
-                _events[index]?.Invoke();
-            }
-            return Task.CompletedTask;
+                Thread.CurrentThread.Name = $"{Id}:Event";
+                info($"<{Thread.CurrentThread.Name}> Executing...");
+                var events = _events.Keys.ToArray();
+                while (!stoppingToken.IsCancellationRequested)
+                {
+                    var index = WaitHandle.WaitAny(events);
+                    _events[index]?.Invoke();
+                }
+            }, stoppingToken);
         }
 
         protected void registerHotkey(ConsoleKey key, Action handler, ConsoleModifiers mod = 0)
         {
             var @event = new AutoResetEvent(false);
             _cmdProvider.AddSignal(key, @event, mod);
-            _events.Add(@event, handler);
+
+            //event 등록
+            lock (_lock)  _events.Add(@event, handler);
         }
         protected void unregisterHotkey(ConsoleKey key, Action handler, ConsoleModifiers mod = 0)
         {
-            var @event = _events.Where(p => p.Value == handler).FirstOrDefault().Key;
+            var @event = _events.Where(p => p.Value == handler).First().Key;
             _cmdProvider.RemoveSignal(key, @event, mod);
-            _events.Remove(@event);
+
+            //event 해지
+            lock (_lock) _events.Remove(@event);
         }
 
 

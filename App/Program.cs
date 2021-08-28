@@ -29,7 +29,7 @@ namespace Universe.Coin.App
 
             #endregion
 
-            //AddWorker<BackTestWorker, BackTestOptions>("backtest.json", "1");
+            AddWorker<BackTestWorker, BackTestOptions>("backtest.json", "1");
             //AddWorker<BackTestWorker, BackTestOptions>(workerId: "2");
             //AddWorker<AutoTradingWorker, AutoTradingWorkerOptions>("autotrading.json");
 

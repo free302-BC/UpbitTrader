@@ -68,24 +68,22 @@ namespace Universe.Coin.App
 
         protected override async Task doWork(CancellationToken stoppingToken)
         {
-            await runWsTicker();
-
-            async Task runWsTicker()
+            try
             {
-                try
-                {
-                    _client.WsTick += onWsTick;
+                //event proxy 수행
+                _ = base.doWork(stoppingToken);
 
-                    _client.AddTick(CurrencyId.KRW, CoinId.BTC);
-                    _headerLine = TickModel.Empty.CalcHeader;
+                _client.WsTick += onWsTick;
 
-                    await _client.ConnectWsAsync(stoppingToken);
-                }
-                finally
-                {
-                    _client.WsTick -= onWsTick;
-                }
-            }            
+                _client.AddTick(CurrencyId.KRW, CoinId.BTC);
+                _headerLine = TickModel.Empty.CalcHeader;
+
+                await _client.ConnectWsAsync(stoppingToken);
+            }
+            finally
+            {
+                _client.WsTick -= onWsTick;
+            }
         }
 
         void onWsTick(TickModel model)
